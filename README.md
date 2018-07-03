@@ -20,5 +20,5 @@ git clone git@github.com:ebi-gene-expression-group/bioconda-recipes.git
 git checkout r-seurat-workflow
 cd bioconda-recipes/recipes/r-seurat-workflow
 conda build .
-conda install --use-local r-seurat-workflow
+conda install --force --use-local r-seurat-workflow
 ```
