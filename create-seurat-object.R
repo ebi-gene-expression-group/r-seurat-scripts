@@ -29,12 +29,12 @@ option_list = list(
   )
 )
 
-opt <- rsw_parse_args(option_list, mandatory = c('data_dir', 'object_file'))
+opt <- rsw_parse_args(option_list, mandatory = c('input_object_file', 'output_object_file'))
 
 # Check parameter values
 
-if ( ! dir.exists(opt$data_dir)){
-  stop((paste('Directory', opt$data_dir, 'does not exist')))
+if ( ! file.exists(opt$input_object_file)){
+  stop((paste('Directory', opt$input_object_file, 'does not exist')))
 }
 
 # Now we're hapy with the arguments, load Seurat and do the work
@@ -43,7 +43,7 @@ suppressPackageStartupMessages(require(Seurat))
 
 # Input from serialized R object
 
-sc_matrix <- readRDS(opt$input_object_file, file = opt$input_object_file)
+sc_matrix <- readRDS(opt$input_object_file)
 
 # Create the Seurat object
 
