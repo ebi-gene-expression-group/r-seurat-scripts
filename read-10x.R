@@ -21,11 +21,11 @@ option_list = list(
     help = "Directory containing the matrix.mtx, genes.tsv, and barcodes.tsv files provided by 10X. A vector or named vector can be given in order to load several data directories. If a named vector is given, the cell barcode names will be prefixed with the name."
   ),
   make_option(
-    c("-o", "--object-file"),
+    c("-o", "--output-object-file"),
     action = "store",
     default = NA,
     type = 'character',
-    help = "File name in which to store serialized R matrix object. File will have extension as per the object type, for example '.dgTMatrix'"
+    help = "File name in which to store serialized R matrix object."
   )
 )
 
@@ -47,4 +47,4 @@ sc_matrix <- Read10X(data.dir = opt$data_dir)
 
 # Output to a serialized R object
 
-saveRDS(sc_matrix, file = paste0(opt$object_file, '.', as.character(class(sc_matrix))))
+saveRDS(sc_matrix, file = opt$object_file)
