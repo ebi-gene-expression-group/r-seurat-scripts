@@ -8,7 +8,7 @@ suppressPackageStartupMessages(require(optparse))
 
 ca <- commandArgs()
 script_dir <- dirname(sub('--file=', '', ca[grep('--file', ca)]))
-source(file.path(script_dir, 'accessory.R'))
+source(file.path(script_dir, 'r-seurat-workflow-accessory.R'))
 
 # parse options
 
