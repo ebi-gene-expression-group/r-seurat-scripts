@@ -29,7 +29,7 @@ option_list = list(
   )
 )
 
-opt <- rsw_parse_args(option_list, mandatory = c('data_dir', 'object_file'))
+opt <- rsw_parse_args(option_list, mandatory = c('data_dir', 'output_object_file'))
 
 # Check parameter values
 
@@ -47,4 +47,4 @@ sc_matrix <- Read10X(data.dir = opt$data_dir)
 
 # Output to a serialized R object
 
-saveRDS(sc_matrix, file = opt$object_file)
+saveRDS(sc_matrix, file = opt$output_object_file)
