@@ -5,8 +5,9 @@ test_data_archive=`basename $test_data_url`
 test_working_dir='post_install_tests'
 
 mkdir -p $test_working_dir
-cd $test_working_dir
 mkdir -p $test_working_dir/outputs
+
+cd $test_working_dir
 
 ################################################################################
 # Fetch test data 
