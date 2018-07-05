@@ -54,7 +54,7 @@ function report_status() {
     script=$1
     status=$2
 
-    if [ $status != 0 ]; then
+    if [ $status -ne 0 ]; then
         echo "FAIL: $script"
         exit 1
     else
@@ -87,7 +87,7 @@ report_status create-seurat-object.R $?
 # Run filter-cells.R
 
 filter-cells.R -i $raw_seurat_object -s nGene,nUMI -l 500,1000 -o $filtered_seurat_object
-report_status filter-cells.R
+report_status filter-cells.R $?
 
 ################################################################################
 # Finish up
