@@ -62,7 +62,7 @@ opt <- rsw_parse_args(option_list, mandatory = c('input_object_file', 'subset_na
 # Check parameter values
 
 if ( ! file.exists(opt$input_object_file)){
-  stop((paste('Directory', opt$input_object_file, 'does not exist')))
+  stop((paste('File', opt$input_object_file, 'does not exist')))
 }
 
 # Input from serialized R object
