@@ -97,6 +97,8 @@ raw_matrix_object="$output_dir/raw_matrix.rds"
 raw_seurat_object="$output_dir/raw_seurat.rds"
 filtered_seurat_object="$output_dir/filtered_seurat.rds"
 normalised_seurat_object="$output_dir/normalised_seurat.rds"
+variable_genes_seurat_object="$output_dir/variable_genes_seurat.rds"
+variable_genes_list="$output_dir/filtered_genes.txt"
 
 ## Test parameters- would form config file in real workflow
 
@@ -110,6 +112,15 @@ min_umi=1000
 assay_type='RNA'
 normalisation_method='LogNormalize'
 scale_factor=10000
+
+# Find variable genes. See ?FindVariableGenes
+
+mean_function='ExpMean'
+dispersion_function='LogVMR'
+fvg_x_low_cutoff='0.1'
+fvg_x_high_cutoff='8'
+fvg_y_low_cutoff='1'
+fvg_y_high_cutoff='Inf'
 
 ################################################################################
 # Test individual scripts
@@ -135,6 +146,10 @@ run_command "filter-cells.R -i $raw_seurat_object -s nGene,nUMI -l $min_genes,$m
 # Run normalise-date.R
 
 run_command "normalise-data.R -i $filtered_seurat_object -a $assay_type -n $normalisation_method -s $scale_factor -o $normalised_seurat_object" $normalised_seurat_object
+
+# Run find-variable-genes.R
+
+run_command "find-variable-genes.R -i $normalised_seurat_object -m $mean_function -d $dispersion_function -l $fvg_x_low_cutoff -h $fvg_x_high_cutoff -y $fvg_y_low_cutoff -z $fvg_y_high_cutoff -o $variable_genes_seurat_object -t $variable_genes_list" $variable_genes_list
 
 ################################################################################
 # Finish up
