@@ -17,8 +17,8 @@ Now you should be able to install using the following command:
 ```
 cd <directory where you do your Git clones>
 git clone git@github.com:ebi-gene-expression-group/bioconda-recipes.git
-git checkout r-seurat-workflow
-cd bioconda-recipes/recipes/r-seurat-workflow
+git checkout r-seurat-scripts
+cd bioconda-recipes/recipes/r-seurat-scripts
 conda build .
-conda install --force --use-local r-seurat-workflow
+conda install --force --use-local r-seurat-scripts
 ```
