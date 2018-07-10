@@ -106,6 +106,10 @@ variable_genes_seurat_object="$output_dir/variable_genes_seurat.rds"
 variable_genes_list="$output_dir/filtered_genes.txt"
 test_genes="$output_dir/random_genes.txt"
 scaled_seurat_object="$output_dir/scaled_seurat.rds"
+pca_seurat_object="$output_dir/pca_seurat.rds"
+pca_embeddings_file="$output_dir/pca_embeddings.csv"
+pca_loadings_file="$output_dir/pca_loadings.csv"
+pca_stdev_file="$output_dir/pca_stdev.txt"
 
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.
@@ -140,6 +144,10 @@ scale_max='10'
 block_size='1000'
 min_cells_to_block='1000'
 check_for_norm='TRUE'
+
+# Run PCA
+pcs_compute=50
+use_imputed='FALSE'
 
 ################################################################################
 # Test individual scripts
@@ -177,6 +185,10 @@ run_command "get-random-genes.R $normalised_seurat_object $test_genes 10000" $te
 # Run scale-data.R
 
 run_command "scale-data.R -i $variable_genes_seurat_object -e $test_genes -v $vars_to_regress -m $model_use -u $use_umi -s $do_scale -c $do_center -x $scale_max -b $block_size -d $min_cells_to_block -a $assay_type -n $check_for_norm -o $scaled_seurat_object" $scaled_seurat_object
+
+# Run run-pca.R
+
+run_command "run-pca.R -i $scaled_seurat_object -e $test_genes -p $pcs_compute -m $use_imputed -o $pca_seurat_object -b $pca_embeddings_file -l $pca_loadings_file -s $pca_stdev_file"  $pca_seurat_object
 
 ################################################################################
 # Finish up
