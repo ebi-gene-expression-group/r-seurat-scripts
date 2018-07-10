@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# This is a test script designed to test that everything works in the various
+# accessory scripts in this package. Parameters used have absolutely NO
+# relation to best practice and this should not be taken as a sensible
+# parameterisation for a workflow.
+
 function usage {
     echo "usage: r-seurat-workflow-post-install-tests.sh [action] [use_existing_outputs]"
     echo "  - action: what action to take, 'test' or 'clean'"
@@ -99,8 +104,11 @@ filtered_seurat_object="$output_dir/filtered_seurat.rds"
 normalised_seurat_object="$output_dir/normalised_seurat.rds"
 variable_genes_seurat_object="$output_dir/variable_genes_seurat.rds"
 variable_genes_list="$output_dir/filtered_genes.txt"
+test_genes="$output_dir/random_genes.txt"
+scaled_seurat_object="$output_dir/scaled_seurat.rds"
 
-## Test parameters- would form config file in real workflow
+## Test parameters- would form config file in real workflow. DO NOT use these
+## as default values without being sure what they mean.
 
 # Normalisation. See Seurat ?FilterCells
 
@@ -121,6 +129,17 @@ fvg_x_low_cutoff='0.1'
 fvg_x_high_cutoff='8'
 fvg_y_low_cutoff='1'
 fvg_y_high_cutoff='Inf'
+
+# Scale and center the data. See ?ScaleData
+vars_to_regress='nUMI'
+model_use='linear'
+use_umi='TRUE'
+do_scale='TRUE'
+do_center='TRUE'
+scale_max='10'
+block_size='1000'
+min_cells_to_block='1000'
+check_for_norm='TRUE'
 
 ################################################################################
 # Test individual scripts
@@ -150,6 +169,14 @@ run_command "normalise-data.R -i $filtered_seurat_object -a $assay_type -n $norm
 # Run find-variable-genes.R
 
 run_command "find-variable-genes.R -i $normalised_seurat_object -m $mean_function -d $dispersion_function -l $fvg_x_low_cutoff -j $fvg_x_high_cutoff -y $fvg_y_low_cutoff -z $fvg_y_high_cutoff -o $variable_genes_seurat_object -t $variable_genes_list" $variable_genes_list
+
+# Get a random set of genes to use in testing argments to scale-data.R
+
+run_command "get-random-genes.R $normalised_seurat_object $test_genes 10000" $test_genes
+
+# Run scale-data.R
+
+run_command "scale-data.R -i $variable_genes_seurat_object -e $test_genes -v $vars_to_regress -m $model_use -u $use_umi -s $do_scale -c $do_center -x $scale_max -b $block_size -d $min_cells_to_block -a $assay_type -n $check_for_norm -o $scaled_seurat_object" $scaled_seurat_object
 
 ################################################################################
 # Finish up
