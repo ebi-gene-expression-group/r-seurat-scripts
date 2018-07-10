@@ -132,7 +132,7 @@ suppressPackageStartupMessages(require(Seurat))
 
 seurat_object <- readRDS(opt$input_object_file)
 
-scaled_seurat_object <- ScaleData(seurat_object, genes.use = genes_use, vars.to.regress = opt$vars_to_regress, model.use = opt$model_use, use.umi = opt$use_umi, do.scale = opt$do_scale, do.center = opt$do_center, scale.max = opt$scale_max, block.size = opt$block_size, min.cells.to.block = opt$min_cells_to_block, assay.type = opt$assay_type, check.for.norm = opt$check_for_norm)
+scaled_seurat_object <- ScaleData(seurat_object, genes.use = genes_use, vars.to.regress = opt$vars_to_regress, model.use = opt$model_use, use.umi = opt$use_umi, do.scale = opt$do_scale, do.center = opt$do_center, scale.max = opt$scale_max, block.size = opt$block_size, min.cells.to.block = opt$min_cells_to_block, assay.type = opt$assay_type, check.for.norm = opt$check_for_norm, display.progress = FALSE)
 
 # Output to a serialized R object
 
