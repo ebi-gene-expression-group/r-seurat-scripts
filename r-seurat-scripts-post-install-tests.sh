@@ -111,6 +111,8 @@ pca_embeddings_file="$output_dir/pca_embeddings.csv"
 pca_loadings_file="$output_dir/pca_loadings.csv"
 pca_stdev_file="$output_dir/pca_stdev.txt"
 pca_image_file="$output_dir/pcatest.png"
+cluster_seurat_object="$output_dir/cluster_seurat.rds"
+cluster_text_file="$output_dir/clusters.txt"
 
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.
@@ -161,6 +163,14 @@ pca_plot_title='Test PCA plot'
 pca_png_width=1000
 pca_png_height=1000
 
+# Find clusters
+reduction_type='pca'
+dims_use='1,2,3,4,5,6,7,8,9,10'
+k_param=30
+resolution=0.8
+cluster_algorithm=1
+cluster_tmp_file_location='/tmp'
+
 ################################################################################
 # Test individual scripts
 ################################################################################
@@ -205,6 +215,10 @@ run_command "run-pca.R -i $scaled_seurat_object -e $test_genes -p $pcs_compute -
 # Plot the PCA
 
 run_command "dim-plot.r -i $pca_seurat_object -r pca -a $pca_dim_one -b $pca_dim_two -p $pt_size -l $label_size -d $do_label -f $group_by -t '$pca_plot_title' -w $pca_png_width -j $pca_png_height -o $pca_image_file" $pca_image_file
+
+# Generate clusters
+
+run_command "find-clusters.r -i $pca_seurat_object -e $test_genes -u $reduction_type -d $dims_use -k $k_param -r $resolution -a $cluster_algorithm -m $cluster_tmp_file_location -o $cluster_seurat_object -t $cluster_text_file" $cluster_text_file
 
 ################################################################################
 # Finish up
