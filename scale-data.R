@@ -116,7 +116,7 @@ if ( ! file.exists(opt$input_object_file)){
 
 if (! is.null(opt$genes_use)){
   if (! file.exists(opt$genes_use)){
-    stop((paste('Supplied genes file', opt$genes_file, 'does not exist')))
+    stop((paste('Supplied genes file', opt$genes_use, 'does not exist')))
   }else{
     genes_use <- readLines(opt$genes_use)
   }
