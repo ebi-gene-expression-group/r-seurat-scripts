@@ -110,6 +110,7 @@ pca_seurat_object="$output_dir/pca_seurat.rds"
 pca_embeddings_file="$output_dir/pca_embeddings.csv"
 pca_loadings_file="$output_dir/pca_loadings.csv"
 pca_stdev_file="$output_dir/pca_stdev.txt"
+pca_image_file="$output_dir/pcatest.png"
 
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.
@@ -148,6 +149,17 @@ check_for_norm='TRUE'
 # Run PCA
 pcs_compute=50
 use_imputed='FALSE'
+
+# Plot PCA
+pca_dim_one=1
+pca_dim_two=2
+pt_size=1
+label_size=4
+do_label='FALSE'
+group_by='ident'
+pca_plot_title='Test PCA plot'
+pca_png_width=1000
+pca_png_height=1000
 
 ################################################################################
 # Test individual scripts
@@ -189,6 +201,10 @@ run_command "scale-data.R -i $variable_genes_seurat_object -e $test_genes -v $va
 # Run run-pca.R
 
 run_command "run-pca.R -i $scaled_seurat_object -e $test_genes -p $pcs_compute -m $use_imputed -o $pca_seurat_object -b $pca_embeddings_file -l $pca_loadings_file -s $pca_stdev_file"  $pca_seurat_object
+
+# Plot the PCA
+
+run_command "dim-plot.r -i $pca_seurat_object -r pca -a $pca_dim_one -b $pca_dim_two -p $pt_size -l $label_size -d $do_label -f $group_by -t '$pca_plot_title' -w $pca_png_width -j $pca_png_height -o $pca_image_file" $pca_image_file
 
 ################################################################################
 # Finish up
