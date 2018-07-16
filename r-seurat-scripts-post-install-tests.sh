@@ -115,6 +115,7 @@ cluster_seurat_object="$output_dir/cluster_seurat.rds"
 cluster_text_file="$output_dir/clusters.txt"
 tsne_seurat_object="$output_dir/tsne_seurat.rds"
 tsne_embeddings_file="$output_dir/tsne_embeddings.csv"
+marker_text_file="$output_dir/markers.csv"
 
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.
@@ -176,6 +177,15 @@ cluster_tmp_file_location='/tmp'
 # t-SNE
 tsne_do_fast='TRUE'
 
+# Marker detection
+logfc_threshold=0.25
+marker_min_pct=0.1
+marker_only_pos='FALSE'
+marker_test_use='wilcox'
+marker_max_cells_per_ident='Inf'
+marker_min_cells_gene=3
+marker_min_cells_group=3
+
 ################################################################################
 # Test individual scripts
 ################################################################################
@@ -228,6 +238,10 @@ run_command "find-clusters.r -i $pca_seurat_object -e $test_genes -u $reduction_
 # Run t-SNE
 
 run_command "run-tsne.r -i $pca_seurat_object -r $reduction_type -d $dims_use -e NULL -f $tsne_do_fast -o $tsne_seurat_object -b $tsne_embeddings_file" $tsne_seurat_object
+
+# Run marker detection
+
+run_command "find-markers.R -i $cluster_seurat_object -e NULL -l $logfc_threshold -m $marker_min_pct -p $marker_only_pos -t $marker_test_use -x $marker_max_cells_per_ident -c $marker_min_cells_gene -d $marker_min_cells_group -o $marker_text_file" $marker_text_file
 
 ################################################################################
 # Finish up
