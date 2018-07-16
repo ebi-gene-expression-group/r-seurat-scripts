@@ -113,6 +113,8 @@ pca_stdev_file="$output_dir/pca_stdev.txt"
 pca_image_file="$output_dir/pcatest.png"
 cluster_seurat_object="$output_dir/cluster_seurat.rds"
 cluster_text_file="$output_dir/clusters.txt"
+tsne_seurat_object="$output_dir/tsne_seurat.rds"
+tsne_embeddings_file="$output_dir/tsne_embeddings.csv"
 
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.
@@ -171,6 +173,9 @@ resolution=0.8
 cluster_algorithm=1
 cluster_tmp_file_location='/tmp'
 
+# t-SNE
+tsne_do_fast='TRUE'
+
 ################################################################################
 # Test individual scripts
 ################################################################################
@@ -219,6 +224,10 @@ run_command "dim-plot.r -i $pca_seurat_object -r pca -a $pca_dim_one -b $pca_dim
 # Generate clusters
 
 run_command "find-clusters.r -i $pca_seurat_object -e $test_genes -u $reduction_type -d $dims_use -k $k_param -r $resolution -a $cluster_algorithm -m $cluster_tmp_file_location -o $cluster_seurat_object -t $cluster_text_file" $cluster_text_file
+
+# Run t-SNE
+
+run_command "run-tsne.r -i $pca_seurat_object -r $reduction_type -d $dims_use -e NULL -f $tsne_do_fast -o $tsne_seurat_object -b $tsne_embeddings_file" $tsne_seurat_object
 
 ################################################################################
 # Finish up
