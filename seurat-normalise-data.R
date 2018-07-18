@@ -65,7 +65,7 @@ suppressPackageStartupMessages(require(Seurat))
 # Input from serialized R object
 
 seurat_object <- readRDS(opt$input_object_file)
-normalised_seurat_object <- NormalizeData(seurat_object, assay.type = opt$assay_type, normalization.method = opt$normalization_method, scale.factor = opt$scale_factor)
+normalised_seurat_object <- NormalizeData(seurat_object, assay.type = opt$assay_type, normalization.method = opt$normalization_method, scale.factor = opt$scale_factor, display.progress = FALSE)
 
 # Output to a serialized R object
 
