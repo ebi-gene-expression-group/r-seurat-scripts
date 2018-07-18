@@ -4,11 +4,9 @@
 
 suppressPackageStartupMessages(require(optparse))
 
-# Source common functions
+# Load common functions
 
-ca <- commandArgs()
-script_dir <- dirname(sub('--file=', '', ca[grep('--file', ca)]))
-source(file.path(script_dir, 'r-seurat-scripts-accessory.R'))
+suppressPackageStartupMessages(require(workflowscriptscommon))
 
 # parse options
 
@@ -106,7 +104,7 @@ option_list = list(
   )
 )
 
-opt <- rsw_parse_args(option_list, mandatory = c('input_object_file', 'output_image_file'))
+opt <- wsc_parse_args(option_list, mandatory = c('input_object_file', 'output_image_file'))
 
 # Check parameter values
 
