@@ -197,51 +197,51 @@ run_command "tar -xvzf $test_data_archive --strip-components 2 -C test_data" $ra
 
 # Run read-10x.R
 
-run_command "read-10x.R -d test_data -o $raw_matrix_object" $raw_matrix_object
+run_command "seurat-read-10x.R -d test_data -o $raw_matrix_object" $raw_matrix_object
 
 # Run create-seurat-object.R
 
-run_command "create-seurat-object.R -i $raw_matrix_object -o $raw_seurat_object" $raw_seurat_object
+run_command "seurat-create-seurat-object.R -i $raw_matrix_object -o $raw_seurat_object" $raw_seurat_object
 
 # Run filter-cells.R
 
-run_command "filter-cells.R -i $raw_seurat_object -s nGene,nUMI -l $min_genes,$min_umi -o $filtered_seurat_object" $filtered_seurat_object
+run_command "seurat-filter-cells.R -i $raw_seurat_object -s nGene,nUMI -l $min_genes,$min_umi -o $filtered_seurat_object" $filtered_seurat_object
 
 # Run normalise-date.R
 
-run_command "normalise-data.R -i $filtered_seurat_object -a $assay_type -n $normalisation_method -s $scale_factor -o $normalised_seurat_object" $normalised_seurat_object
+run_command "seurat-normalise-data.R -i $filtered_seurat_object -a $assay_type -n $normalisation_method -s $scale_factor -o $normalised_seurat_object" $normalised_seurat_object
 
 # Run find-variable-genes.R
 
-run_command "find-variable-genes.R -i $normalised_seurat_object -m $mean_function -d $dispersion_function -l $fvg_x_low_cutoff -j $fvg_x_high_cutoff -y $fvg_y_low_cutoff -z $fvg_y_high_cutoff -o $variable_genes_seurat_object -t $variable_genes_list" $variable_genes_list
+run_command "seurat-find-variable-genes.R -i $normalised_seurat_object -m $mean_function -d $dispersion_function -l $fvg_x_low_cutoff -j $fvg_x_high_cutoff -y $fvg_y_low_cutoff -z $fvg_y_high_cutoff -o $variable_genes_seurat_object -t $variable_genes_list" $variable_genes_list
 
 # Get a random set of genes to use in testing argments to scale-data.R
 
-run_command "get-random-genes.R $normalised_seurat_object $test_genes 10000" $test_genes
+run_command "seurat-get-random-genes.R $normalised_seurat_object $test_genes 10000" $test_genes
 
 # Run scale-data.R
 
-run_command "scale-data.R -i $variable_genes_seurat_object -e $test_genes -v $vars_to_regress -m $model_use -u $use_umi -s $do_scale -c $do_center -x $scale_max -b $block_size -d $min_cells_to_block -a $assay_type -n $check_for_norm -o $scaled_seurat_object" $scaled_seurat_object
+run_command "seurat-scale-data.R -i $variable_genes_seurat_object -e $test_genes -v $vars_to_regress -m $model_use -u $use_umi -s $do_scale -c $do_center -x $scale_max -b $block_size -d $min_cells_to_block -a $assay_type -n $check_for_norm -o $scaled_seurat_object" $scaled_seurat_object
 
 # Run run-pca.R
 
-run_command "run-pca.R -i $scaled_seurat_object -e $test_genes -p $pcs_compute -m $use_imputed -o $pca_seurat_object -b $pca_embeddings_file -l $pca_loadings_file -s $pca_stdev_file"  $pca_seurat_object
+run_command "seurat-run-pca.R -i $scaled_seurat_object -e $test_genes -p $pcs_compute -m $use_imputed -o $pca_seurat_object -b $pca_embeddings_file -l $pca_loadings_file -s $pca_stdev_file"  $pca_seurat_object
 
 # Plot the PCA
 
-run_command "dim-plot.r -i $pca_seurat_object -r pca -a $pca_dim_one -b $pca_dim_two -p $pt_size -l $label_size -d $do_label -f $group_by -t '$pca_plot_title' -w $pca_png_width -j $pca_png_height -o $pca_image_file" $pca_image_file
+run_command "seurat-dim-plot.r -i $pca_seurat_object -r pca -a $pca_dim_one -b $pca_dim_two -p $pt_size -l $label_size -d $do_label -f $group_by -t '$pca_plot_title' -w $pca_png_width -j $pca_png_height -o $pca_image_file" $pca_image_file
 
 # Generate clusters
 
-run_command "find-clusters.r -i $pca_seurat_object -e $test_genes -u $reduction_type -d $dims_use -k $k_param -r $resolution -a $cluster_algorithm -m $cluster_tmp_file_location -o $cluster_seurat_object -t $cluster_text_file" $cluster_text_file
+run_command "seurat-find-clusters.r -i $pca_seurat_object -e $test_genes -u $reduction_type -d $dims_use -k $k_param -r $resolution -a $cluster_algorithm -m $cluster_tmp_file_location -o $cluster_seurat_object -t $cluster_text_file" $cluster_text_file
 
 # Run t-SNE
 
-run_command "run-tsne.r -i $pca_seurat_object -r $reduction_type -d $dims_use -e NULL -f $tsne_do_fast -o $tsne_seurat_object -b $tsne_embeddings_file" $tsne_seurat_object
+run_command "seurat-run-tsne.r -i $pca_seurat_object -r $reduction_type -d $dims_use -e NULL -f $tsne_do_fast -o $tsne_seurat_object -b $tsne_embeddings_file" $tsne_seurat_object
 
 # Run marker detection
 
-run_command "find-markers.R -i $cluster_seurat_object -e NULL -l $logfc_threshold -m $marker_min_pct -p $marker_only_pos -t $marker_test_use -x $marker_max_cells_per_ident -c $marker_min_cells_gene -d $marker_min_cells_group -o $marker_text_file" $marker_text_file
+run_command "seurat-find-markers.R -i $cluster_seurat_object -e NULL -l $logfc_threshold -m $marker_min_pct -p $marker_only_pos -t $marker_test_use -x $marker_max_cells_per_ident -c $marker_min_cells_gene -d $marker_min_cells_group -o $marker_text_file" $marker_text_file
 
 ################################################################################
 # Finish up
