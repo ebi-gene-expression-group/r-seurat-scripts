@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+script_dir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+script_name=$0
+
 # This is a test script designed to test that everything works in the various
 # accessory scripts in this package. Parameters used have absolutely NO
 # relation to best practice and this should not be taken as a sensible
@@ -27,7 +30,7 @@ fi
 
 test_data_url='https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz'
 test_working_dir=`pwd`/'post_install_tests'
-test_data_archive=$test_working_dir/`basename $test_data_url`
+export test_data_archive=$test_working_dir/`basename $test_data_url`
 
 # Clean up if specified
 
@@ -43,209 +46,127 @@ fi
 # Initialise directories
 
 output_dir=$test_working_dir/outputs
-data_dir=$test_working_dir/test_data
+export data_dir=$test_working_dir/test_data
 
 mkdir -p $test_working_dir
 mkdir -p $output_dir
 mkdir -p $data_dir
-
-cd $test_working_dir
 
 ################################################################################
 # Fetch test data 
 ################################################################################
 
 if [ ! -e "$test_data_archive" ]; then
-    wget $test_data_url
+    wget $test_data_url -P $test_working_dir
+    
 fi
-
-################################################################################
-# Accessory functions
-################################################################################
-
-function report_status() {
-    script=$1
-    status=$2
-
-    if [ $status -ne 0 ]; then
-        echo "FAIL: $script"
-        exit 1
-    else
-        echo "SUCCESS: $script"
-    fi
-}
-
-# Run a command, checking the primary output depending on the value of
-# 'use_existing_outputs'
-
-run_command() {
-    command=$1
-    test_output=$2
-
-    echo "$command"
-    command_name=`echo "$command" | awk '{print $1}'`
-
-    if [ -e "$test_output" ] && [ "$use_existing_outputs" == "true" ]; then
-        echo "Using cached output for $command_name"
-    else
-        eval $command
-        report_status $command_name $?
-    fi
-}
-
+    
 ################################################################################
 # List tool outputs/ inputs
 ################################################################################
 
-raw_matrix='test_data/matrix.mtx'
-raw_matrix_object="$output_dir/raw_matrix.rds"
-raw_seurat_object="$output_dir/raw_seurat.rds"
-filtered_seurat_object="$output_dir/filtered_seurat.rds"
-normalised_seurat_object="$output_dir/normalised_seurat.rds"
-variable_genes_seurat_object="$output_dir/variable_genes_seurat.rds"
-variable_genes_list="$output_dir/filtered_genes.txt"
-test_genes="$output_dir/random_genes.txt"
-scaled_seurat_object="$output_dir/scaled_seurat.rds"
-pca_seurat_object="$output_dir/pca_seurat.rds"
-pca_embeddings_file="$output_dir/pca_embeddings.csv"
-pca_loadings_file="$output_dir/pca_loadings.csv"
-pca_stdev_file="$output_dir/pca_stdev.txt"
-pca_image_file="$output_dir/pcatest.png"
-cluster_seurat_object="$output_dir/cluster_seurat.rds"
-cluster_text_file="$output_dir/clusters.txt"
-tsne_seurat_object="$output_dir/tsne_seurat.rds"
-tsne_embeddings_file="$output_dir/tsne_embeddings.csv"
-marker_text_file="$output_dir/markers.csv"
+export raw_matrix="$data_dir/matrix.mtx"
+export raw_matrix_object="$output_dir/raw_matrix.rds"
+export raw_seurat_object="$output_dir/raw_seurat.rds"
+export filtered_seurat_object="$output_dir/filtered_seurat.rds"
+export normalised_seurat_object="$output_dir/normalised_seurat.rds"
+export variable_genes_seurat_object="$output_dir/variable_genes_seurat.rds"
+export variable_genes_list="$output_dir/filtered_genes.txt"
+export test_genes="$output_dir/random_genes.txt"
+export scaled_seurat_object="$output_dir/scaled_seurat.rds"
+export pca_seurat_object="$output_dir/pca_seurat.rds"
+export pca_embeddings_file="$output_dir/pca_embeddings.csv"
+export pca_loadings_file="$output_dir/pca_loadings.csv"
+export pca_stdev_file="$output_dir/pca_stdev.txt"
+export pca_image_file="$output_dir/pcatest.png"
+export cluster_seurat_object="$output_dir/cluster_seurat.rds"
+export cluster_text_file="$output_dir/clusters.txt"
+export tsne_seurat_object="$output_dir/tsne_seurat.rds"
+export tsne_embeddings_file="$output_dir/tsne_embeddings.csv"
+export marker_text_file="$output_dir/markers.csv"
 
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.
 
 # Normalisation. See Seurat ?FilterCells
 
-min_genes=500
-min_umi=1000
+export min_genes=500
+export min_umi=1000
 
 # Normalisation. See Seurat ?NormalizeData
 
-assay_type='RNA'
-normalisation_method='LogNormalize'
-scale_factor=10000
+export assay_type='RNA'
+export normalisation_method='LogNormalize'
+export scale_factor=10000
 
 # Find variable genes. See ?FindVariableGenes
 
-mean_function='ExpMean'
-dispersion_function='LogVMR'
-fvg_x_low_cutoff='0.1'
-fvg_x_high_cutoff='8'
-fvg_y_low_cutoff='1'
-fvg_y_high_cutoff='Inf'
+export mean_function='ExpMean'
+export dispersion_function='LogVMR'
+export fvg_x_low_cutoff='0.1'
+export fvg_x_high_cutoff='8'
+export fvg_y_low_cutoff='1'
+export fvg_y_high_cutoff='Inf'
 
 # Scale and center the data. See ?ScaleData
-vars_to_regress='nUMI'
-model_use='linear'
-use_umi='TRUE'
-do_scale='TRUE'
-do_center='TRUE'
-scale_max='10'
-block_size='1000'
-min_cells_to_block='1000'
-check_for_norm='TRUE'
+export vars_to_regress='nUMI'
+export model_use='linear'
+export use_umi='TRUE'
+export do_scale='TRUE'
+export do_center='TRUE'
+export scale_max='10'
+export block_size='1000'
+export min_cells_to_block='1000'
+export check_for_norm='TRUE'
 
 # Run PCA
-pcs_compute=50
-use_imputed='FALSE'
+export pcs_compute=50
+export use_imputed='FALSE'
 
 # Plot PCA
-pca_dim_one=1
-pca_dim_two=2
-pt_size=1
-label_size=4
-do_label='FALSE'
-group_by='ident'
-pca_plot_title='Test PCA plot'
-pca_png_width=1000
-pca_png_height=1000
+export pca_dim_one=1
+export pca_dim_two=2
+export pt_size=1
+export label_size=4
+export do_label='FALSE'
+export group_by='ident'
+export pca_plot_title='Test PCA plot'
+export pca_png_width=1000
+export pca_png_height=1000
 
 # Find clusters
-reduction_type='pca'
-dims_use='1,2,3,4,5,6,7,8,9,10'
-k_param=30
-resolution=0.8
-cluster_algorithm=1
-cluster_tmp_file_location='/tmp'
+export reduction_type='pca'
+export dims_use='1,2,3,4,5,6,7,8,9,10'
+export k_param=30
+export resolution=0.8
+export cluster_algorithm=1
+export cluster_tmp_file_location='/tmp'
 
 # t-SNE
-tsne_do_fast='TRUE'
+export tsne_do_fast='TRUE'
 
 # Marker detection
-logfc_threshold=0.25
-marker_min_pct=0.1
-marker_only_pos='FALSE'
-marker_test_use='wilcox'
-marker_max_cells_per_ident='Inf'
-marker_min_cells_gene=3
-marker_min_cells_group=3
+export logfc_threshold=0.25
+export marker_min_pct=0.1
+export marker_only_pos='FALSE'
+export marker_test_use='wilcox'
+export marker_max_cells_per_ident='Inf'
+export marker_min_cells_gene=3
+export marker_min_cells_group=3
 
 ################################################################################
 # Test individual scripts
 ################################################################################
 
-# Extract the test data
+# Make the script options available to the tests so we can skip tests e.g.
+# where one of a chain has completed successfullly.
 
-echo "Extracting test data from archive"
-run_command "tar -xvzf $test_data_archive --strip-components 2 -C test_data" $raw_matrix
+export use_existing_outputs
 
-# Run read-10x.R
+# Derive the tests file name from the script name
 
-run_command "seurat-read-10x.R -d test_data -o $raw_matrix_object" $raw_matrix_object
+tests_file="${script_name%.*}".bats
 
-# Run create-seurat-object.R
+# Execute the bats tests
 
-run_command "seurat-create-seurat-object.R -i $raw_matrix_object -o $raw_seurat_object" $raw_seurat_object
-
-# Run filter-cells.R
-
-run_command "seurat-filter-cells.R -i $raw_seurat_object -s nGene,nUMI -l $min_genes,$min_umi -o $filtered_seurat_object" $filtered_seurat_object
-
-# Run normalise-date.R
-
-run_command "seurat-normalise-data.R -i $filtered_seurat_object -a $assay_type -n $normalisation_method -s $scale_factor -o $normalised_seurat_object" $normalised_seurat_object
-
-# Run find-variable-genes.R
-
-run_command "seurat-find-variable-genes.R -i $normalised_seurat_object -m $mean_function -d $dispersion_function -l $fvg_x_low_cutoff -j $fvg_x_high_cutoff -y $fvg_y_low_cutoff -z $fvg_y_high_cutoff -o $variable_genes_seurat_object -t $variable_genes_list" $variable_genes_list
-
-# Get a random set of genes to use in testing argments to scale-data.R
-
-run_command "seurat-get-random-genes.R $normalised_seurat_object $test_genes 10000" $test_genes
-
-# Run scale-data.R
-
-run_command "seurat-scale-data.R -i $variable_genes_seurat_object -e $test_genes -v $vars_to_regress -m $model_use -u $use_umi -s $do_scale -c $do_center -x $scale_max -b $block_size -d $min_cells_to_block -a $assay_type -n $check_for_norm -o $scaled_seurat_object" $scaled_seurat_object
-
-# Run run-pca.R
-
-run_command "seurat-run-pca.R -i $scaled_seurat_object -e $test_genes -p $pcs_compute -m $use_imputed -o $pca_seurat_object -b $pca_embeddings_file -l $pca_loadings_file -s $pca_stdev_file"  $pca_seurat_object
-
-# Plot the PCA
-
-run_command "seurat-dim-plot.r -i $pca_seurat_object -r pca -a $pca_dim_one -b $pca_dim_two -p $pt_size -l $label_size -d $do_label -f $group_by -t '$pca_plot_title' -w $pca_png_width -j $pca_png_height -o $pca_image_file" $pca_image_file
-
-# Generate clusters
-
-run_command "seurat-find-clusters.r -i $pca_seurat_object -e $test_genes -u $reduction_type -d $dims_use -k $k_param -r $resolution -a $cluster_algorithm -m $cluster_tmp_file_location -o $cluster_seurat_object -t $cluster_text_file" $cluster_text_file
-
-# Run t-SNE
-
-run_command "seurat-run-tsne.r -i $pca_seurat_object -r $reduction_type -d $dims_use -e NULL -f $tsne_do_fast -o $tsne_seurat_object -b $tsne_embeddings_file" $tsne_seurat_object
-
-# Run marker detection
-
-run_command "seurat-find-markers.R -i $cluster_seurat_object -e NULL -l $logfc_threshold -m $marker_min_pct -p $marker_only_pos -t $marker_test_use -x $marker_max_cells_per_ident -c $marker_min_cells_gene -d $marker_min_cells_group -o $marker_text_file" $marker_text_file
-
-################################################################################
-# Finish up
-################################################################################
-
-echo "All tests passed"
-exit 0
+$tests_file
