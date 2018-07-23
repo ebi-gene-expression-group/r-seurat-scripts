@@ -4,11 +4,9 @@
 
 suppressPackageStartupMessages(require(optparse))
 
-# Source common functions
+# Load common functions
 
-ca <- commandArgs()
-script_dir <- dirname(sub('--file=', '', ca[grep('--file', ca)]))
-source(file.path(script_dir, 'r-seurat-scripts-accessory.R'))
+suppressPackageStartupMessages(require(workflowscriptscommon))
 
 # parse options
 
@@ -57,7 +55,7 @@ option_list = list(
   )
 )
 
-opt <- rsw_parse_args(option_list, mandatory = c('input_object_file', 'subset_names', 'output_object_file'))
+opt <- wsc_parse_args(option_list, mandatory = c('input_object_file', 'subset_names', 'output_object_file'))
 
 # Check parameter values
 
@@ -71,13 +69,13 @@ seurat_object <- readRDS(opt$input_object_file)
 
 # Are the metadata variables valid for this object?
 
-subset_names <- split_string(opt$subset_names)
-check_metadata(seurat_object, subset_names)
+subset_names <- wsc_split_string(opt$subset_names)
+wsc_check_metadata(seurat_object, subset_names)
 
 # Parse numeric fields
 
-lt <- parse_numeric(opt, 'low_thresholds', -Inf, length(subset_names))
-ht <- parse_numeric(opt, 'high_thresholds', Inf, length(subset_names))
+lt <- wsc_parse_numeric(opt, 'low_thresholds', -Inf, length(subset_names))
+ht <- wsc_parse_numeric(opt, 'high_thresholds', Inf, length(subset_names))
 
 # Check the cells_use
 
@@ -86,7 +84,7 @@ if (! is.null(cells_use)){
   if (file.exists(cells_use)){
     cells_use <- read.table("test_cells.txt", stringsAsFactors = FALSE)$V1
   }else{
-    cells_use <- split_string(cells_use)
+    cells_use <- wsc_split_string(cells_use)
   }
   
   check_cells(cells_use, seurat_object)
