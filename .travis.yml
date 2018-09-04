@@ -28,4 +28,4 @@ install:
 before_script:
     - export PATH=`pwd`:$PATH
 
-script: ./bioconductor-singlecellexperiment-scripts-post-install-tests.sh
+script: ./r-seurat-scripts-post-install-tests.sh
