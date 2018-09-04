@@ -118,19 +118,6 @@
     [ -f  "$pca_seurat_object" ]
 }
 
-# Plot the PCA
-
-@test "Plot dimension reduction" {
-    if [ "$use_existing_outputs" = 'true' ] && [ -f "$pca_image_file" ]; then
-        skip "$scaled_seurat_object exists and use_existing_outputs is set to 'true'"
-    fi
-
-    run seurat-dim-plot.r -i $pca_seurat_object -r pca -a $pca_dim_one -b $pca_dim_two -p $pt_size -l $label_size -d $do_label -f $group_by -t '$pca_plot_title' -w $pca_png_width -j $pca_png_height -o $pca_image_file
-  
-    [ "$status" -eq 0 ]
-    [ -f  "$pca_image_file" ]
-}
-
 # Generate clusters
 
 @test "Generate cell clusters from expression values" {
@@ -169,3 +156,17 @@
     [ "$status" -eq 0 ]
     [ -f  "$marker_text_file" ]
 }
+
+# Plot the PCA
+
+@test "Plot dimension reduction" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$pca_image_file" ]; then
+        skip "$scaled_seurat_object exists and use_existing_outputs is set to 'true'"
+    fi
+
+    run seurat-dim-plot.r -i $pca_seurat_object -r pca -a $pca_dim_one -b $pca_dim_two -p $pt_size -l $label_size -d $do_label -f $group_by -t '$pca_plot_title' -w $pca_png_width -j $pca_png_height -o $pca_image_file
+  
+    [ "$status" -eq 0 ]
+    [ -f  "$pca_image_file" ]
+}
+

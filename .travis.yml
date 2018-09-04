@@ -22,7 +22,7 @@ install:
     - conda config --add channels bioconda
 
     # Create the environment with dependencies
-    - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION r-base r-optparse r-workflowscriptscommon r-seurat
+    - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION r-base r-optparse libpng r-cairo r-workflowscriptscommon r-seurat
     - source activate test-environment
 
 before_script:
