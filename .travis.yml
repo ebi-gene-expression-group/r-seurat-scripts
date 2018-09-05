@@ -8,19 +8,19 @@ before_install:
         wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
       fi
         
-      bash miniconda.sh -b -p $HOME/miniconda
-      export PATH="$HOME/miniconda/bin:$PATH"
-      hash -r
-      conda config --set always_yes yes --set changeps1 no
-      conda update -q conda
+      bash miniconda.sh -b -p $HOME/miniconda;
+      export PATH="$HOME/miniconda/bin:$PATH";
+      hash -r;
+      conda config --set always_yes yes --set changeps1 no;
+      conda update -q conda;
   
-      conda info -a
+      conda info -a;
 
-      conda config --add channels defaults
-      conda config --add channels conda-forge
-      conda config --add channels bioconda
+      conda config --add channels defaults;
+      conda config --add channels conda-forge;
+      conda config --add channels bioconda;
 
-      conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION r-base r-optparse libpng r-cairo r-workflowscriptscommon r-seurat
+      conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION r-base r-optparse libpng r-cairo r-workflowscriptscommon r-seurat;
     fi
 
 install:
