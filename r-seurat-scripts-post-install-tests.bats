@@ -126,6 +126,8 @@
     fi
 
     run seurat-find-clusters.r -i $pca_seurat_object -e $test_genes -u $reduction_type -d $dims_use -k $k_param -r $resolution -a $cluster_algorithm -m $cluster_tmp_file_location -o $cluster_seurat_object -t $cluster_text_file 
+    echo "status = ${status}"
+    echo "output = ${output}"
  
     [ "$status" -eq 0 ]
     [ -f  "$cluster_text_file" ]
