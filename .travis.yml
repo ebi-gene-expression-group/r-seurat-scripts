@@ -25,7 +25,7 @@ before_install:
     fi
 
 install:
-    - source activate test-environment
+    - source $HOME/miniconda/bin/activate
 
 before_script:
     - export PATH=`pwd`:$PATH
