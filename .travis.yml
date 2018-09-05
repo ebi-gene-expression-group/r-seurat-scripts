@@ -1,31 +1,26 @@
 before_install:
-    - if test -e $HOME/miniconda/bin; then
+  - if test -e $HOME/miniconda/bin; then
         echo "miniconda already installed.";
+    else
+      if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+        wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
       else
-    
-        # We do this conditionally because it saves us some downloading if the
-        # version is the same.
-        - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-            wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
-          else
-            wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-          fi
-        - bash miniconda.sh -b -p $HOME/miniconda
-        - export PATH="$HOME/miniconda/bin:$PATH"
-        - hash -r
-        - conda config --set always_yes yes --set changeps1 no
-        - conda update -q conda
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+      fi
+        
+      bash miniconda.sh -b -p $HOME/miniconda
+      export PATH="$HOME/miniconda/bin:$PATH"
+      hash -r
+      conda config --set always_yes yes --set changeps1 no
+      conda update -q conda
   
-        # Useful for debugging any issues with conda
-        - conda info -a
+      conda info -a
 
-        # Add the Bioconda channel
-        - conda config --add channels defaults
-        - conda config --add channels conda-forge
-        - conda config --add channels bioconda
+      conda config --add channels defaults
+      conda config --add channels conda-forge
+      conda config --add channels bioconda
 
-        # Create the environment with dependencies
-        - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION r-base r-optparse libpng r-cairo r-workflowscriptscommon r-seurat
+      conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION r-base r-optparse libpng r-cairo r-workflowscriptscommon r-seurat
     fi
 
 install:
