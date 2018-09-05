@@ -25,10 +25,11 @@ before_install:
     fi
 
 install:
-    - source $HOME/miniconda/bin/activate
+    - export PATH="$HOME/miniconda/bin:$PATH";
+    - source activate test-environment
 
 before_script:
-    - export PATH=`pwd`:$PATH
+    - export PATH=`pwd`:PATH
 
 script: ./r-seurat-scripts-post-install-tests.sh
 
