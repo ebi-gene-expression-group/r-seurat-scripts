@@ -56,7 +56,7 @@ option_list = list(
   make_option(
     c("-r", "--resolution"),
     action = "store",
-    default = NULL,
+    default = 0.8,
     type = 'double',
     help = "Value of the resolution parameter, use a value above (below) 1.0 if you want to obtain a larger (smaller) number of communities."
   ),
