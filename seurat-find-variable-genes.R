@@ -78,8 +78,6 @@ option_list = list(
 
 opt <- wsc_parse_args(option_list, mandatory = c('input_object_file', 'output_object_file', 'output_text_file'))
 
-saveRDS(opt, file="~/Desktop/foo.rds")
-
 # Check parameter values
 
 if ( ! file.exists(opt$input_object_file)){
