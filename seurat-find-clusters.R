@@ -70,7 +70,7 @@ option_list = list(
   make_option(
     c("-m", "--tmp-file-location"),
     action = "store",
-    default = 1,
+    default = NULL,
     type = 'character',
     help = "Directory where intermediate files will be written. Specify the ABSOLUTE path."
   ),
@@ -122,6 +122,12 @@ suppressPackageStartupMessages(require(Seurat))
 seurat_object <- readRDS(opt$input_object_file)
 
 clustered_object <- FindClusters(seurat_object, genes.use = genes_use, reduction.type = opt$reduction_type, dims.use = dims_use, k.param = opt$k_param, prune.SNN = opt$prune_snn, print.output = FALSE, save.SNN = FALSE, resolution = opt$resolution, temp.file.location = opt$temp_file_location)
+
+# Summarise the clustering
+
+opt_table <- data.frame(parameter=names(opt), value=unlist(opt), stringsAsFactors = FALSE)[c(-1,-7,-8,-9,-10),]
+
+cat(paste(ncol(clustered_object@data), 'cells fall into ', length(unique(clustered_object@ident)), 'final clusters. Membership numbers:'), capture.output(table(clustered_object@ident)), '\nParameter values:\n', capture.output(print(opt_table)), sep = '\n')
 
 # Output to a serialized R object
 

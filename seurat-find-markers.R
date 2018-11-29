@@ -135,6 +135,25 @@ results_matrix <- FindAllMarkers(
   max.cells.per.ident = opt$max_cells_per_ident
 )
 
+# Summarise output
+
+opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)[c(-1,-11, -12),, drop=FALSE]
+
+markers_by_cluster <- merge(
+  data.frame(as.matrix(table(seurat_object@ident))),
+  data.frame(as.matrix(table(results_matrix$cluster))),
+  by = 'row.names'
+)
+rownames(markers_by_cluster) <- markers_by_cluster[,1]
+colnames(markers_by_cluster) <- c('Cluster', 'No. cells', 'No. markers')
+
+cat(c(
+  "Summary of markers found:\n",
+  capture.output(markers_by_cluster[,-1]),
+  '\nParameter values:', 
+  capture.output(print(opt_table))
+  ), sep = '\n')
+
 # Output variable genes to a simple text file
 
 write.csv(results_matrix, file = opt$output_text_file, row.names = TRUE)

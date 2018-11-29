@@ -88,6 +88,7 @@ if (! is.null(cells_use)){
   }
   
   check_cells(cells_use, seurat_object)
+  print(paste('Filtering to', length(cells_use), 'specified cells'))
 }
 
 # Now we're hapy with the arguments, load Seurat and do the work
@@ -95,6 +96,20 @@ if (! is.null(cells_use)){
 suppressPackageStartupMessages(require(Seurat))
 
 filtered_seurat_object <- FilterCells(seurat_object, subset.names = subset_names, low.thresholds = lt, high.thresholds = ht, cells.use = cells_use)
+
+# Print a summary of the affects of filtering
+
+opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)[c(-1,-5,-6), , drop = FALSE]
+
+cat(c(
+  '# Before filtering:', 
+  capture.output(print(seurat_object)), 
+  '\n# After filtering:', 
+  capture.output(print(filtered_seurat_object)),
+  '\n# Parameter values:\n',
+  capture.output(print(opt_table))
+), 
+sep = '\n')
 
 # Output to a serialized R object
 

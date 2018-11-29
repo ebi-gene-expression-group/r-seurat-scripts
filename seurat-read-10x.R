@@ -43,6 +43,10 @@ suppressPackageStartupMessages(require(Seurat))
 
 sc_matrix <- Read10X(data.dir = opt$data_dir)
 
+# Use the default show method to print feedback
+
+printSpMatrix2(sc_matrix, note.dropping.colnames = FALSE, maxp = 500)
+
 # Output to a serialized R object
 
 saveRDS(sc_matrix, file = opt$output_object_file)

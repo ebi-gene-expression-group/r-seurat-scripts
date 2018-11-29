@@ -78,6 +78,8 @@ option_list = list(
 
 opt <- wsc_parse_args(option_list, mandatory = c('input_object_file', 'output_object_file', 'output_text_file'))
 
+saveRDS(opt, file="~/Desktop/foo.rds")
+
 # Check parameter values
 
 if ( ! file.exists(opt$input_object_file)){
@@ -96,6 +98,16 @@ variable_genes_seurat_object <- FindVariableGenes(seurat_object, mean.function =
 # Output to a serialized R object
 
 saveRDS(variable_genes_seurat_object, file = opt$output_object_file)
+
+# Output variable gene numbers
+
+opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)[c(-1,-8,-9,-10),, drop=FALSE]
+
+cat(c(
+    paste(length(variable_genes_seurat_object@var.genes), 'variable genes detected out of total', nrow(seurat_object@data))),
+    '\nParameter values:', 
+    capture.output(print(opt_table)
+), sep = '\n')          
 
 # Output variable genes to a simple text file
 
