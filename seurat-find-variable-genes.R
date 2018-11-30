@@ -99,7 +99,12 @@ saveRDS(variable_genes_seurat_object, file = opt$output_object_file)
 
 # Output variable gene numbers
 
-opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)[c(-1,-8,-9,-10),, drop=FALSE]
+# Some parameters aren't interesting for reporting purposes (e.g. file
+# locations), so hide from the summary
+
+nonreport_params <- c('input_object_file', 'output_object_file', 'help', 'output_text_file')
+opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)
+opt_table <- opt_table[! rownames(opt_table) %in% nonreport_params, , drop = FALSE]
 
 cat(c(
     paste(length(variable_genes_seurat_object@var.genes), 'variable genes detected out of total', nrow(seurat_object@data))),

@@ -125,9 +125,18 @@ clustered_object <- FindClusters(seurat_object, genes.use = genes_use, reduction
 
 # Summarise the clustering
 
-opt_table <- data.frame(parameter=names(opt), value=unlist(opt), stringsAsFactors = FALSE)[c(-1,-7,-8,-9,-10),]
+# Some parameters aren't interesting for reporting purposes (e.g. file
+# locations), so hide from the summary
 
-cat(paste(ncol(clustered_object@data), 'cells fall into ', length(unique(clustered_object@ident)), 'final clusters. Membership numbers:'), capture.output(table(clustered_object@ident)), '\nParameter values:\n', capture.output(print(opt_table)), sep = '\n')
+nonreport_params <- c('input_object_file', 'output_object_file', 'help', 'output_text_file', 'tmp_file_location')
+opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)
+opt_table <- opt_table[! rownames(opt_table) %in% nonreport_params, , drop = FALSE]
+
+cluster_table <- as.data.frame(table(clustered_object@ident))
+colnames(cluster_table) <- c('Cluster', 'No. cells')
+rownames(cluster_table) <- cluster_table$Cluster
+
+cat(paste(ncol(clustered_object@data), 'cells fall into ', length(unique(clustered_object@ident)), 'final clusters. Membership numbers:\n'), capture.output(cluster_table[,2, drop = FALSE]), '\nParameter values:\n', capture.output(print(opt_table)), sep = '\n')
 
 # Output to a serialized R object
 

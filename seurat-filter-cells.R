@@ -99,7 +99,12 @@ filtered_seurat_object <- FilterCells(seurat_object, subset.names = subset_names
 
 # Print a summary of the affects of filtering
 
-opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)[c(-1,-5,-6), , drop = FALSE]
+# Some parameters aren't interesting for reporting purposes (e.g. file
+# locations), so hide from the summary
+
+nonreport_params <- c('input_object_file', 'output_object_file', 'help')
+opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)
+opt_table <- opt_table[! rownames(opt_table) %in% nonreport_params, , drop = FALSE]
 
 cat(c(
   '# Before filtering:', 
