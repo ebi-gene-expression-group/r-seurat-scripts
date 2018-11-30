@@ -47,6 +47,16 @@ sc_matrix <- readRDS(opt$input_object_file)
 
 seurat_object <- CreateSeuratObject(sc_matrix)
 
+# Print an object summary
+
+cat(c(
+  '# Object summary', 
+  capture.output(print(seurat_object)), 
+  '\n# Metadata sample', 
+  capture.output(head(seurat_object@meta.data))
+), 
+sep = '\n')
+
 # Output to a serialized R object
 
 saveRDS(seurat_object, file = opt$output_object_file)
