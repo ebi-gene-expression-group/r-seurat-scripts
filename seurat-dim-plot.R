@@ -30,14 +30,14 @@ option_list = list(
     action = "store",
     default = 1,
     type = 'integer',
-    help = "File name in which a serialized R matrix object may be found."
+    help = "Dimension for x-axis (default 1)"
   ),
   make_option(
     c("-b", "--dim-2"),
     action = "store",
     default = 2,
     type = 'integer',
-    help = "File name in which a serialized R matrix object may be found."
+    help = "Dimension for y-axis (default 2)"
   ),
   make_option(
     c("-c", "--cells-use"),
@@ -51,7 +51,7 @@ option_list = list(
     action = "store",
     default = 1,
     type = 'integer',
-    help = "File to be used to derive a vector of cells to plot (default is all cells)."
+    help = "Adjust point size for plotting"
   ),
   make_option(
     c("-l", "--label-size"),
