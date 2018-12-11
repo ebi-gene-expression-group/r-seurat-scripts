@@ -188,7 +188,7 @@
         skip "$scaled_seurat_object exists and use_existing_outputs is set to 'true'"
     fi
 
-    run rm -f $pca_image_file && seurat-dim-plot.R -i $pca_seurat_object -r pca -a $pca_dim_one -b $pca_dim_two -p $pt_size -l $label_size -d $do_label -f $group_by -t '$pca_plot_title' -w $pca_png_width -j $pca_png_height -o $pca_image_file
+    run rm -f $pca_image_file && seurat-dim-plot.R -i $cluster_seurat_object -r pca -a $pca_dim_one -b $pca_dim_two -p $pt_size -l $label_size -d $do_label -f $group_by -t '$pca_plot_title' -m $pca_do_bare -u $pca_cols_use -x $pca_coord_fixed -n $pca_no_axes -k $pca_dark_theme -q $pca_plot_order -w $pca_png_width -j $pca_png_height -o $pca_image_file
     echo "status = ${status}"
     echo "output = ${output}"
   

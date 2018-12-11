@@ -133,6 +133,12 @@ export group_by='ident'
 export pca_plot_title='Test PCA plot'
 export pca_png_width=1000
 export pca_png_height=1000
+export pca_do_bare='TRUE'
+export pca_cols_use='red,blue,green,yellow,orange,pink,purple,black'
+export pca_coord_fixed='TRUE'
+export pca_no_axes='TRUE'
+export pca_dark_theme='TRUE'
+export pca_plot_order='7,6,5,4,3,2,1,0'
 
 # Find clusters
 export reduction_type='pca'

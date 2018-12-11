@@ -30,14 +30,14 @@ option_list = list(
     action = "store",
     default = 1,
     type = 'integer',
-    help = "File name in which a serialized R matrix object may be found."
+    help = "Dimension for x-axis (default 1)"
   ),
   make_option(
     c("-b", "--dim-2"),
     action = "store",
     default = 2,
     type = 'integer',
-    help = "File name in which a serialized R matrix object may be found."
+    help = "Dimension for y-axis (default 2)"
   ),
   make_option(
     c("-c", "--cells-use"),
@@ -51,7 +51,7 @@ option_list = list(
     action = "store",
     default = 1,
     type = 'integer',
-    help = "File to be used to derive a vector of cells to plot (default is all cells)."
+    help = "Adjust point size for plotting"
   ),
   make_option(
     c("-l", "--label-size"),
@@ -82,11 +82,60 @@ option_list = list(
     help = "Title for plot."
   ),
   make_option(
+    c("-m", "--do-bare"),
+    action = "store",
+    default = FALSE,
+    type = 'logical',
+    help = "Do only minimal formatting (default : FALSE)"
+  ),
+  make_option(
+    c("-u", "--cols-use"),
+    action = "store",
+    default = NULL,
+    type = 'character',
+    help = "Comma-separated list of colors, each color corresponds to an identity class. By default, ggplot assigns colors."
+  ),
+  make_option(
+    c("-e", "--pt-shape"),
+    action = "store",
+    default = NULL,
+    type = 'character',
+    help = "If NULL, all points are circles (default). You can specify any cell attribute (that can be pulled with FetchData) allowing for both different colors and different shapes on cells."
+  ),
+  make_option(
+    c("-x", "--coord-fixed"),
+    action = "store",
+    default = FALSE,
+    type = 'character',
+    help = "Use a fixed scale coordinate system (for spatial coordinates). Default is FALSE"
+  ),
+  make_option(
+    c("-n", "--no-axes"),
+    action = "store",
+    default = FALSE,
+    type = 'logical',
+    help = "Setting to TRUE will remove the axes."
+  ),              
+  make_option(
+    c("-k", "--dark-theme"),
+    action = "store",
+    default = FALSE,
+    type = 'logical',
+    help = "Use a dark theme for the plot."
+  ),              
+  make_option(
+    c("-q", "--plot-order"),
+    action = "store",
+    default = NULL,
+    type = 'character',
+    help = "Comma-separated string specifying the order of plotting for the idents (clusters). This can be useful for crowded plots if points of interest are being buried. Provide either a full list of valid idents or a subset to be plotted last (on top).."
+  ),              
+  make_option(
     c("-w", "--png-width"),
     action = "store",
     default = 1000,
     type = 'integer',
-    help = "Widthof png (px)."
+    help = "Width of png (px)."
   ),
   make_option(
     c("-j", "--png-height"),
@@ -105,6 +154,7 @@ option_list = list(
 )
 
 opt <- wsc_parse_args(option_list, mandatory = c('input_object_file', 'output_image_file'))
+saveRDS(opt, file="opt.rds")
 
 # Check parameter values
 
@@ -132,8 +182,22 @@ if (! is.null(opt$cells_use)){
   cells_use <- NULL
 }
 
+# Parse color list (if present)
+
+cols_use <- opt$cols_use
+if (! is.null(cols_use)){
+  cols_use <- wsc_split_string(cols_use)
+}
+
+# Parse plot order ident list (if present)
+
+plot_order <- opt$plot_order
+if (! is.null(cols_use)){
+  plot_order <- wsc_split_string(plot_order)
+}
+
 # Open the image
 
 png(filename = opt$output_image_file, width = opt$png_width, height = opt$png_height)
-DimPlot(seurat_object, reduction.use = opt$reduction_use, dim.1 = opt$dim_1, dim.2 = opt$dim_2, cells.use = cells_use, pt.size = opt$pt_size, label.size = opt$label_size, do.label = opt$do_label, group.by = opt$group_by, plot.title = opt$plot_title)
+DimPlot(seurat_object, reduction.use = opt$reduction_use, dim.1 = opt$dim_1, dim.2 = opt$dim_2, cells.use = cells_use, pt.size = opt$pt_size, label.size = opt$label_size, do.label = opt$do_label, group.by = opt$group_by, do.bare=opt$do_bare, cols.use=cols_use, pt.shape=opt$pt_shape, coord.fixed=opt$coord_fixed, no.axes=opt$no_axes, dark.theme=opt$dark_theme, plot.order=plot_order, plot.title = opt$plot_title)
 dev.off()
