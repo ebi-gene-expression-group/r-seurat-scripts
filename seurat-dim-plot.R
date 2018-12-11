@@ -154,7 +154,6 @@ option_list = list(
 )
 
 opt <- wsc_parse_args(option_list, mandatory = c('input_object_file', 'output_image_file'))
-saveRDS(opt, file="opt.rds")
 
 # Check parameter values
 
