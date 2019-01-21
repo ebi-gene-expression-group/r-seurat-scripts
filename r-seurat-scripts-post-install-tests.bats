@@ -55,7 +55,7 @@
     echo "output = ${output}"
     
     [ "$status" -eq 0 ]
-    [ -f  "$raw_seurat_object" ]
+    [ -f  "$raw_seurat_object_min_genes" ]
 }
 
 @test "Seurat object creation from a matrix object with min cells" {
@@ -68,7 +68,7 @@
     echo "output = ${output}"
     
     [ "$status" -eq 0 ]
-    [ -f  "$raw_seurat_object" ]
+    [ -f  "$raw_seurat_object_min_cells" ]
 }
 
 # Run filter-cells.R
