@@ -45,6 +45,31 @@
     [ -f  "$raw_seurat_object" ]
 }
 
+@test "Seurat object creation from a matrix object with min genes" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$raw_seurat_object_min_genes" ]; then
+        skip "$raw_seurat_object exists and use_existing_outputs is set to 'true'"
+    fi
+    
+    run rm -f $raw_seurat_object && seurat-create-seurat-object.R -i $raw_matrix_object --min_genes 100 -o $raw_seurat_object_min_genes
+    echo "status = ${status}"
+    echo "output = ${output}"
+    
+    [ "$status" -eq 0 ]
+    [ -f  "$raw_seurat_object" ]
+}
+
+@test "Seurat object creation from a matrix object with min cells" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$raw_seurat_object_min_cells" ]; then
+        skip "$raw_seurat_object exists and use_existing_outputs is set to 'true'"
+    fi
+    
+    run rm -f $raw_seurat_object && seurat-create-seurat-object.R -i $raw_matrix_object --min_cells 20 -o $raw_seurat_object_min_cells
+    echo "status = ${status}"
+    echo "output = ${output}"
+    
+    [ "$status" -eq 0 ]
+    [ -f  "$raw_seurat_object" ]
+}
 
 # Run filter-cells.R
 
