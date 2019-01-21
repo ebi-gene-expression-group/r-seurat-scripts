@@ -48,6 +48,36 @@ rule create_seurat_object:
         object = "%s/seurat_raw.rds" % output_dir
     shell:
         "create-seurat-object.R -i {input.object} -o {output.object}"
+        
+# Create a Seurat object, testing create-seurat-object.R with min genes
+
+rule create_seurat_object_min_genes:
+    input:
+        object = "%s/10x_data.rds" % output_dir
+    output:
+        object = "%s/seurat_raw_min_genes.rds" % output_dir
+    shell:
+        "create-seurat-object.R -i {input.object} -o {output.object} --min_genes 100" 
+        
+# Create a Seurat object, testing create-seurat-object.R with min genes
+
+rule create_seurat_object_min_cells:
+    input:
+        object = "%s/10x_data.rds" % output_dir
+    output:
+        object = "%s/seurat_raw_min_cells.rds" % output_dir
+    shell:
+        "create-seurat-object.R -i {input.object} -o {output.object} --min_cells 20" 
+        
+# Create a Seurat object, testing create-seurat-object.R with min genes
+
+rule create_seurat_object_min_cells_min_genes:
+    input:
+        object = "%s/10x_data.rds" % output_dir
+    output:
+        object = "%s/seurat_raw_min_cells_min_genes.rds" % output_dir
+    shell:
+        "create-seurat-object.R -i {input.object} -o {output.object} --min_cells 20 --min_genes 100"
 
 # Cleanup
 

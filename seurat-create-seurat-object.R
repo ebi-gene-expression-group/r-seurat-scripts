@@ -24,6 +24,20 @@ option_list = list(
     default = NA,
     type = 'character',
     help = "File name in which to store serialized R object of type 'Seurat'. File will have extension as per the object type.'"
+  ),
+  make_option(
+    c("--min_cells"),
+    action = "store",
+    default = NA,
+    type = 'integer',
+    help = "Include genes with detected expression in at least this many cells."
+  ),
+  make_option(
+    c("--min_genes"),
+    action = "store",
+    default = NA,
+    type = 'integer',
+    help = 'Include cells where at least this many genes are detected.'
   )
 )
 
@@ -44,8 +58,19 @@ suppressPackageStartupMessages(require(Seurat))
 sc_matrix <- readRDS(opt$input_object_file)
 
 # Create the Seurat object
-
-seurat_object <- CreateSeuratObject(sc_matrix)
+if( !is.na(opt$min_cells) && !is.na(opt$min_genes)) {
+  seurat_object <- CreateSeuratObject(sc_matrix, 
+                                      min.cells = opt$min_cells,
+                                      min.genes = opt$min_genes)
+} else if( is.na(opt$min_cells) && !is.na(opt$min_genes)) {
+  seurat_object <- CreateSeuratObject(sc_matrix, 
+                                      min.genes = opt$min_genes,)
+} else if( !is.na(opt$min_cells) && is.na(opt$min_genes)) {
+  seurat_object <- CreateSeuratObject(sc_matrix, 
+                                      min.cells = opt$min_cells)
+} else {
+  seurat_object <- CreateSeuratObject(sc_matrix )
+}
 
 # Print an object summary
 
