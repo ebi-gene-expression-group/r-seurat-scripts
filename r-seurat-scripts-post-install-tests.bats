@@ -53,7 +53,8 @@
         skip "$filtered_seurat_object exists and use_existing_outputs is set to 'true'"
     fi
     
-    run rm -f $filtered_seurat_object && seurat-filter-cells.R -i $raw_seurat_object -s nGene,nUMI -l $min_genes,$min_umi -o $filtered_seurat_object
+    # TODO add --min-cells 20 here, once test is passing.
+    run rm -f $filtered_seurat_object && seurat-filter.R -i $raw_seurat_object -s nGene,nUMI -l $min_genes,$min_umi -o $filtered_seurat_object
     echo "status = ${status}"
     echo "output = ${output}"
     
@@ -98,7 +99,7 @@
         skip "$test_genes exists and use_existing_outputs is set to 'true'"
     fi
 
-    run rm -f $test_genes && run seurat-get-random-genes.R $normalised_seurat_object $test_genes 10000
+    run rm -f $test_genes && run seurat-get-random-genes.R $normalised_seurat_object $test_genes 1000
     echo "status = ${status}"
     echo "output = ${output}"
     
