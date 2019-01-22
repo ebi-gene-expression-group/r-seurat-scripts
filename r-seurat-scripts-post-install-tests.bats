@@ -53,7 +53,6 @@
         skip "$filtered_seurat_object exists and use_existing_outputs is set to 'true'"
     fi
     
-    # TODO add --min-cells 20 here, once test is passing.
     run rm -f $filtered_seurat_object && seurat-filter.R -i $raw_seurat_object -s nGene,nUMI -l $min_genes,$min_umi --min-cells 10 -o $filtered_seurat_object
     echo "status = ${status}"
     echo "output = ${output}"
