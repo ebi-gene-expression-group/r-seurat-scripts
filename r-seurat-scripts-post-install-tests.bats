@@ -99,7 +99,7 @@
         skip "$test_genes exists and use_existing_outputs is set to 'true'"
     fi
 
-    run rm -f $test_genes && run seurat-get-random-genes.R $normalised_seurat_object $test_genes 1000
+    run rm -f $test_genes && run seurat-get-random-genes.R $normalised_seurat_object $test_genes 10000
     echo "status = ${status}"
     echo "output = ${output}"
     
