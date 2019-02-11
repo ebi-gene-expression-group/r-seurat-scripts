@@ -31,7 +31,7 @@ option_list = list(
   make_option(
     c("-n", "--study-name"),
     action= "store",
-    default = "Seurat study",
+    default = "Seurat_study",
     type="character",
     help="Study name to be displayed in CellBrowser"
   ),
@@ -44,6 +44,7 @@ option_list = list(
 )
 
 opt <- wsc_parse_args(option_list, mandatory = c('input_object_file', 'output_directory'))
+opt$study_name = gsub(" ","_", opt$study_name) # study names cannot have spaces.
 
 # Check parameter values
 
