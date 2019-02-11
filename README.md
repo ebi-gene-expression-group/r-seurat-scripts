@@ -93,3 +93,11 @@ seurat-find-clusters.r -i <<Seurat object with computed dimension reductions, .r
 ```
 seurat-get-random-genes.R <Seurat object in .rds format> <output text file> <ngenes>
 ```
+
+### Export to CellBrowser
+
+Exports a Seurat RDS object and an (optional) markers file to a format that can be read by UCSC CellBrowser:
+
+```
+seurat-export-cellbrowser.R -i <Seurat object in .rds format> [-m markers.csv] -o <directory_for_output>
+```
