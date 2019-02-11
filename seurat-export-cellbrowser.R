@@ -34,6 +34,12 @@ option_list = list(
     default = "Seurat study",
     type="character",
     help="Study name to be displayed in CellBrowser"
+  ),
+  make_option(
+    c("-m", "--markers-file"),
+    default = NULL,
+    type="character",
+    help="Path to markers file computed by Seurat"
   )
 )
 
@@ -293,4 +299,9 @@ enum.string <- paste0(
   
 }
 
-ExportToCellbrowser(object = seurat_object, dir = opt$output_directory, skip.markers = TRUE, dataset.name = opt$study_name)
+skip_markers = TRUE
+if(!is.null(opt$markers_file)) {
+  skip_markers = FALSE
+}
+
+ExportToCellbrowser(object = seurat_object, dir = opt$output_directory, skip.markers = skip_markers, markers.file = opt$markers_file, dataset.name = opt$study_name)
