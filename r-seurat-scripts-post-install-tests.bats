@@ -181,6 +181,14 @@
     [ -f  "$marker_text_file" ]
 }
 
+@test "Export to CellBrowser" {
+    run rm -rf $html_output_dir && seurat-export-cellbrowser.R -i $tsne_seurat_object -o $html_output_dir -n StudyTest
+    echo "status = ${status}"
+    echo "output = ${output}"
+
+    [ "$status" -eq 0 ]
+}
+
 # Plot the PCA
 
 @test "Plot dimension reduction" {
