@@ -1,6 +1,6 @@
 # seurat-scripts [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/seurat-scripts/README.html)
 
-In order to wrap Seurat's internal workflow in any given workflow language, it's important to have scripts to call each of those steps, which is what this pacakge provides.
+In order to wrap Seurat's internal workflow in any given workflow language, it's important to have scripts to call each of those steps, which is what this package provides.
 
 ## Install
 
