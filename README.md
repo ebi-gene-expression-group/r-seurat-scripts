@@ -1,15 +1,15 @@
-# Wrapper scripts for components of the Seurat toolchain
+# seurat-scripts [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/seurat-scripts/README.html)
 
-In order to wrap Seurat's internal workflow in any given workflow language, it's important to have scripts to call each of those steps. These scripts are being written here, and will improve in completeness as time progresses. 
+In order to wrap Seurat's internal workflow in any given workflow language, it's important to have scripts to call each of those steps, which is what this pacakge provides.
 
 ## Install
 
-The recommended method for script installation is via a Bioconda recipe called r-seurat-scripts. 
+The recommended method for script installation is via a Bioconda recipe called seurat-scripts. 
 
 With the [Bioconda channels](https://bioconda.github.io/#set-up-channels) configured the latest release version of the package can be installed via the regular conda install command:
 
 ```
-conda install bioconductor-scater-scripts
+conda install seurat-scripts
 ```
 
 ## Test installation
