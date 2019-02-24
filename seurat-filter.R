@@ -52,6 +52,13 @@ option_list = list(
     default = NA,
     type = 'character',
     help = "File name in which to store serialized R object of type 'Seurat'.'"
+  ),
+  make_option(
+    c("--min-cells"),
+    action = "store",
+    default = 0,
+    type = 'integer',
+    help = "Include only genes with detected expression in at least this many cells."
   )
 )
 
@@ -94,6 +101,15 @@ if (! is.null(cells_use)){
 # Now we're hapy with the arguments, load Seurat and do the work
 
 suppressPackageStartupMessages(require(Seurat))
+
+# taken from create seurat object method
+if (opt$min_cells > 0) {
+  num.cells <- rowSums(seurat_object@data > 0)
+  genes.use <- names(x = num.cells[which(x = num.cells >= opt$min_cells)])
+  seurat_object@raw.data <- seurat_object@raw.data[genes.use, ]
+  seurat_object@data <- seurat_object@data[genes.use, ]
+  warning("Filtering by min cells only changes @data and @raw.data matrices within the Seurat object. However, if you have executed any other downstream operation (scaling, normalization, pca, clustering) on this same dataset, you might want to re-do those steps, as those objects are not updated during this filtering step.")
+}
 
 filtered_seurat_object <- FilterCells(seurat_object, subset.names = subset_names, low.thresholds = lt, high.thresholds = ht, cells.use = cells_use)
 
