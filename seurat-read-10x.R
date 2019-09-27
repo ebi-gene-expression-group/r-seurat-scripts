@@ -38,6 +38,7 @@ if ( ! dir.exists(opt$data_dir)){
 # Now we're hapy with the arguments, load Seurat and do the work
 
 suppressPackageStartupMessages(require(Seurat))
+suppressPackageStartupMessages(require(Matrix))
 
 # Read the data
 

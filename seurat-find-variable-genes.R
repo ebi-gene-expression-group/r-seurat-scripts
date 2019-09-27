@@ -19,6 +19,13 @@ option_list = list(
     help = "File name in which a serialized R matrix object may be found."
   ),
   make_option(
+    c("-s", "--selection-method"),
+    action = "store",
+    default = "vst",
+    type='character',
+    help="How to choose top variable features. Choose one of: 'vst', 'mvp', disp".
+  ),
+  make_option(
     c("-m", "--mean-function"),
     action = "store",
     default = 'ExpMean',
@@ -37,28 +44,35 @@ option_list = list(
     action = "store",
     default = 0.1,
     type = 'double',
-    help = "Bottom cutoff on x-axis for identifying variable genes."
+    help = "Bottom cutoff on x-axis (mean) for identifying variable genes."
   ),
   make_option(
     c("-j", "--x-high-cutoff"),
     action = "store",
     default = 8,
     type = 'double',
-    help = "Top cutoff on x-axis for identifying variable genes."
+    help = "Top cutoff on x-axis (mean) for identifying variable genes."
+  ),
+  make_option(
+    c("-n", "--nfeatures"),
+    action = "store",
+    default = 2000,
+    type = 'integer',
+    help = "Number of features to return."
   ),
   make_option(
     c("-y", "--y-low-cutoff"),
     action = "store",
     default = 1,
     type = 'double',
-    help = "Bottom cutoff on y-axis for identifying variable genes."
+    help = "Bottom cutoff on y-axis (dispersion) for identifying variable genes."
   ),
   make_option(
     c("-z", "--y-high-cutoff"),
     action = "store",
     default = Inf,
     type = 'double',
-    help = "Top cutoff on y-axis for identifying variable genes."
+    help = "Top cutoff on y-axis (dispersion) for identifying variable genes."
   ),
   make_option(
     c("-o", "--output-object-file"),
@@ -91,7 +105,14 @@ suppressPackageStartupMessages(require(Seurat))
 # Input from serialized R object
 
 seurat_object <- readRDS(opt$input_object_file)
-variable_genes_seurat_object <- FindVariableGenes(seurat_object, mean.function = get(opt$mean_function), dispersion.function = get(opt$dispersion_function), x.low.cutoff = opt$x_low_cutoff, x.high.cutoff = opt$x_high_cutoff, y.cutoff = opt$y_low_cutoff, y.high.cutoff = opt$y_high_cutoff, do.plot = FALSE, display.progress = FALSE)
+variable_genes_seurat_object <- FindVariableFeatures(seurat_object, 
+                                                  selection.method = opt$selection_method,
+                                                  nfeatures = opt$nfeatures,
+                                                  mean.function = get(opt$mean_function), 
+                                                  dispersion.function = get(opt$dispersion_function), 
+                                                  mean.cutoff = c(opt$x_low_cutoff, opt$x_high_cutoff),
+                                                  dispersion.cutoff = c(opt$y_low_cutoff, opt$y_high_cutoff),
+                                                  verbose = FALSE)
 
 # Output to a serialized R object
 
@@ -107,7 +128,7 @@ opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)
 opt_table <- opt_table[! rownames(opt_table) %in% nonreport_params, , drop = FALSE]
 
 cat(c(
-    paste(length(variable_genes_seurat_object@var.genes), 'variable genes detected out of total', nrow(seurat_object@data))),
+    paste(length(VariableFeatures(variable_genes_seurat_object)), 'variable genes detected out of total', nrow(seurat_object@data))),
     '\nParameter values:', 
     capture.output(print(opt_table)
 ), sep = '\n')          

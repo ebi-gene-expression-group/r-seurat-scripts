@@ -23,7 +23,7 @@ option_list = list(
     action = "store",
     default = NULL,
     type = 'character',
-    help = "File to be used to derive a vector of gene names to scale/center (one gene per line). Default is all genes in object@data."
+    help = "File with gene names to scale/center (one gene per line). Default is all genes in object@data."
   ),
   make_option(
     c("-v", "--vars-to-regress"),
@@ -82,13 +82,6 @@ option_list = list(
     help = "If object contains fewer than this number of cells, don't block for scaling calculations."
   ),
   make_option(
-    c("-a", "--assay-type"),
-    action = "store",
-    default = 'RNA',
-    type = 'character',
-    help = "Assay to scale data for. Default is RNA. Can be changed for multimodal analyses."
-  ),
-  make_option(
     c("-n", "--check-for-norm"),
     action = "store",
     default = TRUE,
@@ -130,7 +123,18 @@ suppressPackageStartupMessages(require(Seurat))
 
 seurat_object <- readRDS(opt$input_object_file)
 
-scaled_seurat_object <- ScaleData(seurat_object, genes.use = genes_use, vars.to.regress = opt$vars_to_regress, model.use = opt$model_use, use.umi = opt$use_umi, do.scale = opt$do_scale, do.center = opt$do_center, scale.max = opt$scale_max, block.size = opt$block_size, min.cells.to.block = opt$min_cells_to_block, assay.type = opt$assay_type, check.for.norm = opt$check_for_norm, display.progress = FALSE)
+scaled_seurat_object <- ScaleData(seurat_object, 
+                                  features = genes_use, 
+                                  vars.to.regress = opt$vars_to_regress, 
+                                  model.use = opt$model_use, 
+                                  use.umi = opt$use_umi, 
+                                  do.scale = opt$do_scale, 
+                                  do.center = opt$do_center, 
+                                  scale.max = opt$scale_max, 
+                                  block.size = opt$block_size, 
+                                  min.cells.to.block = opt$min_cells_to_block, 
+                                  check.for.norm = opt$check_for_norm, 
+                                  verbose = FALSE)
 
 # Output to a serialized R object
 

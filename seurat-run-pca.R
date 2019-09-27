@@ -23,7 +23,14 @@ option_list = list(
     action = "store",
     default = NULL,
     type = 'character',
-    help = "File to be used to derive a vector of gene names to scale/center. Default is all genes in object@data."
+    help = "File with gene names to scale/center. Default is all genes in object@data."
+  ),
+  make_option(
+    c("-e", "--pc-cells"),
+    action = "store",
+    default = NULL,
+    type = 'character',
+    help = "File with cell names to scale/center. Default is all cells in object@data."
   ),
   make_option(
     c("-p", "--pcs-compute"),
@@ -33,11 +40,11 @@ option_list = list(
     help = "Total Number of PCs to compute and store (20 by default)."
   ),
   make_option(
-    c("-m", "--use-imputed"),
+    c("-r", "--reverse-pca"),
     action = "store",
     default = FALSE,
     type = 'logical',
-    help = "Run PCA on imputed values (FALSE by default)."
+    help = "Run PCA on reverse matrix (gene x cell; FALSE by default means cell x gene)."
   ),
   make_option(
     c("-o", "--output-object-file"),
@@ -79,13 +86,24 @@ if ( ! file.exists(opt$input_object_file)){
 
 if (! is.null(opt$pc_genes)){
   if (! file.exists(opt$pc_genes)){
-    stop((paste('Supplied genes file', opt$genes_file, 'does not exist')))
+    stop((paste('Supplied genes file', opt$pc_genes, 'does not exist')))
   }else{
     pc_genes <- readLines(opt$pc_genes)
   }
 }else{
   pc_genes <- NULL
 }
+
+if (! is.null(opt$pc_cells)){
+  if (! file.exists(opt$pc_cells)){
+    stop((paste('Supplied cells file', opt$pc_cells, 'does not exist')))
+  }else{
+    pc_cells <- readLines(opt$pc_cells)
+  }
+}else{
+  pc_cells <- NULL
+}
+
 
 # Now we're hapy with the arguments, load Seurat and do the work
 
@@ -95,13 +113,21 @@ suppressPackageStartupMessages(require(Seurat))
 
 seurat_object <- readRDS(opt$input_object_file)
 
-pca_seurat_object <- RunPCA(seurat_object, pc.genes = pc_genes, pcs.compute = opt$pcs_compute, use.imputed = opt$use_imputed, do.print=FALSE)
+features<-pc_genes
+if(opt$reverse_pca) {
+  features<-pc_cells
+}
+pca_seurat_object <- RunPCA(seurat_object, 
+                            features = features, 
+                            npcs = opt$pcs_compute, 
+                            rev.pca = opt$reverse_pca,
+                            verbose=FALSE)
 
 # Output to text-format components
-
-write.csv(pca_seurat_object@dr$pca@cell.embeddings, file = opt$output_embeddings_file)
-write.csv(pca_seurat_object@dr$pca@gene.loadings, file = opt$output_loadings_file)
-writeLines(con=opt$output_stdev_file, as.character(pca_seurat_object@dr$pca@sdev))
+# Review question: Do we need to revert this for the reverse PCA case?
+write.csv(pca_seurat_object[['pca']]@cell.embeddings, file = opt$output_embeddings_file)
+write.csv(pca_seurat_object[['pca']]@gene.loadings, file = opt$output_loadings_file)
+writeLines(con=opt$output_stdev_file, as.character(pca_seurat_object[['pca']]@sdev))
 
 # Output to a serialized R object
 

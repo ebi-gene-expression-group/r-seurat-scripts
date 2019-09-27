@@ -19,18 +19,11 @@ option_list = list(
     help = "File name in which a serialized R matrix object may be found."
   ),
   make_option(
-    c("-a", "--assay-type"),
-    action = "store",
-    default = 'RNA',
-    type = 'character',
-    help = "Type of assay to normalize for (default is RNA), but can be changed for multimodal analyses."
-  ),
-  make_option(
     c("-n", "--normalization-method"),
     action = "store",
     default = 'LogNormalize',
     type = 'character',
-    help = "Method for normalization. Default is log-normalization (LogNormalize)."
+    help = "Method for normalization. Default is log-normalization (LogNormalize). Can be 'CLR' or 'RC' additionally."
   ),
   make_option(
     c("-s", "--scale-factor"),
@@ -63,7 +56,10 @@ suppressPackageStartupMessages(require(Seurat))
 # Input from serialized R object
 
 seurat_object <- readRDS(opt$input_object_file)
-normalised_seurat_object <- NormalizeData(seurat_object, assay.type = opt$assay_type, normalization.method = opt$normalization_method, scale.factor = opt$scale_factor, display.progress = FALSE)
+normalised_seurat_object <- NormalizeData(seurat_object, 
+                                          normalization.method = opt$normalization_method, 
+                                          scale.factor = opt$scale_factor, 
+                                          verbose = FALSE)
 
 # Output to a serialized R object
 

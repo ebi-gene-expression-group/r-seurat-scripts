@@ -120,7 +120,7 @@ seurat_object <- readRDS(opt$input_object_file)
 
 # Get results matrix
 
-results_matrix <- FindAllMarkers(
+results_matrix <- FindMarkers(
   seurat_object,
   genes.use = genes_use,
   logfc.threshold = opt$logfc_threshold,

@@ -26,11 +26,25 @@ option_list = list(
     help = 'Which dimensional reduction (e.g. PCA, ICA) to use for the tSNE. Default is PCA.'
   ),
   make_option(
+    c("--tsne-method"),
+    action = "store",
+    default = 'Rtsne',
+    type = 'character',
+    help = 'Select the method to use to compute the tSNE. Available methods are: Rtsne, Flt-SNE'
+  ),
+  make_option(
     c("-c", "--cells-use"),
     action = "store",
     default = NULL,
     type = 'character',
     help = "File to be used to derive a vector of which cells to analyze (default, all cells)."
+  ),
+  make_option(
+    c("--tsne-dimensions"),
+    action = "store",
+    default = 2,
+    type = 'integer',
+    help = "The dimensional space of the resulting tSNE embedding (default is 2). For example, set to 3 for a 3d tSNE"
   ),
   make_option(
     c("-d", "--dims-use"),
@@ -47,13 +61,6 @@ option_list = list(
     help = "File to be used to derive a vector of gene names. If set, run the tSNE on this subset of genes (instead of running on a set of reduced dimensions). Not set (NULL) by default."
   ),
   make_option(
-    c("-f", "--do-fast"),
-    action = "store",
-    default = TRUE,
-    type = 'character',
-    help = "If TRUE, uses the Barnes-hut implementation, which runs faster, but is less flexible. TRUE by default."
-  ),
-  make_option(
     c("-o", "--output-object-file"),
     action = "store",
     default = NA,
@@ -66,6 +73,13 @@ option_list = list(
     default = NA,
     type = 'character',
     help = "File name in which to store a csv-format embeddings table with PCs by cell."
+  ),
+  make_option(
+    c("--random-seed"),
+    action = "store",
+    default = NULL,
+    type = 'integer',
+    help = "Seed of the random number generator"
   )
 )
 
@@ -116,7 +130,15 @@ suppressPackageStartupMessages(require(Seurat))
 
 seurat_object <- readRDS(opt$input_object_file)
 
-tsne_seurat_object <- RunTSNE( seurat_object, reduction.use = opt$reduction_use, cells.use = cells_use, dims.use = dims_use, genes.use = NULL, do.fast = opt$do_fast  )
+tsne_seurat_object <- RunTSNE( seurat_object, 
+                               reduction = opt$reduction_use, 
+                               tsne.method = opt$tsne_method,
+                               dim.embed = opt$dim_embed,
+                               cells = cells_use, 
+                               dims = dims_use, 
+                               seed.use = opt$random_seed,
+                               features = NULL, 
+                                 )
 
 # Output to text-format components
 

@@ -95,7 +95,8 @@ if (! is.null(cells_use)){
 
 suppressPackageStartupMessages(require(Seurat))
 
-filtered_seurat_object <- FilterCells(seurat_object, subset.names = subset_names, low.thresholds = lt, high.thresholds = ht, cells.use = cells_use)
+# filtered_seurat_object <- FilterCells(seurat_object, subset.names = subset_names, low.thresholds = lt, high.thresholds = ht, cells.use = cells_use)
+filtered_seurat_object <- subset(seurat_object, subset = subset_names > lt & subset_names < ht, cells = cells_use)
 
 # Print a summary of the affects of filtering
 
