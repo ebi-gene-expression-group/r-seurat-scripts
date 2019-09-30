@@ -119,17 +119,15 @@ suppressPackageStartupMessages(require(Seurat))
 seurat_object <- readRDS(opt$input_object_file)
 
 # Get results matrix
-
-results_matrix <- FindMarkers(
+FindAllMarkers(
   seurat_object,
-  genes.use = genes_use,
+  features = genes_use,
   logfc.threshold = opt$logfc_threshold,
   test.use = opt$test_use,
   min.pct = opt$min_pct,
   min.diff.pct = opt$min_diff_pct,
-  print.bar = FALSE,
-  do.print = FALSE,
-  min.cells.gene = opt$min_cells_gene,
+  verbose = FALSE,
+  min.cells.feature = opt$min_cells_gene,
   min.cells.group = opt$min_cells_group,
   only.pos = opt$only_pos,
   max.cells.per.ident = opt$max_cells_per_ident
