@@ -119,7 +119,7 @@ suppressPackageStartupMessages(require(Seurat))
 seurat_object <- readRDS(opt$input_object_file)
 
 # Get results matrix
-FindAllMarkers(
+results_matrix<-FindAllMarkers(
   seurat_object,
   features = genes_use,
   logfc.threshold = opt$logfc_threshold,
