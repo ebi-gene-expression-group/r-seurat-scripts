@@ -96,7 +96,6 @@ export min_umi=1000
 
 # Normalisation. See Seurat ?NormalizeData
 
-export assay_type='RNA'
 export normalisation_method='LogNormalize'
 export scale_factor=10000
 

@@ -68,7 +68,7 @@
         skip "$normalised_seurat_object exists and use_existing_outputs is set to 'true'"
     fi
     
-    run rm -f $normalised_seurat_object && seurat-normalise-data.R -i $filtered_seurat_object -a $assay_type -n $normalisation_method -s $scale_factor -o $normalised_seurat_object
+    run rm -f $normalised_seurat_object && seurat-normalise-data.R -i $filtered_seurat_object -n $normalisation_method -s $scale_factor -o $normalised_seurat_object
     echo "status = ${status}"
     echo "output = ${output}"
     
@@ -113,7 +113,7 @@
         skip "$scaled_seurat_object exists and use_existing_outputs is set to 'true'"
     fi
 
-    run rm -f $scaled_seurat_object && seurat-scale-data.R -i $variable_genes_seurat_object -e $test_genes -v $vars_to_regress -m $model_use -u $use_umi -s $do_scale -c $do_center -x $scale_max -b $block_size -d $min_cells_to_block -a $assay_type -n $check_for_norm -o $scaled_seurat_object  
+    run rm -f $scaled_seurat_object && seurat-scale-data.R -i $variable_genes_seurat_object -e $test_genes -v $vars_to_regress -m $model_use -u $use_umi -s $do_scale -c $do_center -x $scale_max -b $block_size -d $min_cells_to_block -n $check_for_norm -o $scaled_seurat_object  
     echo "status = ${status}"
     echo "output = ${output}"
   
@@ -128,7 +128,7 @@
         skip "$scaled_seurat_object exists and use_existing_outputs is set to 'true'"
     fi
 
-    run rm -rf $pca_seurat_object && seurat-run-pca.R -i $scaled_seurat_object -e $test_genes -p $pcs_compute -m $use_imputed -o $pca_seurat_object -b $pca_embeddings_file -l $pca_loadings_file -s $pca_stdev_file
+    run rm -rf $pca_seurat_object && seurat-run-pca.R -i $scaled_seurat_object -e $test_genes -p $pcs_compute -o $pca_seurat_object -b $pca_embeddings_file -l $pca_loadings_file -s $pca_stdev_file
     echo "status = ${status}"
     echo "output = ${output}"
   
@@ -143,7 +143,7 @@
         skip "$pca_image_file exists and use_existing_outputs is set to 'true'"
     fi
 
-    run rm -f $cluster_text_file && seurat-find-clusters.R -i $pca_seurat_object -e $test_genes -u $reduction_type -d $dims_use -k $k_param -r $resolution -a $cluster_algorithm -m $cluster_tmp_file_location -o $cluster_seurat_object -t $cluster_text_file 
+    run rm -f $cluster_text_file && seurat-find-clusters.R -i $pca_seurat_object -r $resolution -a $cluster_algorithm -m $cluster_tmp_file_location -o $cluster_seurat_object -t $cluster_text_file 
     echo "status = ${status}"
     echo "output = ${output}"
  
@@ -158,7 +158,7 @@
         skip "$tsne_seurat_object exists and use_existing_outputs is set to 'true'"
     fi
 
-    run rm -f $tsne_seurat_object && seurat-run-tsne.R -i $pca_seurat_object -r $reduction_type -d $dims_use -e NULL -f $tsne_do_fast -o $tsne_seurat_object -b $tsne_embeddings_file
+    run rm -f $tsne_seurat_object && seurat-run-tsne.R -i $pca_seurat_object -r $reduction_type -d $dims_use -e NULL -o $tsne_seurat_object -b $tsne_embeddings_file
     echo "status = ${status}"
     echo "output = ${output}"
  
