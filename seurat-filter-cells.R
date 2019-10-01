@@ -95,8 +95,21 @@ if (! is.null(cells_use)){
 
 suppressPackageStartupMessages(require(Seurat))
 
-# filtered_seurat_object <- FilterCells(seurat_object, subset.names = subset_names, low.thresholds = lt, high.thresholds = ht, cells.use = cells_use)
-filtered_seurat_object <- subset(seurat_object, subset = subset_names > lt & subset_names < ht, cells = cells_use)
+# Given the new setup, now we need to iterate over all the elements provided for filtering
+# and come up with an intersection on all of them
+cells_bool<-rep(TRUE, length(subset_names))
+for(i in seq_along(subset_names)) {
+  cells_bool<-cells_bool & seurat_object[[]][subset_names[[i]]] > lt[i] & seurat_object[[]][subset_names[[i]]] < ht[i]
+  cat(c(length(which(cells_bool)),"cells remaining after applying",subset_names[i],"thresholds",lt[i],"< x <",ht[i],"\n"))
+}
+# Intersect that with any explicit cells that the user has asked for, if any
+cells<-colnames(seurat_object)[cells_bool]
+if (! is.null(cells_use)){
+  cells<-intersect(cells_use, cells)
+  cat(c(lenght(cells)," cells remaining after intersecting threshold based selection with provided list of cells.\n"))
+}
+
+filtered_seurat_object <- subset(seurat_object, cells = cells)
 
 # Print a summary of the affects of filtering
 

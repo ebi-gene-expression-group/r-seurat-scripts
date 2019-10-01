@@ -53,7 +53,7 @@
         skip "$filtered_seurat_object exists and use_existing_outputs is set to 'true'"
     fi
     
-    run rm -f $filtered_seurat_object && seurat-filter-cells.R -i $raw_seurat_object -s nGene,nUMI -l $min_genes,$min_umi -o $filtered_seurat_object
+    run rm -f $filtered_seurat_object && seurat-filter-cells.R -i $raw_seurat_object -s nFeature_RNA,nCount_RNA -l $min_genes,$min_umi -o $filtered_seurat_object
     echo "status = ${status}"
     echo "output = ${output}"
     
