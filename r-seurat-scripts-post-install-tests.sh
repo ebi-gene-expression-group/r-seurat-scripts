@@ -109,7 +109,7 @@ export fvg_y_low_cutoff='1'
 export fvg_y_high_cutoff='Inf'
 
 # Scale and center the data. See ?ScaleData
-export vars_to_regress='nUMI'
+export vars_to_regress='nCount_RNA'
 export model_use='linear'
 export use_umi='TRUE'
 export do_scale='TRUE'

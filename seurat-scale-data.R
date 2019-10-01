@@ -28,7 +28,7 @@ option_list = list(
   make_option(
     c("-v", "--vars-to-regress"),
     action = "store",
-    default = NA,
+    default = NULL,
     type = 'character',
     help = "Comma-separated list of variables to regress out (previously latent.vars in RegressOut). For example, nUMI, or percent.mito."
   ),
@@ -133,7 +133,6 @@ scaled_seurat_object <- ScaleData(seurat_object,
                                   scale.max = opt$scale_max, 
                                   block.size = opt$block_size, 
                                   min.cells.to.block = opt$min_cells_to_block, 
-                                  check.for.norm = opt$check_for_norm, 
                                   verbose = FALSE)
 
 # Output to a serialized R object

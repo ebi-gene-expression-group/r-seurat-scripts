@@ -23,7 +23,7 @@ option_list = list(
     action = "store",
     default = "vst",
     type='character',
-    help="How to choose top variable features. Choose one of: 'vst', 'mvp', disp".
+    help="How to choose top variable features. Choose one of: 'vst', 'mvp', disp."
   ),
   make_option(
     c("-m", "--mean-function"),
@@ -128,11 +128,11 @@ opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)
 opt_table <- opt_table[! rownames(opt_table) %in% nonreport_params, , drop = FALSE]
 
 cat(c(
-    paste(length(VariableFeatures(variable_genes_seurat_object)), 'variable genes detected out of total', nrow(seurat_object@data))),
+    paste(length(VariableFeatures(variable_genes_seurat_object)), 'variable genes detected out of total', nrow(GetAssayData(seurat_object)))),
     '\nParameter values:', 
     capture.output(print(opt_table)
 ), sep = '\n')          
 
 # Output variable genes to a simple text file
 
-writeLines(con=opt$output_text_file, variable_genes_seurat_object@var.genes)
+writeLines(con=opt$output_text_file, VariableFeatures(variable_genes_seurat_object))
