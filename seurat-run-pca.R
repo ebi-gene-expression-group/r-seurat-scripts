@@ -26,7 +26,7 @@ option_list = list(
     help = "File with gene names to scale/center. Default is all genes in object@data."
   ),
   make_option(
-    c("-e", "--pc-cells"),
+    c("-c", "--pc-cells"),
     action = "store",
     default = NULL,
     type = 'character',
@@ -84,24 +84,22 @@ if ( ! file.exists(opt$input_object_file)){
   stop((paste('File', opt$input_object_file, 'does not exist')))
 }
 
+pc_genes <- NULL
 if (! is.null(opt$pc_genes)){
   if (! file.exists(opt$pc_genes)){
     stop((paste('Supplied genes file', opt$pc_genes, 'does not exist')))
   }else{
     pc_genes <- readLines(opt$pc_genes)
   }
-}else{
-  pc_genes <- NULL
 }
 
+pc_cells <- NULL
 if (! is.null(opt$pc_cells)){
   if (! file.exists(opt$pc_cells)){
     stop((paste('Supplied cells file', opt$pc_cells, 'does not exist')))
   }else{
     pc_cells <- readLines(opt$pc_cells)
   }
-}else{
-  pc_cells <- NULL
 }
 
 
@@ -126,8 +124,8 @@ pca_seurat_object <- RunPCA(seurat_object,
 # Output to text-format components
 # Review question: Do we need to revert this for the reverse PCA case?
 write.csv(pca_seurat_object[['pca']]@cell.embeddings, file = opt$output_embeddings_file)
-write.csv(pca_seurat_object[['pca']]@gene.loadings, file = opt$output_loadings_file)
-writeLines(con=opt$output_stdev_file, as.character(pca_seurat_object[['pca']]@sdev))
+write.csv(pca_seurat_object[['pca']]@feature.loadings, file = opt$output_loadings_file)
+writeLines(con=opt$output_stdev_file, as.character(pca_seurat_object[['pca']]@stdev))
 
 # Output to a serialized R object
 

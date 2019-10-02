@@ -136,6 +136,21 @@
     [ -f  "$pca_seurat_object" ]
 }
 
+# Find Neighbours
+
+@test "Run FindNeighbours" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$neighbours_seurat_object" ]; then
+        skip "$neighbours_seurat_object exists and use_existing_outputs is set to 'true'"
+    fi
+
+    run rm -rf $neighbours_seurat_object && seurat-find-neighbours.R -i $pca_seurat_object -o $neighbours_seurat_object --dims 1,2,3,4,5 --compute-snn --reduction pca
+    echo "status = ${status}"
+    echo "output = ${output}"
+  
+    [ "$status" -eq 0 ]
+    [ -f  "$neighbours_seurat_object" ]
+}
+
 # Generate clusters
 
 @test "Generate cell clusters from expression values" {
@@ -143,7 +158,7 @@
         skip "$pca_image_file exists and use_existing_outputs is set to 'true'"
     fi
 
-    run rm -f $cluster_text_file && seurat-find-clusters.R -i $pca_seurat_object -r $resolution -a $cluster_algorithm -m $cluster_tmp_file_location -o $cluster_seurat_object -t $cluster_text_file 
+    run rm -f $cluster_text_file && seurat-find-clusters.R -i $neighbours_seurat_object -r $resolution -a $cluster_algorithm -m $cluster_tmp_file_location -o $cluster_seurat_object -t $cluster_text_file 
     echo "status = ${status}"
     echo "output = ${output}"
  

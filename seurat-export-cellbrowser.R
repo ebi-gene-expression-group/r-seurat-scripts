@@ -61,4 +61,7 @@ if(!is.null(opt$markers_file)) {
   skip_markers = FALSE
 }
 
-ExportToCellbrowser(object = seurat_object, dir = opt$output_directory, skip.markers = skip_markers, markers.file = opt$markers_file, dataset.name = opt$study_name)
+Seurat::ExportToCellbrowser(object = seurat_object, 
+                            dir = opt$output_directory, 
+                            markers.file = opt$markers_file, 
+                            dataset.name = opt$study_name)

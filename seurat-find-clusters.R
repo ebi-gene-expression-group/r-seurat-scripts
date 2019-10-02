@@ -70,34 +70,34 @@ option_list = list(
   make_option(
     c("--graph-name"),
     action = "store",
-    default = NA,
+    default = NULL,
     type = 'character',
     help = "Name of graph to use for the clustering algorithm."
   ),
   make_option(
     c("-s", "--nrandom-starts"),
     action = "store",
-    default = NULL,
+    default = 10,
     type = 'integer',
     help = "Number of random starts"
   ),
   make_option(
     c("--n-iterations"),
     action = "store",
-    default = NULL,
+    default = 10,
     type = 'integer',
     help = "Maximal number of iterations per random start"
   ),
   make_option(
     c("--group-singletons"),
     action = "store_true",
-    default = TRUE,
+    default = FALSE,
     help = "Group singletons into nearest cluster. If FALSE, assign all singletons to a \"singleton\" group"
   ),
   make_option(
     c("--random-seed"),
     action = "store",
-    default = NULL,
+    default = 0,
     type = 'integer',
     help = "Seed of the random number generator"
   )
@@ -109,11 +109,6 @@ opt <- wsc_parse_args(option_list, mandatory = c('input_object_file', 'output_ob
 
 if ( ! file.exists(opt$input_object_file)){
   stop((paste('File', opt$input_object_file, 'does not exist')))
-}
-
-dims_use <- opt$dims_use
-if ( ! is.null(dims_use)){
-  dims_use <- wsc_parse_numeric(opt, 'dims_use')
 }
 
 if (! is.null(opt$genes_use)){
@@ -142,7 +137,7 @@ clustered_object <- FindClusters(seurat_object,
                                  n.iter = opt$n_iterations,
                                  random.seed = opt$random_seed,
                                  group.singletons = opt$group_singletons,
-                                 verbose = FALSE, 
+                                 verbose = TRUE, 
                                  resolution = opt$resolution, 
                                  graph.name = opt$graph_name,
                                  temp.file.location = opt$temp_file_location)
@@ -156,11 +151,11 @@ nonreport_params <- c('input_object_file', 'output_object_file', 'help', 'output
 opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)
 opt_table <- opt_table[! rownames(opt_table) %in% nonreport_params, , drop = FALSE]
 
-cluster_table <- as.data.frame(table(clustered_object@ident))
+cluster_table <- as.data.frame(table(Idents(clustered_object)))
 colnames(cluster_table) <- c('Cluster', 'No. cells')
 rownames(cluster_table) <- cluster_table$Cluster
 
-cat(paste(ncol(clustered_object@data), 'cells fall into ', length(unique(clustered_object@ident)), 'final clusters. Membership numbers:\n'), capture.output(cluster_table[,2, drop = FALSE]), '\nParameter values:\n', capture.output(print(opt_table)), sep = '\n')
+cat(paste(ncol(GetAssayData(clustered_object)), 'cells fall into ', length(levels(Idents(clustered_object))), 'final clusters. Membership numbers:\n'), capture.output(cluster_table[,2, drop = FALSE]), '\nParameter values:\n', capture.output(print(opt_table)), sep = '\n')
 
 # Output to a serialized R object
 
@@ -168,4 +163,4 @@ saveRDS(clustered_object, file = opt$output_object_file)
 
 # Output variable genes to a simple text file
 
-write.csv(data.frame(cell=names(clustered_object@ident), cluster=clustered_object@ident), file = opt$output_text_file, row.names = FALSE)
+write.csv(data.frame(cell=names(Idents(clustered_object)), cluster=Idents(clustered_object)), file = opt$output_text_file, row.names = FALSE)

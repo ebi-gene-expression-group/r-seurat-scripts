@@ -143,7 +143,7 @@ opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)
 opt_table <- opt_table[! rownames(opt_table) %in% nonreport_params, , drop = FALSE]
 
 markers_by_cluster <- merge(
-  data.frame(as.matrix(table(seurat_object@ident))),
+  data.frame(as.matrix(table(Idents(seurat_object)))),
   data.frame(as.matrix(table(results_matrix$cluster))),
   by = 'row.names'
 )

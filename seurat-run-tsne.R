@@ -40,7 +40,7 @@ option_list = list(
     help = "File to be used to derive a vector of which cells to analyze (default, all cells)."
   ),
   make_option(
-    c("--tsne-dimensions"),
+    c("--dim_embed"),
     action = "store",
     default = 2,
     type = 'integer',
@@ -92,34 +92,30 @@ if ( ! file.exists(opt$input_object_file)){
 }
 
 # Check genes_use
-
+genes_use <- NULL
 if (! is.null(opt$genes_use) && opt$genes_use != 'NULL'){
   if (! file.exists(opt$genes_use)){
     stop((paste('Supplied genes file', opt$genes_use, 'does not exist')))
   }else{
     genes_use <- readLines(opt$genes_use)
   }
-}else{
-  genes_use <- NULL
 }
 
 # Read cells file (if present)
-
+cells_use <- NULL
 if (! is.null(opt$cells_use) && opt$cells_use != 'NULL'){
   if (! file.exists(opt$cells_use)){
     stop((paste('Supplied genes file', opt$cells_use, 'does not exist')))
   }else{
     cells_use <- readLines(opt$cells_use)
   }
-}else{
-  cells_use <- NULL
 }
 
 # Check dims-use
 
 dims_use <- opt$dims_use
 if ( ! is.null(dims_use)){
-  dims_use <- wsc_parse_numeric(opt, 'dims_use')
+  dims_use <- as.integer(wsc_parse_numeric(opt, 'dims_use'))
 }
 
 # Now we're hapy with the arguments, load Seurat and do the work
@@ -137,12 +133,12 @@ tsne_seurat_object <- RunTSNE( seurat_object,
                                cells = cells_use, 
                                dims = dims_use, 
                                seed.use = opt$random_seed,
-                               features = NULL, 
-                                 )
+                               features = genes_use, 
+                              )
 
 # Output to text-format components
 
-write.csv(tsne_seurat_object@dr$tsne@cell.embeddings, file = opt$output_embeddings_file)
+write.csv(tsne_seurat_object[['tsne']]@cell.embeddings, file = opt$output_embeddings_file)
 
 # Output to a serialized R object
 
