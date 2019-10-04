@@ -19,6 +19,20 @@ option_list = list(
     help = "File name in which a serialized R matrix object may be found."
   ),
   make_option(
+    c("--input-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
+  ),
+  make_option(
+    c("--output-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
+  ),
+  make_option(
     c("-s", "--subset-names"),
     action = "store",
     default = NA,
@@ -65,7 +79,7 @@ if ( ! file.exists(opt$input_object_file)){
 
 # Input from serialized R object
 
-seurat_object <- readRDS(opt$input_object_file)
+seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
 
 # Are the metadata variables valid for this object?
 
@@ -94,7 +108,11 @@ if (! is.null(cells_use)){
 # Now we're hapy with the arguments, load Seurat and do the work
 
 suppressPackageStartupMessages(require(Seurat))
-
+if(opt$input_format == "loom" | opt$output_format == "loom") {
+  suppressPackageStartupMessages(require(loomR))
+} else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
+  suppressPackageStartupMessages(require(scater))
+}
 # Given the new setup, now we need to iterate over all the elements provided for filtering
 # and come up with an intersection on all of them
 cells_bool<-rep(TRUE, length(subset_names))
@@ -131,5 +149,6 @@ cat(c(
 sep = '\n')
 
 # Output to a serialized R object
-
-saveRDS(filtered_seurat_object, file = opt$output_object_file)
+write_seurat3_object(seurat_object = filtered_seurat_object, 
+                     output_path = opt$output_object_file, 
+                     format = opt$output_format)

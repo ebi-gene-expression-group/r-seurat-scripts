@@ -19,6 +19,20 @@ option_list = list(
     help = "File name in which a serialized R matrix object may be found."
   ),
   make_option(
+    c("--input-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
+  ),
+  make_option(
+    c("--output-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
+  ),
+  make_option(
     c("-s", "--selection-method"),
     action = "store",
     default = "vst",
@@ -101,10 +115,15 @@ if ( ! file.exists(opt$input_object_file)){
 # Now we're hapy with the arguments, load Seurat and do the work
 
 suppressPackageStartupMessages(require(Seurat))
+if(opt$input_format == "loom" | opt$output_format == "loom") {
+  suppressPackageStartupMessages(require(loomR))
+} else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
+  suppressPackageStartupMessages(require(scater))
+}
 
 # Input from serialized R object
 
-seurat_object <- readRDS(opt$input_object_file)
+seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
 variable_genes_seurat_object <- FindVariableFeatures(seurat_object, 
                                                   selection.method = opt$selection_method,
                                                   nfeatures = opt$nfeatures,
@@ -115,8 +134,9 @@ variable_genes_seurat_object <- FindVariableFeatures(seurat_object,
                                                   verbose = FALSE)
 
 # Output to a serialized R object
-
-saveRDS(variable_genes_seurat_object, file = opt$output_object_file)
+write_seurat3_object(seurat_object = variable_genes_seurat_object, 
+                     output_path = opt$output_object_file, 
+                     format = opt$output_format)
 
 # Output variable gene numbers
 

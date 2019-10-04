@@ -22,6 +22,13 @@ option_list = list(
     help = "File name in which a serialized R matrix object may be found."
   ),
   make_option(
+    c("--input-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
+  ),
+  make_option(
     c("-o", "--output-directory"),
     action = "store",
     default = NA,
@@ -52,16 +59,22 @@ if ( ! file.exists(opt$input_object_file)){
   stop((paste('File', opt$input_object_file, 'does not exist')))
 }
 
-# Input from serialized R object
+suppressPackageStartupMessages(require(Seurat))
+if(opt$input_format == "loom" ) {
+  suppressPackageStartupMessages(require(loomR))
+} else if(opt$input_format == "singlecellexperiment" ) {
+  suppressPackageStartupMessages(require(scater))
+}
 
-seurat_object <- readRDS(opt$input_object_file)
+# Input from serialized R object
+seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
 
 skip_markers = TRUE
 if(!is.null(opt$markers_file)) {
   skip_markers = FALSE
 }
 
-Seurat::ExportToCellbrowser(object = seurat_object, 
-                            dir = opt$output_directory, 
-                            markers.file = opt$markers_file, 
-                            dataset.name = opt$study_name)
+ExportToCellbrowser(object = seurat_object, 
+                    dir = opt$output_directory, 
+                    markers.file = opt$markers_file, 
+                    dataset.name = opt$study_name)

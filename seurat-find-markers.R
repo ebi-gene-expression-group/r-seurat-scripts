@@ -26,6 +26,13 @@ option_list = list(
     help = "File to be used to derive a vector of genes to test. Default is to use all genes."
   ),
   make_option(
+    c("--input-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
+  ),
+  make_option(
     c("-l", "--logfc-threshold"),
     action = "store",
     default = 0.25,
@@ -113,10 +120,15 @@ if (! is.null(opt$genes_use) && opt$genes_use != 'NULL'){
 # Now we're hapy with the arguments, load Seurat and do the work
 
 suppressPackageStartupMessages(require(Seurat))
+if(opt$input_format == "loom" ) {
+  suppressPackageStartupMessages(require(loomR))
+} else if(opt$input_format == "singlecellexperiment" ) {
+  suppressPackageStartupMessages(require(scater))
+}
 
 # Input from serialized R object
 
-seurat_object <- readRDS(opt$input_object_file)
+seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
 
 # Get results matrix
 results_matrix<-FindAllMarkers(

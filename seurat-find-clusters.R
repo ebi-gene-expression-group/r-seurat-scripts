@@ -19,6 +19,20 @@ option_list = list(
     help = "File name in which a serialized R matrix object may be found."
   ),
   make_option(
+    c("--input-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
+  ),
+  make_option(
+    c("--output-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
+  ),
+  make_option(
     c("-r", "--resolution"),
     action = "store",
     default = 0.8,
@@ -124,10 +138,15 @@ if (! is.null(opt$genes_use)){
 # Now we're hapy with the arguments, load Seurat and do the work
 
 suppressPackageStartupMessages(require(Seurat))
+if(opt$input_format == "loom" | opt$output_format == "loom") {
+  suppressPackageStartupMessages(require(loomR))
+} else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
+  suppressPackageStartupMessages(require(scater))
+}
 
 # Input from serialized R object
 
-seurat_object <- readRDS(opt$input_object_file)
+seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
 
 clustered_object <- FindClusters(seurat_object, 
                                  algorithm = opt$algorithm,
@@ -158,8 +177,9 @@ rownames(cluster_table) <- cluster_table$Cluster
 cat(paste(ncol(GetAssayData(clustered_object)), 'cells fall into ', length(levels(Idents(clustered_object))), 'final clusters. Membership numbers:\n'), capture.output(cluster_table[,2, drop = FALSE]), '\nParameter values:\n', capture.output(print(opt_table)), sep = '\n')
 
 # Output to a serialized R object
-
-saveRDS(clustered_object, file = opt$output_object_file)
+write_seurat3_object(seurat_object = clustered_object, 
+                     output_path = opt$output_object_file, 
+                     format = opt$output_format)
 
 # Output variable genes to a simple text file
 

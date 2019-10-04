@@ -19,6 +19,20 @@ option_list = list(
     help = "File name in which a serialized R matrix object may be found."
   ),
   make_option(
+    c("--input-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
+  ),
+  make_option(
+    c("--output-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
+  ),
+  make_option(
     c("-e", "--pc-genes"),
     action = "store",
     default = NULL,
@@ -106,10 +120,15 @@ if (! is.null(opt$pc_cells)){
 # Now we're hapy with the arguments, load Seurat and do the work
 
 suppressPackageStartupMessages(require(Seurat))
+if(opt$input_format == "loom" | opt$output_format == "loom") {
+  suppressPackageStartupMessages(require(loomR))
+} else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
+  suppressPackageStartupMessages(require(scater))
+}
 
 # Input from serialized R object
 
-seurat_object <- readRDS(opt$input_object_file)
+seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
 
 features<-pc_genes
 if(opt$reverse_pca) {
@@ -128,6 +147,7 @@ write.csv(pca_seurat_object[['pca']]@feature.loadings, file = opt$output_loading
 writeLines(con=opt$output_stdev_file, as.character(pca_seurat_object[['pca']]@stdev))
 
 # Output to a serialized R object
-
-saveRDS(pca_seurat_object, file = opt$output_object_file)
+write_seurat3_object(seurat_object = pca_seurat_object, 
+                     output_path = opt$output_object_file, 
+                     format = opt$output_format)
 

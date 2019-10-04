@@ -19,6 +19,20 @@ option_list = list(
     help = "File name in which a serialized R matrix object may be found."
   ),
   make_option(
+    c("--input-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
+  ),
+  make_option(
+    c("--output-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
+  ),
+  make_option(
     c("-d", "--distance-matrix"),
     action = "store_true",
     default = TRUE,
@@ -152,10 +166,15 @@ if (! is.null(opt$features)){
 # Now we're hapy with the arguments, load Seurat and do the work
 
 suppressPackageStartupMessages(require(Seurat))
+if(opt$input_format == "loom" | opt$output_format == "loom") {
+  suppressPackageStartupMessages(require(loomR))
+} else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
+  suppressPackageStartupMessages(require(scater))
+}
 
 # Input from serialized R object
 
-seurat_object <- readRDS(opt$input_object_file)
+seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
 
 neighbours_object <- FindNeighbors(object = seurat_object, 
                                   k.param = opt$k_param, 
@@ -184,5 +203,6 @@ opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)
 opt_table <- opt_table[! rownames(opt_table) %in% nonreport_params, , drop = FALSE]
 
 # Output to a serialized R object
-
-saveRDS(neighbours_object, file = opt$output_object_file)
+write_seurat3_object(seurat_object = neighbours_object, 
+                     output_path = opt$output_object_file, 
+                     format = opt$output_format)
