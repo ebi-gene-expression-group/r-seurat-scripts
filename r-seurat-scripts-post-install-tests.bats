@@ -18,26 +18,11 @@
 # Create the Matrix object
 
 @test "Matrix object creation from 10x" {
-    if [ "$use_existing_outputs" = 'true' ] && [ -f "$raw_matrix_object" ]; then
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$raw_seurat_object" ]; then
         skip "$raw_matrix_object exists and use_existing_outputs is set to 'true'"
     fi
     
-    run rm -f $raw_matrix_object && seurat-read-10x.R -d $data_dir -o $raw_matrix_object
-    echo "status = ${status}"
-    echo "output = ${output}"
-    
-    [ "$status" -eq 0 ]
-    [ -f  "$raw_matrix_object" ]
-}
-
-# Run create-seurat-object.R
-
-@test "Seurat object creation from a matrix object" {
-    if [ "$use_existing_outputs" = 'true' ] && [ -f "$raw_seurat_object" ]; then
-        skip "$raw_seurat_object exists and use_existing_outputs is set to 'true'"
-    fi
-    
-    run rm -f $raw_seurat_object && seurat-create-seurat-object.R -i $raw_matrix_object -o $raw_seurat_object
+    run rm -f $raw_matrix_object && seurat-read-10x.R -d $data_dir -o $raw_seurat_object
     echo "status = ${status}"
     echo "output = ${output}"
     
