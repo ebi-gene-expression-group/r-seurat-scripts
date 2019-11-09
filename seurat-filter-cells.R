@@ -77,17 +77,8 @@ if ( ! file.exists(opt$input_object_file)){
   stop((paste('File', opt$input_object_file, 'does not exist')))
 }
 
-# Input from serialized R object
-
-seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
-
-# Are the metadata variables valid for this object?
-
-subset_names <- wsc_split_string(opt$subset_names)
-wsc_check_metadata(seurat_object, subset_names)
-
 # Parse numeric fields
-
+subset_names <- wsc_split_string(opt$subset_names)
 lt <- wsc_parse_numeric(opt, 'low_thresholds', -Inf, length(subset_names))
 ht <- wsc_parse_numeric(opt, 'high_thresholds', Inf, length(subset_names))
 
@@ -113,6 +104,13 @@ if(opt$input_format == "loom" | opt$output_format == "loom") {
 } else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
   suppressPackageStartupMessages(require(scater))
 }
+
+# Input from serialized R object
+
+seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
+# Are the metadata variables valid for this object?
+wsc_check_metadata(seurat_object, subset_names)
+
 # Given the new setup, now we need to iterate over all the elements provided for filtering
 # and come up with an intersection on all of them
 cells_bool<-rep(TRUE, length(subset_names))
