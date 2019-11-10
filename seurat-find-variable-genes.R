@@ -124,6 +124,8 @@ if(opt$input_format == "loom" | opt$output_format == "loom") {
 # Input from serialized R object
 
 seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
+# clean previous find variable genes
+seurat_object@assays$RNA@meta.features<-data.frame(row.names = rownames(seurat_object@assays$RNA@meta.features))
 variable_genes_seurat_object <- FindVariableFeatures(seurat_object, 
                                                   selection.method = opt$selection_method,
                                                   nfeatures = opt$nfeatures,
