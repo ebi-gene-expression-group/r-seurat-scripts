@@ -55,7 +55,7 @@ option_list = list(
   ),
   make_option(
     c("-r", "--reverse-pca"),
-    action = "store",
+    action = "store_true",
     default = FALSE,
     type = 'logical',
     help = "Run PCA on reverse matrix (gene x cell; FALSE by default means cell x gene)."

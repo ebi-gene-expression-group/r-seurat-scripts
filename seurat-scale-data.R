@@ -141,7 +141,8 @@ if(opt$input_format == "loom" | opt$output_format == "loom") {
 # Input from serialized R object
 
 seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
-
+# https://stackoverflow.com/questions/9129673/passing-list-of-named-parameters-to-function
+# might be useful
 scaled_seurat_object <- ScaleData(seurat_object, 
                                   features = genes_use, 
                                   vars.to.regress = opt$vars_to_regress, 
