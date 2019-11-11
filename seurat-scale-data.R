@@ -61,18 +61,18 @@ option_list = list(
     help = "Regress on UMI count data. Default is FALSE for linear modeling, but automatically set to TRUE if model.use is 'negbinom' or 'poisson'."
   ),
   make_option(
-    c("-s", "--do-scale"),
-    action = "store",
-    default = TRUE,
+    c("-s", "--do-not-scale"),
+    action = "store_true",
+    default = FALSE,
     type = 'logical',
-    help = "Whether to scale the data."
+    help = "Skip the data scale."
   ),
   make_option(
-    c("-c", "--do-center"),
-    action = "store",
-    default = TRUE,
+    c("-c", "--do-not-center"),
+    action = "store_true",
+    default = FALSE,
     type = 'logical',
-    help = "Whether to center the data."
+    help = "Skip data centering."
   ),  
   make_option(
     c("-x", "--scale-max"),
@@ -148,8 +148,8 @@ scaled_seurat_object <- ScaleData(seurat_object,
                                   vars.to.regress = opt$vars_to_regress, 
                                   model.use = opt$model_use, 
                                   use.umi = opt$use_umi, 
-                                  do.scale = opt$do_scale, 
-                                  do.center = opt$do_center, 
+                                  do.scale = !opt$do_not_scale, 
+                                  do.center = !opt$do_not_center, 
                                   scale.max = opt$scale_max, 
                                   block.size = opt$block_size, 
                                   min.cells.to.block = opt$min_cells_to_block, 
@@ -157,5 +157,5 @@ scaled_seurat_object <- ScaleData(seurat_object,
 
 # Output to a serialized R object
 write_seurat3_object(seurat_object = scaled_seurat_object, 
-                     output_path = opt$output_object_file, 
+                     output_path = opt$output_object_file,
                      format = opt$output_format)

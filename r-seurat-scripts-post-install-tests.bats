@@ -98,7 +98,7 @@
         skip "$scaled_seurat_object exists and use_existing_outputs is set to 'true'"
     fi
 
-    run rm -f $scaled_seurat_object && seurat-scale-data.R -i $variable_genes_seurat_object -e $test_genes -v $vars_to_regress -m $model_use -u $use_umi -s $do_scale -c $do_center -x $scale_max -b $block_size -d $min_cells_to_block -n $check_for_norm -o $scaled_seurat_object  
+    run rm -f $scaled_seurat_object && seurat-scale-data.R -i $variable_genes_seurat_object -e $test_genes -v $vars_to_regress -m $model_use -u $use_umi -x $scale_max -b $block_size -d $min_cells_to_block -n $check_for_norm -o $scaled_seurat_object  
     echo "status = ${status}"
     echo "output = ${output}"
   
