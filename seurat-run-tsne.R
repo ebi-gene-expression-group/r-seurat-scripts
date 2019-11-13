@@ -94,6 +94,14 @@ option_list = list(
     default = NULL,
     type = 'integer',
     help = "Seed of the random number generator"
+  ),
+  make_option(
+    c("--add-iter"),
+    action = "store_true",
+    default = FALSE,
+    metavar = "Add iterations",
+    type = 'logical',
+    help = "If an existing tSNE has already been computed, uses the current tSNE to seed the algorithm and then adds additional iterations on top of this"
   )
 )
 
@@ -151,7 +159,11 @@ tsne_seurat_object <- RunTSNE( seurat_object,
                                dim.embed = opt$dim_embed,
                                cells = cells_use, 
                                dims = dims_use, 
-                               seed.use = opt$random_seed,
+                               seed.use = opt$random_seed, 
+                               add.iter = , 
+                               reduction.key = , 
+                               reduction.name = , 
+                               distance.matrix = ,
                                features = genes_use, 
                               )
 

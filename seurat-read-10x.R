@@ -52,6 +52,46 @@ option_list = list(
     default = 0,
     type = 'integer',
     help = "Include cells where at least this many features are detected."
+  ),
+  make_option(
+    c("--gene-column"),
+    action = "store",
+    default = 2,
+    type = 'integer',
+    metavar = 'Gene name column',
+    help = "Specify which column of genes.tsv or features.tsv to use for gene names; default is 2."
+  ),
+  make_option(
+    c("--not-unique-features"),
+    action = "store_true",
+    default = FALSE,
+    type = 'logical',
+    metavar = 'Do not make features unique',
+    help = "Do not make feature names unique (default FALSE - make them unique)."
+  ),
+  make_option(
+    c("--project"),
+    action = "store",
+    default = "SeuratProject",
+    type = 'character',
+    metavar = 'Sets the project name for the Seurat object.',
+    help = "Do not make feature names unique (default FALSE - make them unique)."
+  ),
+  make_option(
+    c("--names-field"),
+    action = "store",
+    default = NULL,
+    type = 'integer',
+    metavar = 'Index for field with cells name',
+    help = "For the initial identity class for each cell, choose this field for the cell's name. E.g. If your cells are named as BARCODE_CLUSTER_CELLTYPE in the input matrix, set names.field to 3 to set the initial identities to CELLTYPE."
+  ),
+  make_option(
+    c("--names-delim"),
+    action = "store",
+    default = NULL,
+    type = 'character',
+    metavar = 'Delimiter field within cells name',
+    help = "For the initial identity class for each cell, choose this delimiter from the cell's column name. E.g. If your cells are named as BARCODE-CLUSTER-CELLTYPE, set this to '-' to separate the cell name into its component parts for picking the relevant field."
   )
 )
 
@@ -80,7 +120,9 @@ suppressPackageStartupMessages(require(Matrix))
 
 # Read the data
 
-sc_matrix <- Read10X(data.dir = opt$data_dir)
+sc_matrix <- Read10X(data.dir = opt$data_dir, 
+                     unique.features = !opt$not_unique_features,
+                     gene.column = opt$gene_column)
 
 # Use the default show method to print feedback
 printSpMatrix2(sc_matrix, note.dropping.colnames = FALSE, maxp = 500)
@@ -88,7 +130,10 @@ printSpMatrix2(sc_matrix, note.dropping.colnames = FALSE, maxp = 500)
 seurat_object <- CreateSeuratObject(sc_matrix,
                                     min.cells = opt$min_cells, 
                                     min.features = opt$min_features, 
-                                    meta.data = cell_metadata
+                                    meta.data = cell_metadata, 
+                                    project = opt$project, 
+                                    names.field = opt$names_field,
+                                    names.delim = opt$names_delim
                                     )
 
 cat(c(

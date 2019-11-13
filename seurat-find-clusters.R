@@ -84,7 +84,7 @@ option_list = list(
   make_option(
     c("--graph-name"),
     action = "store",
-    default = NULL,
+    default = "RNA_nn",
     type = 'character',
     help = "Name of graph to use for the clustering algorithm."
   ),

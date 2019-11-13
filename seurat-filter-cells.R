@@ -66,6 +66,22 @@ option_list = list(
     default = NA,
     type = 'character',
     help = "File name in which to store serialized R object of type 'Seurat'.'"
+  ),
+  make_option(
+    c("--idents"),
+    action = "store",
+    default = NULL,
+    type = 'character',
+    metavar = 'Ident classes to keep',
+    help = "Comma-separated list of identity classes to keep"
+  ),
+  make_option(
+    c("--features"),
+    action = "store",
+    default = NULL,
+    type = 'character',
+    metavar = 'Features to keep',
+    help = "Comma-separated list or file path with features (normally genes) to keep"
   )
 )
 
@@ -87,13 +103,23 @@ ht <- wsc_parse_numeric(opt, 'high_thresholds', Inf, length(subset_names))
 cells_use <- opt$cells_use
 if (! is.null(cells_use)){
   if (file.exists(cells_use)){
-    cells_use <- read.table("test_cells.txt", stringsAsFactors = FALSE)$V1
+    cells_use <- read.table(file = cells_use, stringsAsFactors = FALSE)$V1
   }else{
     cells_use <- wsc_split_string(cells_use)
   }
   
   check_cells(cells_use, seurat_object)
   print(paste('Filtering to', length(cells_use), 'specified cells'))
+}
+
+# Check features to use
+features_use<-NULL
+if (! is.null(opt$features) ) {
+  if (file.exists(opt$features)){
+    features_use <- read.table(file = opt$features, stringsAsFactors = FALSE)$V1
+  }else{
+    features_use <- wsc_split_string(opt$features)
+  }
 }
 
 # Now we're hapy with the arguments, load Seurat and do the work
@@ -126,6 +152,14 @@ if (! is.null(cells_use)){
 }
 
 filtered_seurat_object <- subset(seurat_object, cells = cells)
+
+if (! is.null(features_use) ) {
+  filtered_seurat_object <- subset(filtered_seurat_object, features=features_use)
+}
+if (! is.null(opt$idents) ) {
+  idents_vector=unlist(strsplit(opt$idents, split=","))
+  filtered_seurat_object <- subset(filtered_seurat_object, idents = idents_vector)
+}
 
 # Print a summary of the affects of filtering
 

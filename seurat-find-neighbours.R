@@ -175,7 +175,7 @@ if(opt$input_format == "loom" | opt$output_format == "loom") {
 # Input from serialized R object
 seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
 
-neighbours_object <- FindNeighbors(object = seurat_object, 
+neighbours_object <- FindNeighbors(object = seurat_object,
                                   k.param = opt$k_param, 
                                   compute.SNN = opt$compute_snn,
                                   prune.SNN = opt$prune_snn,

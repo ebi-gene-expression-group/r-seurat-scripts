@@ -49,16 +49,16 @@ option_list = list(
   make_option(
     c("-p", "--pcs-compute"),
     action = "store",
-    default = 20,
+    default = 50,
     type = 'integer',
-    help = "Total Number of PCs to compute and store (20 by default)."
+    help = "Total Number of PCs to compute and store (50 by default)."
   ),
   make_option(
     c("-r", "--reverse-pca"),
     action = "store_true",
     default = FALSE,
     type = 'logical',
-    help = "Run PCA on reverse matrix (gene x cell; FALSE by default means cell x gene)."
+    help = "By default computes the PCA on the cell x gene matrix. Setting to true will compute it on gene x cell matrix."
   ),
   make_option(
     c("-o", "--output-object-file"),
@@ -87,6 +87,46 @@ option_list = list(
     default = NA,
     type = 'character',
     help = "File name in which to store PC stdev values (one per line)."
+  ),
+  make_option(
+    c("--weight-by-var"),
+    action = "store_true",
+    default = FALSE,
+    metavar = "Weight by variance of each PC",
+    type = 'logical',
+    help = "Weight the cell embeddings by the variance of each PC (weights the gene loadings if rev.pca is TRUE)"
+  ),
+  make_option(
+    c("--ndims-print"),
+    action = "store",
+    default = NULL,
+    metavar = "Num of dims. print",
+    type = 'integer',
+    help = "PCs to print genes for"
+  ),
+  make_option(
+    c("--nfeatures-print"),
+    action = "store",
+    default = NULL,
+    metavar = "N features print",
+    type = 'integer',
+    help = "Number of genes to print for each PC"
+  ),
+  make_option(
+    c("--reduction-key"),
+    action = "store",
+    default = "PC",
+    metavar = "Reduction key",
+    type = 'character',
+    help = "dimensional reduction key, specifies the string before the number for the dimension names. PC by default"
+  ),
+  make_option(
+    c("--reduction-name"),
+    action = "store",
+    default = "pca",
+    metavar = "Reduction name",
+    type = 'character',
+    help = "dimensional reduction name, pca by default"
   )
 )
 
@@ -137,7 +177,12 @@ if(opt$reverse_pca) {
 pca_seurat_object <- RunPCA(seurat_object, 
                             features = features, 
                             npcs = opt$pcs_compute, 
-                            rev.pca = opt$reverse_pca,
+                            rev.pca = opt$reverse_pca, 
+                            weight.by.var = opt$weight_by_var, 
+                            ndims.print = opt$ndims_print, 
+                            nfeatures.print = opt$nfeatures_print, 
+                            reduction.key = opt$reduction_key, 
+                            reduction.name = opt$reduction_name, 
                             verbose=FALSE)
 
 # Output to text-format components

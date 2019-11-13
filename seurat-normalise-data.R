@@ -52,6 +52,20 @@ option_list = list(
     default = NA,
     type = 'character',
     help = "File name in which to store serialized R object of type 'Seurat'.'"
+  ),
+  make_option(
+    c("--margin"),
+    action = "store",
+    default = NULL,
+    type = 'integer',
+    help = "If performing CLR normalization, normalize across features (1) or cells (2)."
+  ),
+  make_option(
+    c("--block-size"),
+    action = "store",
+    default = NULL,
+    type = 'integer',
+    help = "How many cells should be run in each chunk, will try to split evenly across threads"
   )
 )
 
@@ -78,6 +92,8 @@ seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format 
 normalised_seurat_object <- NormalizeData(seurat_object, 
                                           normalization.method = opt$normalization_method, 
                                           scale.factor = opt$scale_factor, 
+                                          margin = opt$margin, 
+                                          block.size = opt$block_size,
                                           verbose = FALSE)
 
 # Output to a serialized R object

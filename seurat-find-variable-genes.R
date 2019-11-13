@@ -101,6 +101,38 @@ option_list = list(
     default = NA,
     type = 'character',
     help = "File name in which to store variable genes in plain text."
+  ),
+  make_option(
+    c("--loess-span"),
+    action = "store",
+    default = 0.3,
+    metavar = "Loess span parameter for VST",
+    type = 'double',
+    help = "(vst method) Loess span parameter used when fitting the variance-mean relationship. Default: 0.3"
+  ),
+  make_option(
+    c("--clip-max"),
+    action = "store",
+    default = "auto",
+    metavar = "Clip max for VST",
+    type = 'character',
+    help = "(vst method) After standardization values larger than clip.max will be set to clip.max; default is 'auto' which sets this value to the square root of the number of cells."
+  ),
+  make_option(
+    c("--num-bin"),
+    action = "store",
+    default = 20,
+    metavar = "Bins for scaled analysis",
+    type = 'integer',
+    help = "Total number of bins to use in the scaled analysis (default is 20)."
+  ),
+  make_option(
+    c("--binning-method"),
+    action = "store",
+    default = "equal_width",
+    metavar = "Binning method",
+    type = 'character',
+    help = "Specifies how the bins should be computed. Available methods are either equal_width: each bin is of equal width along the x-axis [default]; or equal_frequency: each bin contains an equal number of features (can increase statistical power to detect overdispersed features at high expression values, at the cost of reduced resolution along the x-axis)"
   )
 )
 
@@ -133,6 +165,10 @@ variable_genes_seurat_object <- FindVariableFeatures(seurat_object,
                                                   dispersion.function = get(opt$dispersion_function), 
                                                   mean.cutoff = c(opt$x_low_cutoff, opt$x_high_cutoff),
                                                   dispersion.cutoff = c(opt$y_low_cutoff, opt$y_high_cutoff),
+                                                  loess.span = opt$loess_span,
+                                                  clip.max = opt$clip_max,
+                                                  num.bin = opt$num_bin,
+                                                  binning.method = opt$binning_method, 
                                                   verbose = FALSE)
 
 # Output to a serialized R object
