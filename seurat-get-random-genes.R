@@ -21,7 +21,7 @@ seurat_object <- readRDS(input_object_file)
 # Set the seed to make random genes reproducible
 
 set.seed(42)
-random_genes <- sample(rownames(seurat_object@data), ngenes)
+random_genes <- sample(rownames(GetAssayData(seurat_object)), ngenes)
 
 # Write to file
 

@@ -79,6 +79,7 @@ export pca_embeddings_file="$output_dir/pca_embeddings.csv"
 export pca_loadings_file="$output_dir/pca_loadings.csv"
 export pca_stdev_file="$output_dir/pca_stdev.txt"
 export pca_image_file="$output_dir/pcatest.png"
+export neighbours_seurat_object="$output_dir/neighbours_seurat.rds"
 export cluster_seurat_object="$output_dir/cluster_seurat.rds"
 export cluster_text_file="$output_dir/clusters.txt"
 export tsne_seurat_object="$output_dir/tsne_seurat.rds"
@@ -96,7 +97,6 @@ export min_umi=1000
 
 # Normalisation. See Seurat ?NormalizeData
 
-export assay_type='RNA'
 export normalisation_method='LogNormalize'
 export scale_factor=10000
 
@@ -110,11 +110,9 @@ export fvg_y_low_cutoff='1'
 export fvg_y_high_cutoff='Inf'
 
 # Scale and center the data. See ?ScaleData
-export vars_to_regress='nUMI'
+export vars_to_regress='nCount_RNA'
 export model_use='linear'
 export use_umi='TRUE'
-export do_scale='TRUE'
-export do_center='TRUE'
 export scale_max='10'
 export block_size='1000'
 export min_cells_to_block='1000'

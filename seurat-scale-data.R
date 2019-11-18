@@ -19,16 +19,30 @@ option_list = list(
     help = "File name in which a serialized R matrix object may be found."
   ),
   make_option(
+    c("--input-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
+  ),
+  make_option(
+    c("--output-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
+  ),
+  make_option(
     c("-e", "--genes-use"),
     action = "store",
     default = NULL,
     type = 'character',
-    help = "File to be used to derive a vector of gene names to scale/center (one gene per line). Default is all genes in object@data."
+    help = "File with gene names to scale/center (one gene per line). Default is all genes in object@data."
   ),
   make_option(
     c("-v", "--vars-to-regress"),
     action = "store",
-    default = NA,
+    default = NULL,
     type = 'character',
     help = "Comma-separated list of variables to regress out (previously latent.vars in RegressOut). For example, nUMI, or percent.mito."
   ),
@@ -47,18 +61,18 @@ option_list = list(
     help = "Regress on UMI count data. Default is FALSE for linear modeling, but automatically set to TRUE if model.use is 'negbinom' or 'poisson'."
   ),
   make_option(
-    c("-s", "--do-scale"),
-    action = "store",
-    default = TRUE,
+    c("-s", "--do-not-scale"),
+    action = "store_true",
+    default = FALSE,
     type = 'logical',
-    help = "Whether to scale the data."
+    help = "Skip the data scale."
   ),
   make_option(
-    c("-c", "--do-center"),
-    action = "store",
-    default = TRUE,
+    c("-c", "--do-not-center"),
+    action = "store_true",
+    default = FALSE,
     type = 'logical',
-    help = "Whether to center the data."
+    help = "Skip data centering."
   ),  
   make_option(
     c("-x", "--scale-max"),
@@ -80,13 +94,6 @@ option_list = list(
     default = 1000,
     type = 'integer',
     help = "If object contains fewer than this number of cells, don't block for scaling calculations."
-  ),
-  make_option(
-    c("-a", "--assay-type"),
-    action = "store",
-    default = 'RNA',
-    type = 'character',
-    help = "Assay to scale data for. Default is RNA. Can be changed for multimodal analyses."
   ),
   make_option(
     c("-n", "--check-for-norm"),
@@ -125,13 +132,30 @@ if (! is.null(opt$genes_use)){
 # Now we're hapy with the arguments, load Seurat and do the work
 
 suppressPackageStartupMessages(require(Seurat))
+if(opt$input_format == "loom" | opt$output_format == "loom") {
+  suppressPackageStartupMessages(require(loomR))
+} else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
+  suppressPackageStartupMessages(require(scater))
+}
 
 # Input from serialized R object
 
-seurat_object <- readRDS(opt$input_object_file)
-
-scaled_seurat_object <- ScaleData(seurat_object, genes.use = genes_use, vars.to.regress = opt$vars_to_regress, model.use = opt$model_use, use.umi = opt$use_umi, do.scale = opt$do_scale, do.center = opt$do_center, scale.max = opt$scale_max, block.size = opt$block_size, min.cells.to.block = opt$min_cells_to_block, assay.type = opt$assay_type, check.for.norm = opt$check_for_norm, display.progress = FALSE)
+seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
+# https://stackoverflow.com/questions/9129673/passing-list-of-named-parameters-to-function
+# might be useful
+scaled_seurat_object <- ScaleData(seurat_object, 
+                                  features = genes_use, 
+                                  vars.to.regress = opt$vars_to_regress, 
+                                  model.use = opt$model_use, 
+                                  use.umi = opt$use_umi, 
+                                  do.scale = !opt$do_not_scale, 
+                                  do.center = !opt$do_not_center, 
+                                  scale.max = opt$scale_max, 
+                                  block.size = opt$block_size, 
+                                  min.cells.to.block = opt$min_cells_to_block, 
+                                  verbose = FALSE)
 
 # Output to a serialized R object
-
-saveRDS(scaled_seurat_object, file = opt$output_object_file)
+write_seurat3_object(seurat_object = scaled_seurat_object, 
+                     output_path = opt$output_object_file,
+                     format = opt$output_format)

@@ -19,39 +19,18 @@ option_list = list(
     help = "File name in which a serialized R matrix object may be found."
   ),
   make_option(
-    c("-e", "--genes-use"),
+    c("--input-format"),
     action = "store",
-    default = NULL,
+    default = "seurat",
     type = 'character',
-    help = "File to be used to derive a vector of gene names to use in construction of SNN graph if building directly based on expression data rather than a dimensionally reduced representation (i.e. PCs)."
+    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
   ),
   make_option(
-    c("-u", "--reduction-type"),
+    c("--output-format"),
     action = "store",
-    default = 'pca',
+    default = "seurat",
     type = 'character',
-    help = "Name of dimensional reduction technique to use in construction of SNN graph. (e.g. 'pca', 'ica')."
-  ),
-  make_option(
-    c("-d", "--dims-use"),
-    action = "store",
-    default = NULL,
-    type = 'character',
-    help = "A comma-separated list of the dimensions to use in construction of the SNN graph (e.g. To use the first 5 PCs, pass 1,2,3,4,5)."
-  ),
-  make_option(
-    c("-k", "--k-param"),
-    action = "store",
-    default = 30,
-    type = 'integer',
-    help = "Defines k for the k-nearest neighbor algorithm."
-  ),
-  make_option(
-    c("-j", "--prune-snn"),
-    action = "store",
-    default = 1/15,
-    type = 'double',
-    help = "Sets the cutoff for acceptable Jaccard distances when computing the neighborhood overlap for the SNN construction. Any edges with values less than or equal to this will be set to 0 and removed from the SNN graph. Essentially sets the strigency of pruning (0 — no pruning, 1 — prune everything)."
+    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
   ),
   make_option(
     c("-r", "--resolution"),
@@ -65,7 +44,7 @@ option_list = list(
     action = "store",
     default = 1,
     type = 'integer',
-    help = "Algorithm for modularity optimization (1 = original Louvain algorithm; 2 = Louvain algorithm with multilevel refinement; 3 = SLM algorithm)."
+    help = "Algorithm for modularity optimization (1 = original Louvain algorithm; 2 = Louvain algorithm with multilevel refinement; 3 = SLM algorithm; 4 Leiden)."
   ),
   make_option(
     c("-m", "--tmp-file-location"),
@@ -73,6 +52,20 @@ option_list = list(
     default = NULL,
     type = 'character',
     help = "Directory where intermediate files will be written. Specify the ABSOLUTE path."
+  ),
+  make_option(
+    c("--modularity-fxn"),
+    action = "store",
+    default = 1,
+    type = 'integer',
+    help = "Modularity function: 1 standard, 2 alternative."
+  ),
+  make_option(
+    c("--method"),
+    action = "store",
+    default = 'matrix',
+    type = 'character',
+    help = "Method for leiden  (defaults to matrix which is fast for small datasets). Enable method = \"igraph\" to avoid casting large data to a dense matrix."
   ),
   make_option(
     c("-o", "--output-object-file"),
@@ -87,6 +80,40 @@ option_list = list(
     default = NA,
     type = 'character',
     help = "File name in which to store text format set of clusters."
+  ),
+  make_option(
+    c("--graph-name"),
+    action = "store",
+    default = "RNA_nn",
+    type = 'character',
+    help = "Name of graph to use for the clustering algorithm."
+  ),
+  make_option(
+    c("-s", "--nrandom-starts"),
+    action = "store",
+    default = 10,
+    type = 'integer',
+    help = "Number of random starts"
+  ),
+  make_option(
+    c("--n-iterations"),
+    action = "store",
+    default = 10,
+    type = 'integer',
+    help = "Maximal number of iterations per random start"
+  ),
+  make_option(
+    c("--group-singletons"),
+    action = "store_true",
+    default = FALSE,
+    help = "Group singletons into nearest cluster. If FALSE, assign all singletons to a \"singleton\" group"
+  ),
+  make_option(
+    c("--random-seed"),
+    action = "store",
+    default = 0,
+    type = 'integer',
+    help = "Seed of the random number generator"
   )
 )
 
@@ -96,11 +123,6 @@ opt <- wsc_parse_args(option_list, mandatory = c('input_object_file', 'output_ob
 
 if ( ! file.exists(opt$input_object_file)){
   stop((paste('File', opt$input_object_file, 'does not exist')))
-}
-
-dims_use <- opt$dims_use
-if ( ! is.null(dims_use)){
-  dims_use <- wsc_parse_numeric(opt, 'dims_use')
 }
 
 if (! is.null(opt$genes_use)){
@@ -116,12 +138,28 @@ if (! is.null(opt$genes_use)){
 # Now we're hapy with the arguments, load Seurat and do the work
 
 suppressPackageStartupMessages(require(Seurat))
+if(opt$input_format == "loom" | opt$output_format == "loom") {
+  suppressPackageStartupMessages(require(loomR))
+} else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
+  suppressPackageStartupMessages(require(scater))
+}
 
 # Input from serialized R object
 
-seurat_object <- readRDS(opt$input_object_file)
+seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
 
-clustered_object <- FindClusters(seurat_object, genes.use = genes_use, reduction.type = opt$reduction_type, dims.use = dims_use, k.param = opt$k_param, prune.SNN = opt$prune_snn, print.output = FALSE, save.SNN = FALSE, resolution = opt$resolution, temp.file.location = opt$temp_file_location)
+clustered_object <- FindClusters(seurat_object, 
+                                 algorithm = opt$algorithm,
+                                 modularity.fxn = opt$modularity_fxn,
+                                 method = opt$method,
+                                 n.start = opt$nrandom_starts,
+                                 n.iter = opt$n_iterations,
+                                 random.seed = opt$random_seed,
+                                 group.singletons = opt$group_singletons,
+                                 verbose = TRUE, 
+                                 resolution = opt$resolution, 
+                                 graph.name = opt$graph_name,
+                                 temp.file.location = opt$temp_file_location)
 
 # Summarise the clustering
 
@@ -132,16 +170,17 @@ nonreport_params <- c('input_object_file', 'output_object_file', 'help', 'output
 opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)
 opt_table <- opt_table[! rownames(opt_table) %in% nonreport_params, , drop = FALSE]
 
-cluster_table <- as.data.frame(table(clustered_object@ident))
+cluster_table <- as.data.frame(table(Idents(clustered_object)))
 colnames(cluster_table) <- c('Cluster', 'No. cells')
 rownames(cluster_table) <- cluster_table$Cluster
 
-cat(paste(ncol(clustered_object@data), 'cells fall into ', length(unique(clustered_object@ident)), 'final clusters. Membership numbers:\n'), capture.output(cluster_table[,2, drop = FALSE]), '\nParameter values:\n', capture.output(print(opt_table)), sep = '\n')
+cat(paste(ncol(GetAssayData(clustered_object)), 'cells fall into ', length(levels(Idents(clustered_object))), 'final clusters. Membership numbers:\n'), capture.output(cluster_table[,2, drop = FALSE]), '\nParameter values:\n', capture.output(print(opt_table)), sep = '\n')
 
 # Output to a serialized R object
-
-saveRDS(clustered_object, file = opt$output_object_file)
+write_seurat3_object(seurat_object = clustered_object, 
+                     output_path = opt$output_object_file, 
+                     format = opt$output_format)
 
 # Output variable genes to a simple text file
 
-write.csv(data.frame(cell=names(clustered_object@ident), cluster=clustered_object@ident), file = opt$output_text_file, row.names = FALSE)
+write.csv(data.frame(cell=names(Idents(clustered_object)), cluster=Idents(clustered_object)), file = opt$output_text_file, row.names = FALSE)
