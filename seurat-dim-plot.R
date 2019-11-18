@@ -203,7 +203,7 @@ if (! is.null(cols_use)){
 # Parse plot order ident list (if present)
 
 plot_order <- opt$plot_order
-if (! is.null(cols_use)){
+if (! is.null(plot_order)){
   plot_order <- wsc_split_string(plot_order)
 }
 
