@@ -19,6 +19,20 @@ option_list = list(
     help = "File name in which a serialized R matrix object may be found."
   ),
   make_option(
+    c("--input-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
+  ),
+  make_option(
+    c("--output-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
+  ),
+  make_option(
     c("-s", "--subset-names"),
     action = "store",
     default = NA,
@@ -52,6 +66,22 @@ option_list = list(
     default = NA,
     type = 'character',
     help = "File name in which to store serialized R object of type 'Seurat'.'"
+  ),
+  make_option(
+    c("--idents"),
+    action = "store",
+    default = NULL,
+    type = 'character',
+    metavar = 'Ident classes to keep',
+    help = "Comma-separated list of identity classes to keep"
+  ),
+  make_option(
+    c("--features"),
+    action = "store",
+    default = NULL,
+    type = 'character',
+    metavar = 'Features to keep',
+    help = "Comma-separated list or file path with features (normally genes) to keep"
   )
 )
 
@@ -63,17 +93,8 @@ if ( ! file.exists(opt$input_object_file)){
   stop((paste('File', opt$input_object_file, 'does not exist')))
 }
 
-# Input from serialized R object
-
-seurat_object <- readRDS(opt$input_object_file)
-
-# Are the metadata variables valid for this object?
-
-subset_names <- wsc_split_string(opt$subset_names)
-wsc_check_metadata(seurat_object, subset_names)
-
 # Parse numeric fields
-
+subset_names <- wsc_split_string(opt$subset_names)
 lt <- wsc_parse_numeric(opt, 'low_thresholds', -Inf, length(subset_names))
 ht <- wsc_parse_numeric(opt, 'high_thresholds', Inf, length(subset_names))
 
@@ -82,7 +103,7 @@ ht <- wsc_parse_numeric(opt, 'high_thresholds', Inf, length(subset_names))
 cells_use <- opt$cells_use
 if (! is.null(cells_use)){
   if (file.exists(cells_use)){
-    cells_use <- read.table("test_cells.txt", stringsAsFactors = FALSE)$V1
+    cells_use <- read.table(file = cells_use, stringsAsFactors = FALSE)$V1
   }else{
     cells_use <- wsc_split_string(cells_use)
   }
@@ -91,11 +112,54 @@ if (! is.null(cells_use)){
   print(paste('Filtering to', length(cells_use), 'specified cells'))
 }
 
+# Check features to use
+features_use<-NULL
+if (! is.null(opt$features) ) {
+  if (file.exists(opt$features)){
+    features_use <- read.table(file = opt$features, stringsAsFactors = FALSE)$V1
+  }else{
+    features_use <- wsc_split_string(opt$features)
+  }
+}
+
 # Now we're hapy with the arguments, load Seurat and do the work
 
 suppressPackageStartupMessages(require(Seurat))
+if(opt$input_format == "loom" | opt$output_format == "loom") {
+  suppressPackageStartupMessages(require(loomR))
+} else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
+  suppressPackageStartupMessages(require(scater))
+}
 
-filtered_seurat_object <- FilterCells(seurat_object, subset.names = subset_names, low.thresholds = lt, high.thresholds = ht, cells.use = cells_use)
+# Input from serialized R object
+
+seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
+# Are the metadata variables valid for this object?
+wsc_check_metadata(seurat_object, subset_names)
+
+# Given the new setup, now we need to iterate over all the elements provided for filtering
+# and come up with an intersection on all of them
+cells_bool<-rep(TRUE, length(subset_names))
+for(i in seq_along(subset_names)) {
+  cells_bool<-cells_bool & seurat_object[[]][subset_names[[i]]] > lt[i] & seurat_object[[]][subset_names[[i]]] < ht[i]
+  cat(c(length(which(cells_bool)),"cells remaining after applying",subset_names[i],"thresholds",lt[i],"< x <",ht[i],"\n"))
+}
+# Intersect that with any explicit cells that the user has asked for, if any
+cells<-colnames(seurat_object)[cells_bool]
+if (! is.null(cells_use)){
+  cells<-intersect(cells_use, cells)
+  cat(c(lenght(cells)," cells remaining after intersecting threshold based selection with provided list of cells.\n"))
+}
+
+filtered_seurat_object <- subset(seurat_object, cells = cells)
+
+if (! is.null(features_use) ) {
+  filtered_seurat_object <- subset(filtered_seurat_object, features=features_use)
+}
+if (! is.null(opt$idents) ) {
+  idents_vector=unlist(strsplit(opt$idents, split=","))
+  filtered_seurat_object <- subset(filtered_seurat_object, idents = idents_vector)
+}
 
 # Print a summary of the affects of filtering
 
@@ -117,5 +181,6 @@ cat(c(
 sep = '\n')
 
 # Output to a serialized R object
-
-saveRDS(filtered_seurat_object, file = opt$output_object_file)
+write_seurat3_object(seurat_object = filtered_seurat_object, 
+                     output_path = opt$output_object_file, 
+                     format = opt$output_format)

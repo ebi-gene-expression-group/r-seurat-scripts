@@ -19,18 +19,25 @@ option_list = list(
     help = "File name in which a serialized R matrix object may be found."
   ),
   make_option(
-    c("-a", "--assay-type"),
+    c("--input-format"),
     action = "store",
-    default = 'RNA',
+    default = "seurat",
     type = 'character',
-    help = "Type of assay to normalize for (default is RNA), but can be changed for multimodal analyses."
+    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
+  ),
+  make_option(
+    c("--output-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
   ),
   make_option(
     c("-n", "--normalization-method"),
     action = "store",
     default = 'LogNormalize',
     type = 'character',
-    help = "Method for normalization. Default is log-normalization (LogNormalize)."
+    help = "Method for normalization. Default is log-normalization (LogNormalize). Can be 'CLR' or 'RC' additionally."
   ),
   make_option(
     c("-s", "--scale-factor"),
@@ -45,6 +52,20 @@ option_list = list(
     default = NA,
     type = 'character',
     help = "File name in which to store serialized R object of type 'Seurat'.'"
+  ),
+  make_option(
+    c("--margin"),
+    action = "store",
+    default = NULL,
+    type = 'integer',
+    help = "If performing CLR normalization, normalize across features (1) or cells (2)."
+  ),
+  make_option(
+    c("--block-size"),
+    action = "store",
+    default = NULL,
+    type = 'integer',
+    help = "How many cells should be run in each chunk, will try to split evenly across threads"
   )
 )
 
@@ -59,12 +80,23 @@ if ( ! file.exists(opt$input_object_file)){
 # Now we're hapy with the arguments, load Seurat and do the work
 
 suppressPackageStartupMessages(require(Seurat))
+if(opt$input_format == "loom" | opt$output_format == "loom") {
+  suppressPackageStartupMessages(require(loomR))
+} else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
+  suppressPackageStartupMessages(require(scater))
+}
 
 # Input from serialized R object
 
-seurat_object <- readRDS(opt$input_object_file)
-normalised_seurat_object <- NormalizeData(seurat_object, assay.type = opt$assay_type, normalization.method = opt$normalization_method, scale.factor = opt$scale_factor, display.progress = FALSE)
+seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
+normalised_seurat_object <- NormalizeData(seurat_object, 
+                                          normalization.method = opt$normalization_method, 
+                                          scale.factor = opt$scale_factor, 
+                                          margin = opt$margin, 
+                                          block.size = opt$block_size,
+                                          verbose = FALSE)
 
 # Output to a serialized R object
-
-saveRDS(normalised_seurat_object, file = opt$output_object_file)
+write_seurat3_object(seurat_object = normalised_seurat_object, 
+                     output_path = opt$output_object_file, 
+                     format = opt$output_format)

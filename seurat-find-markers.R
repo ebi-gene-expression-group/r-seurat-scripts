@@ -26,6 +26,13 @@ option_list = list(
     help = "File to be used to derive a vector of genes to test. Default is to use all genes."
   ),
   make_option(
+    c("--input-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
+  ),
+  make_option(
     c("-l", "--logfc-threshold"),
     action = "store",
     default = 0.25,
@@ -88,6 +95,31 @@ option_list = list(
     type = 'character',
     help = "File name in which to store text format matrix containing a ranked list of putative markers, and associated statistics (p-values, ROC score, etc.)."
   )
+  # , # The defaults for the above variables lead to zero marker genes found:
+  # make_option(
+  #   c("--slot"),
+  #   action = "store",
+  #   default = NULL,
+  #   metavar = "Data slot",
+  #   type = 'character',
+  #   help = "Slot to pull data from; note that if test.use is 'negbinom', 'poisson', or 'DESeq2', slot will be set to 'counts'"
+  # ),
+  # make_option(
+  #   c("--latent-vars"),
+  #   action = "store",
+  #   default = NULL,
+  #   metavar = "Data slot",
+  #   type = 'character',
+  #   help = "Comma separated variables to test, used only when test.use is one of 'LR', 'negbinom', 'poisson', or 'MAST'"
+  # ),
+  # make_option(
+  #   c("--pseudocount-use"),
+  #   action = "store",
+  #   default = NULL,
+  #   metavar = "Use pseudocount",
+  #   type = 'integer',
+  #   help = "Pseudocount to add to averaged expression values when calculating logFC. 1 by default."
+  # )
 )
 
 opt <- wsc_parse_args(option_list, mandatory = c('input_object_file', 'output_text_file'))
@@ -99,37 +131,47 @@ if ( ! file.exists(opt$input_object_file)){
 }
 
 # Check genes_use
-
+genes_use <- NULL
 if (! is.null(opt$genes_use) && opt$genes_use != 'NULL'){
   if (! file.exists(opt$genes_use)){
     stop((paste('Supplied genes file', opt$genes_use, 'does not exist')))
   }else{
     genes_use <- readLines(opt$genes_use)
   }
-}else{
-  genes_use <- NULL
 }
+
+# Latent vars
+#latent_vars<-NULL
+#if (! is.null(opt$latent_vars)) {
+#  latent_vars<-strsplit(opt$latent_vars,split = ",")
+#}
 
 # Now we're hapy with the arguments, load Seurat and do the work
 
 suppressPackageStartupMessages(require(Seurat))
+if(opt$input_format == "loom" ) {
+  suppressPackageStartupMessages(require(loomR))
+} else if(opt$input_format == "singlecellexperiment" ) {
+  suppressPackageStartupMessages(require(scater))
+}
 
 # Input from serialized R object
 
-seurat_object <- readRDS(opt$input_object_file)
+seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
 
 # Get results matrix
-
-results_matrix <- FindAllMarkers(
-  seurat_object,
-  genes.use = genes_use,
+results_matrix<-FindAllMarkers(
+  seurat_object, 
+  # slot = opt$slot,
+  features = genes_use, 
+  # latent.vars = latent_vars, 
+  # pseudocount.use = opt$pseudocount_use,
   logfc.threshold = opt$logfc_threshold,
   test.use = opt$test_use,
   min.pct = opt$min_pct,
   min.diff.pct = opt$min_diff_pct,
-  print.bar = FALSE,
-  do.print = FALSE,
-  min.cells.gene = opt$min_cells_gene,
+  verbose = FALSE,
+  min.cells.feature = opt$min_cells_gene,
   min.cells.group = opt$min_cells_group,
   only.pos = opt$only_pos,
   max.cells.per.ident = opt$max_cells_per_ident
@@ -145,7 +187,7 @@ opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)
 opt_table <- opt_table[! rownames(opt_table) %in% nonreport_params, , drop = FALSE]
 
 markers_by_cluster <- merge(
-  data.frame(as.matrix(table(seurat_object@ident))),
+  data.frame(as.matrix(table(Idents(seurat_object)))),
   data.frame(as.matrix(table(results_matrix$cluster))),
   by = 'row.names'
 )
