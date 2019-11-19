@@ -1,6 +1,8 @@
-# seurat-scripts [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/seurat-scripts/README.html)
+# seurat-scripts for Seurat 3.1.1 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/seurat-scripts/README.html)
 
 In order to wrap Seurat's internal workflow in any given workflow language, it's important to have scripts to call each of those steps, which is what this package provides.
+
+This version of seurat-scripts uses native conversions to Loom (thoroughly tested), SCE and AnnData.
 
 ## Install
 
@@ -25,6 +27,8 @@ This downloads [a well-known test 10X dataset]('https://s3-us-west-2.amazonaws.c
 ## Commands
 
 Currently wrapped Seurat functions are described below. Each script has usage instructions available via --help, consult function documentation in Seurat for further details.
+
+These instructions might be currently outdated for Seurat 3.1.1, the best source of information is `--help` on each command.
 
 ###  Read10X(): read 10X data and create the matrix object
 

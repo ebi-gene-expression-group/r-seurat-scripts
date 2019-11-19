@@ -102,6 +102,22 @@ option_list = list(
     metavar = "Add iterations",
     type = 'logical',
     help = "If an existing tSNE has already been computed, uses the current tSNE to seed the algorithm and then adds additional iterations on top of this"
+  ),
+  make_option(
+    c("--reduction-key"),
+    action = "store",
+    default = 'tSNE_',
+    metavar = 'Reductio key',
+    type = 'character',
+    help = 'dimensional reduction key, specifies the string before the number for the dimension names. tSNE_ by default'
+  ),
+  make_option(
+    c("--reduction-name"),
+    action = "store",
+    default = "tsne",
+    metavar = "Reduction name",
+    type = "character",
+    help = "dimensional reduction name, specifies the position in the object$dr list. tsne by default"
   )
 )
 
@@ -161,10 +177,9 @@ tsne_seurat_object <- RunTSNE( seurat_object,
                                dims = dims_use, 
                                seed.use = opt$random_seed, 
                                add.iter = opt$add_iter, 
-                               reduction.key = , 
-                               reduction.name = , 
-                               distance.matrix = ,
-                               features = genes_use, 
+                               reduction.key = opt$reduction_key, 
+                               reduction.name = opt$reduction_name, 
+                               features = genes_use
                               )
 
 # Output to text-format components
