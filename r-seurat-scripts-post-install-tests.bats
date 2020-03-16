@@ -59,10 +59,35 @@
     
     [ "$status" -eq 0 ]
     [ -f  "$normalised_seurat_object" ]
+	}	
+
+
+
+ # run find transfer anchor with normalised_seurat_object as query and reference
+ 
+@test "Find transfer anchors" {
+   #if [ "$use_existing_outputs" = 'true' ] && [ -f "$normalised_seurat_object" ]; then
+     #   skip "$normalised_seurat_object exists and use_existing_outputs is set to 'true'"
+   # fi
+   
+    run seurat-find-transfer-anchor.R $normalised_seurat_object $normalised_seurat_object
+    echo "status = ${status}"
+    echo "output = ${output}" 
+    [ "$status" -eq 0 ]
+
+    
+    
 }
 
-# Run find-variable-genes.R
 
+
+
+
+
+
+
+
+# Run find-variable-genes.R
 @test "Find variable genes" {
     if [ "$use_existing_outputs" = 'true' ] && [ -f "$variable_genes_list" ]; then
         skip "$variable_genes_list exists and use_existing_outputs is set to 'true'"
