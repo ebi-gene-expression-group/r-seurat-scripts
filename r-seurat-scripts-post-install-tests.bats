@@ -62,31 +62,6 @@
 	}	
 
 
-
- # run find transfer anchor with normalised_seurat_object as query and reference
- 
-@test "Find transfer anchors" {
-   if [ "$use_existing_outputs" = 'true' ] && [ -f "$anchor_object" ]; then
-       skip "$anchor_objet exists and use_existing_outputs is set to 'true'"
-   fi
-   
-    run seurat-find-transfer-anchor.R -i $normalised_seurat_object -r $normalised_seurat_object -o $anchor_object --project-query --approx-pca 
-    echo "status = ${status}"
-    echo "output = ${output}" 
-    [ "$status" -eq 0 ]
-
-    
-    
-}
-
-
-
-
-
-
-
-
-
 # Run find-variable-genes.R
 @test "Find variable genes" {
     if [ "$use_existing_outputs" = 'true' ] && [ -f "$variable_genes_list" ]; then
@@ -145,6 +120,21 @@
     [ "$status" -eq 0 ]
     [ -f  "$pca_seurat_object" ]
 }
+
+
+#Run transfer anchor
+@test "Find transfer anchors" {
+      if [ "$use_existing_outputs" = 'true' ] && [ -f "$anchor_object" ]; then
+          skip "$anchor_objet exists and use_existing_outputs is set to 'true'"
+      fi
+
+      run seurat-find-transfer-anchor.R -i $pca_seurat_object -r $pca_seurat_object -o $anchor_object
+      echo "status = ${status}"
+      echo "output = ${output}"
+      [ "$status" -eq 0 ]
+
+}
+
 
 # Find Neighbours
 

@@ -85,6 +85,7 @@ option_list = list(
   make_option(
     c("--project-query"),
     action = "store_false",
+    default = FALSE,
     help = "Project the PCA from the query dataset onto the reference. Use only in rare cases"
   ),
   make_option(
@@ -192,22 +193,22 @@ seurat_reference <- read_seurat3_object(input_path = opt$query_file, format = op
 #make the fonction work
 anchor_object <- FindTransferAnchors(seurat_reference,
                                     seurat_query,
-                                    normalization.method = opt$normalization.method,
-                                    reference.assay = opt$reference.assay,
-                                    query.assay = opt$query.assay,
+                                    normalization.method = opt$normalization_method,
+                                    reference.assay = opt$reference_assay,
+                                    query.assay = opt$query_assay,
                                     reduction = opt$reduction,
-                                   # project.query = opt$project.query,
+                                    project.query = opt$project_query,
                                     features = opt$features,
                                     npcs = opt$npcs,
-                                    l2.norm = opt$l2.norm,
+                                    l2.norm = opt$l2_norm,
                                     dims = opt$dims,
-                                    k.anchor = opt$k.anchor,
-                                    k.filter = opt$k.filter,
-                                    k.score = opt$k.score,
-                                    max.features = opt$max.features,
-                                    nn.method = opt$nn.method,
+                                    k.anchor = opt$k_anchor,
+                                    k.filter = opt$k_filter,
+                                    k.score = opt$k_score,
+                                    max.features = opt$max_features,
+                                    nn.method = opt$nn_method,
                                     eps = opt$eps,
-                                    approx.pca = opt$approx.pca,
+                                    approx.pca = opt$approx_pca,
                                     verbose = opt$verbose)
 
 #directly save the anchorset
