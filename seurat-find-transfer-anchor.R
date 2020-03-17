@@ -44,7 +44,7 @@ option_list = list(
     c("-o", "--output-file"),
     action = "store",
     default = NULL,
-    type = 'anchorSet',
+    type = 'character',
     help = "path to the output"
   ),
   make_option(
@@ -56,10 +56,10 @@ option_list = list(
   ),
   make_option(
     c("--I2-norm"),
-    action = "store-true",
+    action = "store_false",
     default = FALSE,
-    type = 'character',
-    help = "apply I2 normalization"
+    help = " execute a i2 normalization on the query"
+
   ),
   make_option(
     c("--reference-assay"),
@@ -84,9 +84,7 @@ option_list = list(
   ),
   make_option(
     c("--project-query"),
-    action = "store",
-    default = FALSE,
-    type = 'logical',
+    action = "store_false",
     help = "Project the PCA from the query dataset onto the reference. Use only in rare cases"
   ),
   make_option(
@@ -180,11 +178,13 @@ if ( ! file.exists(opt$reference_file)){
 
 #load seurat and packages needed to read input
 suppressPackageStartupMessages(require(Seurat))
-if(opt$query_format == "loom" | opt$output_format == "loom") {
-  suppressPackageStartupMessages(require(loomR))
-} else if(opt$query_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
-  suppressPackageStartupMessages(require(scater))
-}
+
+
+#if(opt$query_format == "loom" | opt$output_format == "loom") {
+ # suppressPackageStartupMessages(require(loomR))
+#} else if(opt$query_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
+ # suppressPackageStartupMessages(require(scater))
+#}
 
 seurat_query <- read_seurat3_object(input_path = opt$reference_file, format = opt$reference_format)
 seurat_reference <- read_seurat3_object(input_path = opt$query_file, format = opt$query_format)
@@ -196,7 +196,7 @@ anchor_object <- FindTransferAnchors(seurat_reference,
                                     reference.assay = opt$reference.assay,
                                     query.assay = opt$query.assay,
                                     reduction = opt$reduction,
-                                    project.query = opt$project.query,
+                                   # project.query = opt$project.query,
                                     features = opt$features,
                                     npcs = opt$npcs,
                                     l2.norm = opt$l2.norm,
@@ -208,9 +208,9 @@ anchor_object <- FindTransferAnchors(seurat_reference,
                                     nn.method = opt$nn.method,
                                     eps = opt$eps,
                                     approx.pca = opt$approx.pca,
-                                    verbose = opt$verbose))
+                                    verbose = opt$verbose)
 
 #directly save the anchorset
-saveRDS(anchor_object, file = opt$output_outputfile)
+saveRDS(anchor_object, file = opt$output_file)
 
 

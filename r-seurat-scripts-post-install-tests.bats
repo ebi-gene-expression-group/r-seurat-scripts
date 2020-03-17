@@ -70,7 +70,7 @@
        skip "$anchor_objet exists and use_existing_outputs is set to 'true'"
    fi
    
-    run seurat-find-transfer-anchor.R -i $normalised_seurat_object -r $normalised_seurat_object -o $anchor_object
+    run seurat-find-transfer-anchor.R -i $normalised_seurat_object -r $normalised_seurat_object -o $anchor_object --project-query --approx-pca 
     echo "status = ${status}"
     echo "output = ${output}" 
     [ "$status" -eq 0 ]
