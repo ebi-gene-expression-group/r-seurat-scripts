@@ -55,10 +55,10 @@ option_list = list(
     help = "default SCT can also be LogNormalize"
   ),
   make_option(
-    c("--I2-norm"),
+    c("--l2-norm"),
     action = "store_false",
     default = FALSE,
-    help = " execute a i2 normalization on the query"
+    help = " execute a l2 normalization on the query"
 
   ),
   make_option(
