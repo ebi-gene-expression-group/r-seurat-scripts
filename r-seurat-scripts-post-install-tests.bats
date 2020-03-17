@@ -66,11 +66,11 @@
  # run find transfer anchor with normalised_seurat_object as query and reference
  
 @test "Find transfer anchors" {
-   #if [ "$use_existing_outputs" = 'true' ] && [ -f "$normalised_seurat_object" ]; then
-     #   skip "$normalised_seurat_object exists and use_existing_outputs is set to 'true'"
-   # fi
+   if [ "$use_existing_outputs" = 'true' ] && [ -f "$anchor_object" ]; then
+       skip "$anchor_objet exists and use_existing_outputs is set to 'true'"
+   fi
    
-    run seurat-find-transfer-anchor.R $normalised_seurat_object $normalised_seurat_object
+    run seurat-find-transfer-anchor.R -i $normalised_seurat_object -r $normalised_seurat_object -o $anchor_object
     echo "status = ${status}"
     echo "output = ${output}" 
     [ "$status" -eq 0 ]

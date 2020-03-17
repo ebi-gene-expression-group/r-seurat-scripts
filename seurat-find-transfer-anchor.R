@@ -9,11 +9,11 @@ option_list = list(
  
   
    make_option(
-    c("--query-file"),
+    c("-i", "--query-file"),
     action = "store",
     default = NA,
     type = 'character',
-    help = "place to find query ",
+    help = "seurat object to use as the reference",
   ),
  
    make_option(
@@ -21,14 +21,14 @@ option_list = list(
     action = "store",
     default = "seurat",
     type = 'character',
-    help = "format of the query  "
+    help = "format of the query"
   ),
   make_option(
-    c("-i", "--reference-file"),
+    c("-r", "--reference-file"),
     action = "store",
     default = NA,
     type = 'character',
-    help = "place to find reference"
+    help = "seurat object to use as the reference"
   ),
   
   make_option(
@@ -36,19 +36,19 @@ option_list = list(
     action = "store",
     default = "seurat",
     type = 'character',
-    help = "format of the reference   "
+    help = "format of the reference"
   ),
   
   
   make_option(
-    c("--output-file"),
+    c("-o", "--output-file"),
     action = "store",
     default = NULL,
     type = 'anchorSet',
-    help = "place to  find output "
+    help = "path to the output"
   ),
   make_option(
-    c("--normalization-method"),
+    c("-n", "--normalization-method"),
     action = "store",
     default = 'SCT',
     type = 'character',
@@ -59,7 +59,7 @@ option_list = list(
     action = "store-true",
     default = FALSE,
     type = 'character',
-    help = "apply I2 normalization   "
+    help = "apply I2 normalization"
   ),
   make_option(
     c("--reference-assay"),
@@ -80,17 +80,17 @@ option_list = list(
     action = "store",
     default = "pcaproject",
     type = 'character',
-    help = "Dimensional reduction to perform when finding anchors.  "
+    help = "Dimensional reduction to perform when finding anchors"
   ),
   make_option(
     c("--project-query"),
     action = "store",
     default = FALSE,
     type = 'logical',
-    help = "Project the PCA from the query dataset onto the reference. Use only in rare cases "
+    help = "Project the PCA from the query dataset onto the reference. Use only in rare cases"
   ),
   make_option(
-    c("--features"),
+    c("-f","--features"),
     action = "store",
     default = NULL,
     type = 'character',
@@ -104,7 +104,7 @@ option_list = list(
     help = "Number of PCs to compute on reference. If null, then use an existing PCA structure in the reference object"
   ),
   make_option(
-    c("--dims"),
+    c("-d","--dims"),
     action = "store",
     default = 0:30,
     type = 'integer', #note sure
@@ -115,7 +115,7 @@ option_list = list(
     action = "store",
     default = 5,
     type = 'integer',
-    help = "How many neighbors (k) to use when picking anchors "
+    help = "How many neighbors (k) to use when picking anchors"
   ),
   make_option(
     c("--k-filter"),
@@ -123,7 +123,7 @@ option_list = list(
     action = "store",
     default = 200,
     type = 'integer',
-    help = "How many neighbors (k) to use when filtering anchors "
+    help = "How many neighbors (k) to use when filtering anchors"
   ),
   make_option(
     c("--k-score"),
@@ -133,7 +133,7 @@ option_list = list(
     help ="How many neighbors (k) to use when scoring anchors"
   ),
   make_option(
-    c("--max-features"),
+    c("-m","--max-features"),
     action = "store",
     default = 200,
     type = 'integer',
@@ -208,13 +208,9 @@ anchor_object <- FindTransferAnchors(seurat_reference,
                                     nn.method = opt$nn.method,
                                     eps = opt$eps,
                                     approx.pca = opt$approx.pca,
-                                    verbose = opt$verbose)
-#get the addr for output
-#position <- string_locate_all("/",$output_file)
-#position <- position[position(lenght(position))]
-#display(position)
-#get the anchor matrix and save it as csv
-anchor_matrix <- anchor_object.anchors
-csv_anchor <- writematrix(csv_anchor,paste(output_file(:position), "anchor_matrix.csv"))
+                                    verbose = opt$verbose))
+
+#directly save the anchorset
+saveRDS(anchor_object, file = opt$output_outputfile)
 
 

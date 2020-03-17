@@ -86,6 +86,8 @@ export tsne_seurat_object="$output_dir/tsne_seurat.rds"
 export tsne_embeddings_file="$output_dir/tsne_embeddings.csv"
 export html_output_dir="$output_dir/html_out"
 export marker_text_file="$output_dir/markers.csv"
+export anchor_object="$output_dir/anchor_object.rds"
+
 
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.
