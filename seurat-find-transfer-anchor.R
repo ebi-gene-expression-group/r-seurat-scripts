@@ -193,15 +193,15 @@ seurat_reference <- read_seurat3_object(input_path = opt$query_file, format = op
 #make the fonction work
 anchor_object <- FindTransferAnchors(seurat_reference,
                                     seurat_query,
-                                    normalization.method = opt$normalization_method,
-                                    reference.assay = opt$reference_assay,
-                                    query.assay = opt$query_assay,
-                                    reduction = opt$reduction,
-                                    project.query = opt$project_query,
-                                    features = opt$features,
-                                    npcs = opt$npcs,
-                                    l2.norm = opt$l2_norm,
-                                    dims = opt$dims)
+                                    normalization.method = opt$normalization_method)
+                                   # reference.assay = opt$reference_assay,
+                                   # query.assay = opt$query_assay,
+                                   # reduction = opt$reduction,
+                                   # project.query = opt$project_query,
+                                   # features = opt$features,
+                                   # npcs = opt$npcs,
+                                   # l2.norm = opt$l2_norm,
+                                   # dims = opt$dims)
                                    # k.anchor = opt$k_anchor,
                                   #  k.filter = opt$k_filter,
                                    # k.score = opt$k_score,
