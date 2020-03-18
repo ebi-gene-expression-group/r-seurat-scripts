@@ -55,13 +55,6 @@ option_list = list(
     help = "default SCT can also be LogNormalize"
   ),
   make_option(
-    c("--l2-norm"),
-    action = "store_false",
-    default = FALSE,
-    help = " execute a l2 normalization on the query"
-
-  ),
-  make_option(
     c("--reference-assay"),
     action = "store",
     default = NULL,
@@ -87,6 +80,13 @@ option_list = list(
     action = "store_false",
     default = FALSE,
     help = "Project the PCA from the query dataset onto the reference. Use only in rare cases"
+  ),
+make_option(
+    c("--l2-norm"),
+    action = "store_false",
+    default = FALSE,
+    help = " execute a l2 normalization on the query"
+
   ),
   make_option(
     c("-f","--features"),
@@ -194,7 +194,7 @@ seurat_reference <- read_seurat3_object(input_path = opt$query_file, format = op
 anchor_object <- FindTransferAnchors(seurat_reference,
                                     seurat_query,
                                     normalization.method = opt$normalization_method,
-                                    reference.assay = opt$reference_assay,
+                                   # reference.assay = opt$reference_assay,
                                     query.assay = opt$query_assay,
                                     reduction = opt$reduction,
                                     project.query = opt$project_query,
