@@ -105,7 +105,7 @@ make_option(
   make_option(
     c("-d","--dims"),
     action = "store",
-    default = 0:30,
+    default = 1:10,
     type = 'integer', #note sure
     help = "dimension to go throw"
   ),
@@ -201,7 +201,7 @@ anchor_object <- FindTransferAnchors(seurat_reference,
                                     features = opt$features,
                                     npcs = opt$npcs,
                                     l2.norm = opt$l2_norm,
-                                   # dims = opt$dims,
+                                    dims = opt$dims,
                                     k.anchor = opt$k_anchor,
                                     k.filter = opt$k_filter,
                                     k.score = opt$k_score,
