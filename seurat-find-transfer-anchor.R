@@ -195,8 +195,8 @@ anchor_object <- FindTransferAnchors(seurat_reference,
                                     seurat_query,
                                     normalization.method = opt$normalization_method,
                                     reference.assay = opt$reference_assay,
-                                    query.assay = opt$query_assay)
-                                   # reduction = opt$reduction,
+                                    query.assay = opt$query_assay,
+                                    reduction = opt$reduction)
                                    # project.query = opt$project_query,
                                    # features = opt$features,
                                    # npcs = opt$npcs,
