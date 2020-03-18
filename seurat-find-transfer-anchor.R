@@ -200,8 +200,8 @@ anchor_object <- FindTransferAnchors(seurat_reference,
                                     project.query = opt$project_query,
                                     features = opt$features,
                                     npcs = opt$npcs,
-                                    l2.norm = opt$l2_norm)
-                       #             dims = opt$dims,
+                                    l2.norm = opt$l2_norm,
+                                    dims = opt$dims)
                         #            k.anchor = opt$k_anchor,
                          #           k.filter = opt$k_filter,
                           #          k.score = opt$k_score,
