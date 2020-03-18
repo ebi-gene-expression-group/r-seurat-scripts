@@ -181,11 +181,11 @@ if ( ! file.exists(opt$reference_file)){
 suppressPackageStartupMessages(require(Seurat))
 
 
-#if(opt$query_format == "loom" | opt$output_format == "loom") {
- # suppressPackageStartupMessages(require(loomR))
-#} else if(opt$query_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
- # suppressPackageStartupMessages(require(scater))
-#}
+if(opt$query_format == "loom") {
+  suppressPackageStartupMessages(require(loomR))
+} else if(opt$query_format == "singlecellexperiment") {
+  suppressPackageStartupMessages(require(scater))
+}
 
 seurat_query <- read_seurat3_object(input_path = opt$reference_file, format = opt$reference_format)
 seurat_reference <- read_seurat3_object(input_path = opt$query_file, format = opt$query_format)
