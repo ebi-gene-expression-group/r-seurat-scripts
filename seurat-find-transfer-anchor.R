@@ -201,15 +201,15 @@ anchor_object <- FindTransferAnchors(seurat_reference,
                                     features = opt$features,
                                     npcs = opt$npcs,
                                     l2.norm = opt$l2_norm,
-                                    dims = opt$dims,
-                                    k.anchor = opt$k_anchor,
+                                    dims = opt$dims)
+                                   # k.anchor = opt$k_anchor,
                                   #  k.filter = opt$k_filter,
-                                    k.score = opt$k_score,
-                                    max.features = opt$max_features,
-                                    nn.method = opt$nn_method,
-                                    eps = opt$eps,
-                                    approx.pca = opt$approx_pca,
-                                    verbose = opt$verbose)
+                                   # k.score = opt$k_score,
+                                   # max.features = opt$max_features,
+                                   # nn.method = opt$nn_method,
+                                   # eps = opt$eps,
+                                   # approx.pca = opt$approx_pca,
+                                   # verbose = opt$verbose
 
 #directly save the anchorset
 saveRDS(anchor_object, file = opt$output_file)
