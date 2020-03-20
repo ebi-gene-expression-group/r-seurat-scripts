@@ -128,7 +128,7 @@
           skip "$anchor_objet exists and use_existing_outputs is set to 'true'"
       fi
 
-      run seurat-find-transfer-anchor.R -i $pca_seurat_object -r $pca_seurat_object -o $anchor_object --normalization-method LogNormalize  
+      run seurat-find-transfer-anchor.R -i $pca_seurat_object -r $pca_seurat_object -o $anchor_object --dims 0 --dims 1, 2, 3, 4, 5, 6, 7, 8, 9,10  --normalization-method LogNormalize  
       echo "status = ${status}"
       echo "output = ${output}"
       [ "$status" -eq 0 ]
