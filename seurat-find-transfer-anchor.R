@@ -98,8 +98,7 @@ option_list = list(
   make_option(
     c("-d","--dims"),
     action = "store",
-    default = 0:30,
-    type = 'integer', 
+    default = 0:30, 
     help = "Which dimensions to use from the reduction to specify the neighbor search space."
   ),
   make_option(
