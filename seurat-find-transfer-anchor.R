@@ -172,7 +172,7 @@ dims <- opt$dims
 dims <- strsplit(dims, ":")
 print(dims)
 #dims <- seq(from=(strtoi(dims[0])),to=(strtoi(dims[1])),1)
-dims <- strtoi(dims[0]),strtoi(dims[1])
+dims <- strtoi(dims[0]):strtoi(dims[1])
 
 #load seurat and packages needed to read input
 suppressPackageStartupMessages(require(Seurat))
