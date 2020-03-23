@@ -99,7 +99,7 @@ option_list = list(
     c("-d","--dims"),
     action = "store",
     default = "0:30", 
-    type = character
+    type = 'character',
     help = "Which dimensions to use from the reduction to specify the neighbor search space."
   ),
   make_option(
