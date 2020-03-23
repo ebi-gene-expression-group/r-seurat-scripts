@@ -170,7 +170,7 @@ if ( ! file.exists(opt$reference_file)){
 #convert dims from "a:b" to a real vector
 dims <- opt$dims
 dims <- strsplit(dims, ":")
-dims <- seq(strtoi(dims[0]),strtoi(dims[1]),1)
+dims <- seq(from=(strtoi(dims[0])),to=(strtoi(dims[1])),1)
 
 
 #load seurat and packages needed to read input
