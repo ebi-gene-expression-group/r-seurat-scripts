@@ -98,7 +98,8 @@ option_list = list(
   make_option(
     c("-d","--dims"),
     action = "store",
-    default = 1:10, 
+    default = 0:30, 
+    type = character
     help = "Which dimensions to use from the reduction to specify the neighbor search space."
   ),
   make_option(
@@ -163,6 +164,15 @@ opt <- wsc_parse_args(option_list, mandatory = c('query_file', 'reference_file',
 # Check parameter values
 if ( ! file.exists(opt$reference_file)){
   stop((paste('File', opt$reference_file, 'does not exist')))
+
+dims <- opt$dims
+if ( ! is.null(dims)){
+  dims <- strsplit(dims, ":")
+  dims <- seq(strtoi(dims[0]),strtoi(dims[1]),1) 
+}
+
+
+
 }
 
 
@@ -190,7 +200,7 @@ anchor_object <- FindTransferAnchors(seurat_reference,
                                     features = opt$features,
                                     npcs = opt$npcs,
                                     l2.norm = opt$l2_norm,
-                                    dims = opt$dims,
+                                    dims = dims,
                                     k.anchor = opt$k_anchor,
                                     k.filter = opt$k_filter,
                                     k.score = opt$k_score,
