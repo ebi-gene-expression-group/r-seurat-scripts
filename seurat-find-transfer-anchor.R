@@ -164,14 +164,12 @@ opt <- wsc_parse_args(option_list, mandatory = c('query_file', 'reference_file',
 # Check parameter values
 if ( ! file.exists(opt$reference_file)){
   stop((paste('File', opt$reference_file, 'does not exist')))
-
 }
 
 #convert dims from "a:b" to a real vector
 dims <- opt$dims
 dims <- strsplit(dims, ":")
 print(dims)
-#dims <- seq(from=(strtoi(dims[0])),to=(strtoi(dims[1])),1)
 dims <- strtoi(dims[[1]][1]):strtoi(dims[[1]][2])
 
 #load seurat and packages needed to read input
