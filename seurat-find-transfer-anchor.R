@@ -167,11 +167,7 @@ if ( ! file.exists(opt$reference_file)){
 }
 
 #convert dims from "a:b" to a real vector
-dims <- opt$dims
-dims <- strsplit(dims, ":")
-print(dims)
-dims <- strtoi(dims[[1]][1]):strtoi(dims[[1]][2])
-
+dims <- wsc_parse_numeric(opt, 'dims')
 #load seurat and packages needed to read input
 suppressPackageStartupMessages(require(Seurat))
 
@@ -184,7 +180,6 @@ if(opt$query_format == "loom") {
 
 seurat_query <- read_seurat3_object(input_path = opt$reference_file, format = opt$reference_format)
 seurat_reference <- read_seurat3_object(input_path = opt$query_file, format = opt$query_format)
-
 #make the function work
 anchor_object <- FindTransferAnchors(seurat_reference,
                                     seurat_query,
