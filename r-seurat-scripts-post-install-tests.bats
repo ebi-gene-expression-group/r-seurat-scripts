@@ -59,10 +59,10 @@
     
     [ "$status" -eq 0 ]
     [ -f  "$normalised_seurat_object" ]
-	}	
-
+}	
 
 # Run find-variable-genes.R
+
 @test "Find variable genes" {
     if [ "$use_existing_outputs" = 'true' ] && [ -f "$variable_genes_list" ]; then
         skip "$variable_genes_list exists and use_existing_outputs is set to 'true'"
@@ -121,8 +121,8 @@
     [ -f  "$pca_seurat_object" ]
 }
 
-
 #Run transfer anchor
+
 @test "Find transfer anchors" {
       if [ "$use_existing_outputs" = 'true' ] && [ -f "$anchor_object" ]; then
           skip "$anchor_objet exists and use_existing_outputs is set to 'true'"
@@ -141,7 +141,7 @@
         skip "$neighbours_seurat_object exists and use_existing_outputs is set to 'true'"
     fi
 
-    run rm -rf $neighbours_seurat_object && seurat-find-neighbours.R -i $pca_seurat_object -o $neighbours_seurat_object --compute-snn --reduction pca
+    run rm -rf $neighbours_seurat_object && seurat-find-neighbours.R -i $pca_seurat_object -o $neighbours_seurat_object --dims 1,2,3,4,5 --compute-snn --reduction pca
     echo "status = ${status}"
     echo "output = ${output}"
   
