@@ -59,7 +59,7 @@
     
     [ "$status" -eq 0 ]
     [ -f  "$normalised_seurat_object" ]
-}
+}	
 
 # Run find-variable-genes.R
 
@@ -119,6 +119,19 @@
   
     [ "$status" -eq 0 ]
     [ -f  "$pca_seurat_object" ]
+}
+
+#Run transfer anchor
+
+@test "Find transfer anchors" {
+      if [ "$use_existing_outputs" = 'true' ] && [ -f "$anchor_object" ]; then
+          skip "$anchor_objet exists and use_existing_outputs is set to 'true'"
+      fi
+
+      run seurat-find-transfer-anchors.R -i $pca_seurat_object -r $pca_seurat_object -o $anchor_object --normalization-method LogNormalize --dims 1:10  
+      echo "status = ${status}"
+      echo "output = ${output}"
+      [ "$status" -eq 0 ]
 }
 
 # Find Neighbours
