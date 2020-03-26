@@ -72,6 +72,12 @@ seurat-scale-data.R -i <Seurat object with variable genes, in .rds format> -e <t
 seurat-run-pca.R -i <Seurat object with scaled expression valus in .rds format> -e <test genes> -p <pcs to compute> -m <use imputed> -o <output Seurat object in .rds format> -b <pca embedding in text format> -l <pca loadings file in format> -s <pca stdev file, text format>
 ```
 
+### FindTransferAnchors(): project a reference on a query (integration)
+
+```
+seurat-find-transfer-anchors.R -i <seurat object with computed dimension reduction used as query, .rds format> -r <seurat object with computed dimension reduction used as reference, .rds format> -o <anchorSet object with anchor matrix, .rds format> -n <normalization method: pcaproject or cca> -f <features to use for dimensional reduction> -d <which dimensions to use from the reduction to specify the neighbor search space, a:b format>    
+```
+
 ### DimPlot(): plot dimension reductions
 
 ```
