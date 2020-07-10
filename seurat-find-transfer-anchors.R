@@ -98,7 +98,7 @@ option_list = list(
   make_option(
     c("-d","--dims"),
     action = "store",
-    default = "0:30", 
+    default = "1:30", 
     type = 'character',
     help = "Which dimensions to use from the reduction to specify the neighbor search space."
   ),
@@ -133,7 +133,7 @@ option_list = list(
   make_option(
     c("--nn-method"),
     action = "store",
-    default = "annoy",
+    default = "rann",
     type = 'character',
     help ="Method for nearest neighbor finding. Options include: rann, annoy."
   ),
