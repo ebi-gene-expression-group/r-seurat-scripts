@@ -47,13 +47,6 @@ option_list = list(
     help = 'Select the method to use to compute the tSNE. Available methods are: Rtsne, Flt-SNE'
   ),
   make_option(
-    c("--perplexity"),
-    action = "store",
-    default = NULL,
-    type = 'integer',
-    help = 'Perplexity value for tSNE, if none is set, the default from seurat is used.'
-  ),
-  make_option(
     c("-c", "--cells-use"),
     action = "store",
     default = NULL,

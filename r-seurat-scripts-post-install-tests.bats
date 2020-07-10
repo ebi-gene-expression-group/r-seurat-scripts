@@ -179,7 +179,6 @@
 }
 
 # Run t-SNE
-
 @test "Run-tSNE analysis" {
     if [ "$use_existing_outputs" = 'true' ] && [ -f "$tsne_seurat_object" ]; then
         skip "$tsne_seurat_object exists and use_existing_outputs is set to 'true'"
@@ -194,8 +193,7 @@
 }
 
 # Run t-SNE with perplexity
-
-@test "Run-tSNE analysis" {
+@test "Run-tSNE analysis with perplexity" {
     if [ "$use_existing_outputs" = 'true' ] && [ -f "$tsne_seurat_object" ]; then
         skip "$tsne_seurat_object exists and use_existing_outputs is set to 'true'"
     fi
