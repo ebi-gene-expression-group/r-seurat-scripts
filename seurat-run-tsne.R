@@ -47,6 +47,13 @@ option_list = list(
     help = 'Select the method to use to compute the tSNE. Available methods are: Rtsne, Flt-SNE'
   ),
   make_option(
+    c("--perplexity"),
+    action = "store",
+    default = NULL,
+    type = 'integer',
+    help = 'Perplexity value for tSNE, if none is set, the default from seurat is used.'
+  ),
+  make_option(
     c("-c", "--cells-use"),
     action = "store",
     default = NULL,
@@ -176,7 +183,8 @@ tsne_seurat_object <- RunTSNE( seurat_object,
                                cells = cells_use, 
                                dims = dims_use, 
                                seed.use = opt$random_seed, 
-                               add.iter = opt$add_iter, 
+                               add.iter = opt$add_iter,
+                               perplexity = opt$perplexity,
                                reduction.key = opt$reduction_key, 
                                reduction.name = opt$reduction_name, 
                                features = genes_use

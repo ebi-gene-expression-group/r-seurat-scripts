@@ -179,6 +179,21 @@
     [ -f  "$tsne_seurat_object" ]
 }
 
+# Run t-SNE with perplexity
+
+@test "Run-tSNE analysis" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$tsne_seurat_object" ]; then
+        skip "$tsne_seurat_object exists and use_existing_outputs is set to 'true'"
+    fi
+
+    run rm -f $tsne_seurat_object && seurat-run-tsne.R -i $pca_seurat_object -r $reduction_type -d $dims_use -e NULL -o $tsne_seurat_object -b $tsne_embeddings_file --perplexity 20
+    echo "status = ${status}"
+    echo "output = ${output}"
+ 
+    [ "$status" -eq 0 ]
+    [ -f  "$tsne_seurat_object" ]
+}
+
 # Run marker detection
 
 @test "Find markers for each cluster" {
