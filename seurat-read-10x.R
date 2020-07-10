@@ -12,11 +12,18 @@ suppressPackageStartupMessages(require(workflowscriptscommon))
 
 option_list = list(
   make_option(
+    c("-f", "--data-file"),
+    action = "store",
+    default = NA,
+    type = 'character',
+    help = "A tab-separated file containing expression data."
+  ),
+  make_option(
     c("-d", "--data-dir"),
     action = "store",
     default = NA,
     type = 'character',
-    help = "Directory containing the matrix.mtx, genes.tsv, and barcodes.tsv files provided by 10X. A vector or named vector can be given in order to load several data directories. If a named vector is given, the cell barcode names will be prefixed with the name."
+    help = "Directory containing the matrix.mtx, genes.tsv, and barcodes.tsv files matching 10X conventions (overrides --data-file)."
   ),
   make_option(
     c("-o", "--output-object-file"),
@@ -95,12 +102,22 @@ option_list = list(
   )
 )
 
-opt <- wsc_parse_args(option_list, mandatory = c('data_dir', 'output_object_file'))
+opt <- wsc_parse_args(option_list, mandatory = c('output_object_file'))
+
+if (is.na(opt$data_file) && is.na(opt$data_dir)){
+    stop("One of --data-file or data-dir must be supplied")
+}
 
 # Check parameter values
 
-if ( ! dir.exists(opt$data_dir)){
-  stop((paste('Directory', opt$data_dir, 'does not exist')))
+if (! is.na(opt$data_dir)){
+    if ( ! dir.exists(opt$data_dir)){
+      stop((paste('Directory', opt$data_dir, 'does not exist')))
+    }
+}else{
+    if ( ! file.exists(opt$data_file)){
+      stop((paste('File', opt$data_file, 'does not exist')))
+    }
 }
 
 cell_metadata<-NULL
@@ -120,9 +137,13 @@ suppressPackageStartupMessages(require(Matrix))
 
 # Read the data
 
-sc_matrix <- Read10X(data.dir = opt$data_dir, 
-                     unique.features = !opt$not_unique_features,
-                     gene.column = opt$gene_column)
+if ( ! is.na(opt$data_dir)){
+    sc_matrix <- Read10X(data.dir = opt$data_dir, 
+                         unique.features = !opt$not_unique_features,
+                         gene.column = opt$gene_column)
+}else{
+    sc_matrix <- read.table(opt$data_file)
+}
 
 # Use the default show method to print feedback
 printSpMatrix2(sc_matrix, note.dropping.colnames = FALSE, maxp = 500)
