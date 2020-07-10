@@ -210,5 +210,5 @@ if (! is.null(plot_order)){
 # Open the image
 
 png(filename = opt$output_image_file, width = opt$png_width, height = opt$png_height)
-DimPlot(seurat_object, reduction.use = opt$reduction_use, dim.1 = opt$dim_1, dim.2 = opt$dim_2, cells.use = cells_use, pt.size = opt$pt_size, label.size = opt$label_size, do.label = opt$do_label, group.by = opt$group_by, do.bare=opt$do_bare, cols.use=cols_use, pt.shape=opt$pt_shape, coord.fixed=opt$coord_fixed, no.axes=opt$no_axes, dark.theme=opt$dark_theme, plot.order=plot_order, plot.title = opt$plot_title)
+DimPlot(seurat_object, reduction.use = opt$reduction_use, dims = c(opt$dim_1, opt$dim_2), cells.use = cells_use, pt.size = opt$pt_size, label.size = opt$label_size, do.label = opt$do_label, group.by = opt$group_by, do.bare=opt$do_bare, cols.use=cols_use, pt.shape=opt$pt_shape, coord.fixed=opt$coord_fixed, no.axes=opt$no_axes, dark.theme=opt$dark_theme, plot.order=plot_order, plot.title = opt$plot_title)
 dev.off()
