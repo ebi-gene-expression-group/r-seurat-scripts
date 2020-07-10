@@ -22,7 +22,7 @@
         skip "$raw_matrix_object exists and use_existing_outputs is set to 'true'"
     fi
     
-    run rm -f $raw_matrix_object && seurat-read-10x.R -d $data_dir -o $raw_seurat_object
+    run rm -f $raw_matrix_object && seurat-read.R -d $data_dir -o $raw_seurat_object
     echo "status = ${status}"
     echo "output = ${output}"
     
@@ -30,6 +30,20 @@
     [ -f  "$raw_seurat_object" ]
 }
 
+# Create mattrix object from tabular file
+
+@test "Matrix object creation from tabular" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$raw_seurat_object_from_tab" ]; then
+        skip "$raw_matrix_object_from_tab exists and use_existing_outputs is set to 'true'"
+    fi
+    
+    run rm -f $raw_matrix_object_from_tab && echo "file.copy(system.file('extdata', 'pbmc_raw.txt', package = 'Seurat'), 'test.txt')" | R --no-save && seurat-read.R -f test.txt -o $raw_seurat_object_from_tab
+    echo "status = ${status}"
+    echo "output = ${output}"
+    
+    [ "$status" -eq 0 ]
+    [ -f  "$raw_seurat_object_from_tab" ]
+}
 
 # Run filter-cells.R
 
@@ -59,7 +73,7 @@
     
     [ "$status" -eq 0 ]
     [ -f  "$normalised_seurat_object" ]
-}
+}	
 
 # Run find-variable-genes.R
 
@@ -121,6 +135,19 @@
     [ -f  "$pca_seurat_object" ]
 }
 
+#Run transfer anchor
+
+@test "Find transfer anchors" {
+      if [ "$use_existing_outputs" = 'true' ] && [ -f "$anchor_object" ]; then
+          skip "$anchor_objet exists and use_existing_outputs is set to 'true'"
+      fi
+
+      run seurat-find-transfer-anchors.R -i $pca_seurat_object -r $pca_seurat_object -o $anchor_object --normalization-method LogNormalize --dims 1:10  
+      echo "status = ${status}"
+      echo "output = ${output}"
+      [ "$status" -eq 0 ]
+}
+
 # Find Neighbours
 
 @test "Run FindNeighbours" {
@@ -164,6 +191,21 @@
  
     [ "$status" -eq 0 ]
     [ -f  "$tsne_seurat_object" ]
+}
+
+# Run t-SNE with perplexity
+
+@test "Run-tSNE analysis with perplexity" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$tsne_seurat_object_perplexity" ]; then
+        skip "$tsne_seurat_object_perplexity exists and use_existing_outputs is set to 'true'"
+    fi
+
+    run rm -f $tsne_seurat_object_perplexity && seurat-run-tsne.R -i $pca_seurat_object -r $reduction_type -d $dims_use -e NULL -o $tsne_seurat_object_perplexity -b $tsne_embeddings_file --perplexity 20
+    echo "status = ${status}"
+    echo "output = ${output}"
+ 
+    [ "$status" -eq 0 ]
+    [ -f  "$tsne_seurat_object_perplexity" ]
 }
 
 # Run marker detection

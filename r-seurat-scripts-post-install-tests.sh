@@ -68,6 +68,7 @@ fi
 export raw_matrix="$data_dir/matrix.mtx"
 export raw_matrix_object="$output_dir/raw_matrix.rds"
 export raw_seurat_object="$output_dir/raw_seurat.rds"
+export raw_seurat_object_from_tab="$output_dir/raw_seurat_from_tab.rds"
 export filtered_seurat_object="$output_dir/filtered_seurat.rds"
 export normalised_seurat_object="$output_dir/normalised_seurat.rds"
 export variable_genes_seurat_object="$output_dir/variable_genes_seurat.rds"
@@ -83,9 +84,12 @@ export neighbours_seurat_object="$output_dir/neighbours_seurat.rds"
 export cluster_seurat_object="$output_dir/cluster_seurat.rds"
 export cluster_text_file="$output_dir/clusters.txt"
 export tsne_seurat_object="$output_dir/tsne_seurat.rds"
+export tsne_seurat_object_perplexity="$output_dir/tsne_seurat_perplexity.rds"
 export tsne_embeddings_file="$output_dir/tsne_embeddings.csv"
 export html_output_dir="$output_dir/html_out"
 export marker_text_file="$output_dir/markers.csv"
+export anchor_object="$output_dir/anchor_object.rds"
+
 
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.
