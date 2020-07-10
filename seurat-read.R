@@ -141,12 +141,14 @@ if ( ! is.na(opt$data_dir)){
     sc_matrix <- Read10X(data.dir = opt$data_dir, 
                          unique.features = !opt$not_unique_features,
                          gene.column = opt$gene_column)
+
+    # Use the default show method to print feedback
+    printSpMatrix2(sc_matrix, note.dropping.colnames = FALSE, maxp = 500)
+
 }else{
     sc_matrix <- read.table(opt$data_file)
+    print(paste(nrow(sc_matrix), 'x', ncol(sc_matrix), 'matrix of class', class(sc_matrix)))
 }
-
-# Use the default show method to print feedback
-printSpMatrix2(sc_matrix, note.dropping.colnames = FALSE, maxp = 500)
 
 seurat_object <- CreateSeuratObject(sc_matrix,
                                     min.cells = opt$min_cells, 
