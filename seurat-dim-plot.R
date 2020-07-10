@@ -75,25 +75,18 @@ option_list = list(
     help = "Whether to label the clusters."
   ),
   make_option(
+    c("--repel"),
+    action = "store",
+    default = FALSE,
+    type = 'logical',
+    help = "Repel labels."
+  ),
+  make_option(
     c("-f", "--group-by"),
     action = "store",
     default = 'ident',
     type = 'character',
     help = "Group (color) cells in different ways (for example, orig.ident)."
-  ),
-  make_option(
-    c("-t", "--plot-title"),
-    action = "store",
-    default = 1,
-    type = 'character',
-    help = "Title for plot."
-  ),
-  make_option(
-    c("-m", "--do-bare"),
-    action = "store",
-    default = FALSE,
-    type = 'logical',
-    help = "Do only minimal formatting (default : FALSE)"
   ),
   make_option(
     c("-u", "--cols-use"),
@@ -109,27 +102,6 @@ option_list = list(
     type = 'character',
     help = "If NULL, all points are circles (default). You can specify any cell attribute (that can be pulled with FetchData) allowing for both different colors and different shapes on cells."
   ),
-  make_option(
-    c("-x", "--coord-fixed"),
-    action = "store",
-    default = FALSE,
-    type = 'character',
-    help = "Use a fixed scale coordinate system (for spatial coordinates). Default is FALSE"
-  ),
-  make_option(
-    c("-n", "--no-axes"),
-    action = "store",
-    default = FALSE,
-    type = 'logical',
-    help = "Setting to TRUE will remove the axes."
-  ),              
-  make_option(
-    c("-k", "--dark-theme"),
-    action = "store",
-    default = FALSE,
-    type = 'logical',
-    help = "Use a dark theme for the plot."
-  ),              
   make_option(
     c("-q", "--plot-order"),
     action = "store",
@@ -210,5 +182,14 @@ if (! is.null(plot_order)){
 # Open the image
 
 png(filename = opt$output_image_file, width = opt$png_width, height = opt$png_height)
-DimPlot(seurat_object, reduction.use = opt$reduction_use, dims = c(opt$dim_1, opt$dim_2), cells.use = cells_use, pt.size = opt$pt_size, label.size = opt$label_size, do.label = opt$do_label, group.by = opt$group_by, do.bare=opt$do_bare, cols.use=cols_use, pt.shape=opt$pt_shape, coord.fixed=opt$coord_fixed, no.axes=opt$no_axes, dark.theme=opt$dark_theme, plot.order=plot_order, plot.title = opt$plot_title)
+DimPlot(seurat_object, reduction = opt$reduction_use, 
+        dims = c(opt$dim_1, opt$dim_2), 
+        cells = cells_use, 
+        pt.size = opt$pt_size, 
+        label.size = opt$label_size, 
+        label = opt$do_label, 
+        repel = opt$repel,
+        group.by = opt$group_by, 
+        cols=cols_use, shape.by=opt$pt_shape, 
+        order=plot_order)
 dev.off()
