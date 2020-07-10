@@ -68,6 +68,7 @@ fi
 export raw_matrix="$data_dir/matrix.mtx"
 export raw_matrix_object="$output_dir/raw_matrix.rds"
 export raw_seurat_object="$output_dir/raw_seurat.rds"
+export raw_seurat_object_from_tab="$output_dir/raw_seurat_from_tab.rds"
 export filtered_seurat_object="$output_dir/filtered_seurat.rds"
 export normalised_seurat_object="$output_dir/normalised_seurat.rds"
 export variable_genes_seurat_object="$output_dir/variable_genes_seurat.rds"

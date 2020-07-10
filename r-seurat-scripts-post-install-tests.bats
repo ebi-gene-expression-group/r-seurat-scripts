@@ -22,7 +22,7 @@
         skip "$raw_matrix_object exists and use_existing_outputs is set to 'true'"
     fi
     
-    run rm -f $raw_matrix_object && seurat-read-10x.R -d $data_dir -o $raw_seurat_object
+    run rm -f $raw_matrix_object && seurat-read.R -d $data_dir -o $raw_seurat_object
     echo "status = ${status}"
     echo "output = ${output}"
     
@@ -30,6 +30,20 @@
     [ -f  "$raw_seurat_object" ]
 }
 
+# Create mattrix object from tabular file
+
+@test "Matrix object creation from tabular" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$raw_seurat_object_from_tab" ]; then
+        skip "$raw_matrix_object_from_tab exists and use_existing_outputs is set to 'true'"
+    fi
+    
+    run rm -f $raw_matrix_object_from_tab && echo "file.copy(system.file('extdata', 'pbmc_raw.txt', package = 'Seurat'), 'test.txt')" | R --no-save && seurat-read.R -f test.txt -o $raw_seurat_object_from_tab
+    echo "status = ${status}"
+    echo "output = ${output}"
+    
+    [ "$status" -eq 0 ]
+    [ -f  "$raw_seurat_object_from_tab" ]
+}
 
 # Run filter-cells.R
 
