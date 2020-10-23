@@ -122,7 +122,9 @@ if (! is.na(opt$data_dir)){
 
 cell_metadata<-NULL
 if ( ! is.null(opt$metadata) ) {
-  cell_metadata<-read.table(opt$metadata,header = TRUE, sep="\t", row.names = 1)
+  cell_metadata<-read.table(opt$metadata,header = TRUE, sep="\t",
+                            row.names = 1, check.names = FALSE, 
+                            stringsAsFactors = FALSE)
   # vvv below is to avoid https://github.com/satijalab/seurat/issues/2310
   for ( name in colnames(cell_metadata)) {
     cell_metadata[[name]]<-gsub("^$", "N/A", trimws(cell_metadata[[name]]))
