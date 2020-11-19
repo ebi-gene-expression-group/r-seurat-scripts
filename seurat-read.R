@@ -82,7 +82,7 @@ option_list = list(
     default = "SeuratProject",
     type = 'character',
     metavar = 'Sets the project name for the Seurat object.',
-    help = "Do not make feature names unique (default FALSE - make them unique)."
+    help = "Sets the project name for the Seurat object."
   ),
   make_option(
     c("--names-field"),
