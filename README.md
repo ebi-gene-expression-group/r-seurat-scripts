@@ -30,16 +30,10 @@ Currently wrapped Seurat functions are described below. Each script has usage in
 
 These instructions might be currently outdated for Seurat 3.1.1, the best source of information is `--help` on each command.
 
-###  Read10X(): read 10X data and create the matrix object
+###  Read10X(): read 10X data and create Seurat object from the matrix
 
 ```
 seurat-read-10x.R -d <10x data directory> -o <output matrix object in .rds format>
-```
-
-### CreateSeuratObject(): create the Seurat object from the matrix
-
-```
-seurat-create-seurat-object.R -i <input matrix object in .rds format> -o <output Seurat object in .rds format>
 ```
 
 ### FilterCells(): filter out poor-quality cells
