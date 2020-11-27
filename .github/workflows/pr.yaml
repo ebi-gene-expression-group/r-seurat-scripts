@@ -41,9 +41,9 @@ jobs:
           show-channel-urls: true
           use-only-tar-bz2: true
       
-      - name: Install packagages 
+      - name: Install packages 
         run: |
-          conda install openblas bats r-optparse libpng r-cairo r-workflowscriptscommon r-seurat=3.1.1 r-loom bioconductor-scater;
+          conda install openblas libiconv bats r-optparse libpng r-cairo r-workflowscriptscommon r-seurat=3.1.1 r-loom bioconductor-scater;
 
       - name: Run tests
         run: |
