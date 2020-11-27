@@ -30,7 +30,7 @@ jobs:
         with:
           activate-environment: foo
           python-version: 3.6
-          channels: defaults,biocond,conda-forge
+          channels: defaults,bioconda,conda-forge
           allow-softlinks: true
           channel-priority: strict
           show-channel-urls: true
