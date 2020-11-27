@@ -1,0 +1,12 @@
+name: test
+dependencies:
+  - openblas 
+  - libiconv 
+  - bats 
+  - r-optparse 
+  - libpng 
+  - r-cairo 
+  - r-workflowscriptscommon 
+  - r-seurat=3.1.1 
+  - r-loom 
+  - bioconductor-scater

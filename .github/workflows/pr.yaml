@@ -28,12 +28,12 @@ jobs:
         with:
           path: ~/conda_pkgs_dir
           key:
-            ${{ matrix.os }}-conda-${{ env.CACHE_NUMBER }}-${{
-            hashFiles('etc/example-environment.yml') }}
+            ${{ matrix.os }}-conda-${{ env.CACHE_NUMBER }}-${{hashFiles('environment.yml') }}
       
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          activate-environment: foo
+          activate-environment: test
+          environment-file: environment.yml
           python-version: 3.6
           channels: defaults,bioconda,conda-forge
           allow-softlinks: true
@@ -41,10 +41,6 @@ jobs:
           show-channel-urls: true
           use-only-tar-bz2: true
       
-      - name: Install packages 
-        run: |
-          conda install openblas libiconv bats r-optparse libpng r-cairo r-workflowscriptscommon r-seurat=3.1.1 r-loom bioconductor-scater;
-
       - name: Run tests
         run: |
           r-seurat-scripts-post-install-tests.sh
