@@ -32,7 +32,7 @@ jobs:
           python-version: 3.6
           channels: defaults,bioconda,conda-forge
           allow-softlinks: true
-          channel-priority: strict
+          channel-priority: flexible
           show-channel-urls: true
           use-only-tar-bz2: true
       
