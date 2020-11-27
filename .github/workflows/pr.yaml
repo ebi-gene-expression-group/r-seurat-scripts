@@ -28,7 +28,7 @@ jobs:
         with:
           path: ~/conda_pkgs_dir
           key:
-            ${{ matrix.os }}-conda-${{ env.CACHE_NUMBER }}-${{hashFiles('environment.yml') }}
+            ${{ matrix.os }}-conda-${{ env.CACHE_NUMBER }}-${{hashFiles('test-environment.yml') }}
       
       - uses: conda-incubator/setup-miniconda@v2
         with:
