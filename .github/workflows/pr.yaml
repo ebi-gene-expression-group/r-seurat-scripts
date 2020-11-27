@@ -15,6 +15,11 @@ jobs:
         shell: bash -l {0}
     steps:
       - uses: actions/checkout@v2
+
+      - name: Add workspace to path
+        run: |
+          echo "${GITHUB_WORKSPACE}" >> $GITHUB_PATH
+
       - name: Cache conda
         uses: actions/cache@v1
         env:
@@ -42,4 +47,4 @@ jobs:
 
       - name: Run tests
         run: |
-          env PATH=$(pwd):$PATH ./r-seurat-scripts-post-install-tests.sh
+          r-seurat-scripts-post-install-tests.sh
