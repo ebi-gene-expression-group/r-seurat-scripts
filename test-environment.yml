@@ -1,7 +1,5 @@
 name: test
 dependencies:
-  - openblas 
-  - libiconv 
   - bats 
   - r-optparse 
   - libpng 
