@@ -33,7 +33,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: test
-          environment-file: environment.yml
+          environment-file: test-environment.yml
           python-version: 3.6
           channels: defaults,bioconda,conda-forge
           allow-softlinks: true
