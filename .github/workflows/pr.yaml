@@ -1,3 +1,7 @@
+name: Test Seurat workflow with CLI scripts
+
+on: [pull_request]
+
 jobs:
   setup:
     name: ${{ matrix.os }})
