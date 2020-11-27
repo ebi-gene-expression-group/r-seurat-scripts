@@ -35,7 +35,7 @@ jobs:
           activate-environment: test
           environment-file: test-environment.yml
           python-version: 3.6
-          channels: conda-forege,bioconda,defaults
+          channels: conda-forge,bioconda,defaults
           allow-softlinks: true
           channel-priority: flexible
           show-channel-urls: true
