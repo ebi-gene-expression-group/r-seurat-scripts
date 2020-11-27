@@ -42,4 +42,4 @@ jobs:
 
       - name: Run tests
         run: |
-          ./r-seurat-scripts-post-install-tests.sh
+          env PATH=$(pwd):$PATH ./r-seurat-scripts-post-install-tests.sh
