@@ -1,0 +1,46 @@
+name: Test Seurat workflow with CLI scripts
+
+on: [pull_request]
+
+jobs:
+  setup:
+    name: ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest", "macos-latest"]
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Add workspace to path
+        run: |
+          echo "${GITHUB_WORKSPACE}" >> $GITHUB_PATH
+
+      - name: Cache conda
+        uses: actions/cache@v1
+        env:
+          # Increase this value to reset cache if etc/example-environment.yml has not changed
+          CACHE_NUMBER: 0
+        with:
+          path: ~/conda_pkgs_dir
+          key:
+            ${{ matrix.os }}-conda-${{ env.CACHE_NUMBER }}-${{hashFiles('test-environment.yml') }}
+      
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: test
+          environment-file: test-environment.yml
+          python-version: 3.6
+          channels: conda-forge,bioconda,defaults
+          allow-softlinks: true
+          channel-priority: flexible
+          show-channel-urls: true
+          use-only-tar-bz2: true
+      
+      - name: Run tests
+        run: |
+          r-seurat-scripts-post-install-tests.sh
