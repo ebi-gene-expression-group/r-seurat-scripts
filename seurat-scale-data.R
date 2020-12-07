@@ -111,7 +111,7 @@ option_list = list(
   )
 )
 
-opt <- wsc_parse_args(option_list, mandatory = c('input_object_file', 'output_object_file', 'vars_to_regress'))
+opt <- wsc_parse_args(option_list, mandatory = c('input_object_file', 'output_object_file'))
 
 # Check parameter values
 
