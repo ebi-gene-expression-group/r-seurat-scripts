@@ -1,10 +1,10 @@
 name: test
 dependencies:
-  - bats 
-  - r-optparse 
-  - libpng 
-  - r-cairo 
-  - r-workflowscriptscommon 
-  - r-seurat=3.1.1 
-  - r-loom 
+  - bats
+  - r-optparse
+  - libpng
+  - r-cairo
+  - r-workflowscriptscommon
+  - r-seurat=3.1.5
+  - r-loom
   - bioconductor-scater
