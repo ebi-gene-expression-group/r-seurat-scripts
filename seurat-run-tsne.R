@@ -49,9 +49,9 @@ option_list = list(
   make_option(
     c("--perplexity"),
     action = "store",
-    default = NULL,
+    default = 30,
     type = 'integer',
-    help = 'Perplexity value for tSNE, if none is set, the default from seurat is used.'
+    help = 'Perplexity value for tSNE, if none is set, the default from seurat (30) is used.'
   ),
   make_option(
     c("-c", "--cells-use"),

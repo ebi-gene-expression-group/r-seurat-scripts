@@ -41,7 +41,7 @@ if [ "$action" = 'clean' ]; then
 elif [ "$action" != 'test' ]; then
     echo "Invalid action '$action' supplied"
     exit 1
-fi 
+fi
 
 # Initialise directories
 
@@ -53,14 +53,14 @@ mkdir -p $output_dir
 mkdir -p $data_dir
 
 ################################################################################
-# Fetch test data 
+# Fetch test data
 ################################################################################
 
 if [ ! -e "$test_data_archive" ]; then
     wget $test_data_url -P $test_working_dir
-    
+
 fi
-    
+
 ################################################################################
 # List tool outputs/ inputs
 ################################################################################
