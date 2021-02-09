@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript 
+#!/usr/bin/env Rscript
 
 # Load optparse we need to check inputs
 
@@ -45,6 +45,13 @@ option_list = list(
     default = 'Rtsne',
     type = 'character',
     help = 'Select the method to use to compute the tSNE. Available methods are: Rtsne, Flt-SNE'
+  ),
+  make_option(
+    c("--perplexity"),
+    action = "store",
+    default = NULL,
+    type = 'integer',
+    help = 'Perplexity value for tSNE, if none is set, the default from seurat is used.'
   ),
   make_option(
     c("-c", "--cells-use"),
