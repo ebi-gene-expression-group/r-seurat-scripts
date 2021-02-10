@@ -29,7 +29,9 @@ if [ "$use_existing_outputs" != 'true' ] && [ "$use_existing_outputs" != 'false'
 fi
 
 test_data_url='https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz'
+test_data_transfer_url='https://www.dropbox.com/s/1zxbn92y5du9pu0/pancreas_v3_files.tar.gz?dl=1'
 test_working_dir=`pwd`/'post_install_tests'
+export test_data_transfer_file=$test_working_dir/pancreas_v3_files.tar.gz
 export test_data_archive=$test_working_dir/`basename $test_data_url`
 
 # Clean up if specified
@@ -58,7 +60,7 @@ mkdir -p $data_dir
 
 if [ ! -e "$test_data_archive" ]; then
     wget $test_data_url -P $test_working_dir
-
+    wget $test_data_transfer_url -O $test_data_transfer_file
 fi
 
 ################################################################################
@@ -69,6 +71,8 @@ export raw_matrix="$data_dir/matrix.mtx"
 export raw_matrix_object="$output_dir/raw_matrix.rds"
 export raw_seurat_object="$output_dir/raw_seurat.rds"
 export raw_seurat_object_from_tab="$output_dir/raw_seurat_from_tab.rds"
+export transfer_metadata_object="$data_dir/pancreas_metadata.rds"
+export transfer_expression_object="$data_dir/pancreas_expression_matrix.rds"
 export filtered_seurat_object="$output_dir/filtered_seurat.rds"
 export normalised_seurat_object="$output_dir/normalised_seurat.rds"
 export variable_genes_seurat_object="$output_dir/variable_genes_seurat.rds"

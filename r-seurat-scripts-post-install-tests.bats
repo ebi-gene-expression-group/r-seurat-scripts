@@ -243,3 +243,20 @@
     [ "$status" -eq 0 ]
     [ -f  "$pca_image_file" ]
 }
+
+# Extract the transfer test data
+@test "Extract transfer test data from archive" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$transfer_expression_object" ] && [ -f "$transfer_metadata_object" ]; then
+        skip "$transfer_expression_object and $transfer_metadata_object exist and use_existing_outputs is set to 'true'"
+    fi
+
+    run rm -f $raw_matrix && tar -xvzf $test_data_transfer_file --strip-components 1 -C $data_dir
+    echo "status = ${status}"
+    echo "output = ${output}"
+
+    [ "$status" -eq 0 ]
+    [ -f "$transfer_expression_object" ]
+    [ -f "$transfer_metadata_object" ]
+}
+
+
