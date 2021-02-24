@@ -21,7 +21,7 @@ option_list = list(
   make_option(
     c("--metadata-rds"),
     action = "store",
-    default = NULL
+    default = NULL,
     type = 'character',
     help = 'Optional RDS with metadata.'
   ),
