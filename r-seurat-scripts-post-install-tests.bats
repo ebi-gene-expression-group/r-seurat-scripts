@@ -222,6 +222,10 @@
 }
 
 @test "Export to CellBrowser" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -d "$html_output_dir" ]; then
+        skip "$html_output_dir exists and use_existing_outputs is set to 'true'"
+    fi
+    
     run rm -rf $html_output_dir && seurat-export-cellbrowser.R -i $tsne_seurat_object -o $html_output_dir -n StudyTest
     echo "status = ${status}"
     echo "output = ${output}"
@@ -250,7 +254,9 @@
         skip "$transfer_expression_object and $transfer_metadata_object exist and use_existing_outputs is set to 'true'"
     fi
 
-    run rm -f $raw_matrix && tar -xvzf $test_data_transfer_file --strip-components 1 -C $data_dir
+    echo "Transfer file: $test_data_transfer_file"
+    echo "Data dir: $data_dir"
+    run rm -f $transfer_expression_object $transfer_metadata_object && tar -xvzf $test_data_transfer_file --strip-components 1 -C $data_dir
     echo "status = ${status}"
     echo "output = ${output}"
 
@@ -259,4 +265,15 @@
     [ -f "$transfer_metadata_object" ]
 }
 
+# Split data by technology for later integration
+@test "Split data by technology for later integration" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$transfer_expression_split_obj" ]; then
+        skip "$transfer_expression_split_obj exists and use_existing_outputs is set to true"
+    fi
+    
+    echo "Transfer expression object: $transfer_expression_object"
+    echo "Transfer metadata object: $transfer_metadata_object"
+    run rm -f $transfer_expression_split_obj && rm -rf $transfer_out_dir && mkdir -p $transfer_out_dir  && seurat-split-object.R -i $transfer_expression_object -o $transfer_out_dir --split-by tech -m $transfer_metadata_object
 
+    [ "$status" -eq 0 ]
+}

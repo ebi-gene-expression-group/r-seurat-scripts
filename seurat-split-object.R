@@ -19,7 +19,7 @@ option_list = list(
     help = "RDS/Loom/SCE serialised object with content to split."
   ),
   make_option(
-    c("--metadata-rds"),
+    c("-m", "--metadata-rds"),
     action = "store",
     default = NULL,
     type = 'character',
@@ -40,7 +40,7 @@ option_list = list(
     help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
   ),
   make_option(
-	      c("--output-path"),
+	      c("-o", "--output-path"),
 	      action = "store",
 	      default = "./",
 	      type = "character",
@@ -66,14 +66,15 @@ if(opt$input_format == "loom" | opt$output_format == "loom") {
   suppressPackageStartupMessages(require(scater))
 }
 
-seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
+seurat_object <- CreateSeuratObject(read_seurat3_object(input_path = opt$input_object, format = opt$input_format))
+# Maybe check if the read object is not a Seurat object and call CreateSeuratObject if not.
 
-if(opt$metadata_rds) {
+if(!is.null(opt$metadata_rds)) {
   metadata<-readRDS(file=opt$metadata_rds)
-  seurat_object <- AddMetadata(seurat_object, metadata)
+  seurat_object <- AddMetaData(seurat_object, metadata=metadata)
 }
 
-ouput.list <- SplitObject(seurat_object, split.by = opt$split_by)
+output.list <- SplitObject(seurat_object, split.by = opt$split_by)
 
 for(output in output.list) {
   write_seurat3_object(seurat_object = output,
