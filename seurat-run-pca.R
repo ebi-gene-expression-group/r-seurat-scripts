@@ -90,8 +90,8 @@ option_list = list(
   ),
   make_option(
     c("--weight-by-var"),
-    action = "store_true",
-    default = FALSE,
+    action = "store",
+    default = TRUE,
     metavar = "Weight by variance of each PC",
     type = 'logical',
     help = "Weight the cell embeddings by the variance of each PC (weights the gene loadings if rev.pca is TRUE)"

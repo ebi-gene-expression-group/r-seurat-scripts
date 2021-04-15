@@ -103,10 +103,10 @@ option_list = list(
     help = "Maximal number of iterations per random start"
   ),
   make_option(
-    c("--group-singletons"),
-    action = "store_true",
-    default = FALSE,
-    help = "Group singletons into nearest cluster. If FALSE, assign all singletons to a \"singleton\" group"
+    c("--no-group-singletons"),
+    action = "store_false",
+    default = TRUE,
+    help = "Do not group singletons into nearest cluster. If TRUE, assign all singletons to a \"singleton\" group"
   ),
   make_option(
     c("--random-seed"),
@@ -155,7 +155,7 @@ clustered_object <- FindClusters(seurat_object,
                                  n.start = opt$nrandom_starts,
                                  n.iter = opt$n_iterations,
                                  random.seed = opt$random_seed,
-                                 group.singletons = opt$group_singletons,
+                                 group.singletons = opt$no_group_singletons,
                                  verbose = TRUE, 
                                  resolution = opt$resolution, 
                                  graph.name = opt$graph_name,

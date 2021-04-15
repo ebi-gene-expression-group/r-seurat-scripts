@@ -35,7 +35,7 @@ option_list = list(
   make_option(
     c("-d", "--distance-matrix"),
     action = "store_true",
-    default = TRUE,
+    default = FALSE,
     help = "Boolean value of whether the provided matrix is a distance matrix; note, for objects of class dist, this parameter will be set automatically."
   ),
   make_option(
@@ -47,14 +47,14 @@ option_list = list(
   ),
   make_option(
     c("--compute-snn"),
-    action = "store_true",
-    default = FALSE,
-    help = "Also compute the shared nearest neighbor graph"
+    action = "store",
+    default = TRUE,
+    help = "Also compute the shared nearest neighbor graph. Default: TRUE"
   ),
   make_option(
     c("--prune-snn"),
     action = "store",
-    default = 0,
+    default = 1/15,
     type = 'double',
     help = "Sets the cutoff for acceptable Jaccard index when computing the neighborhood overlap for the SNN construction. Any edges with values less than or equal to this will be set to 0 and removed from the SNN graph. Essentially sets the strigency of pruning (0 --- no pruning, 1 --- prune everything)."
   ),

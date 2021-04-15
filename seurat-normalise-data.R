@@ -56,7 +56,7 @@ option_list = list(
   make_option(
     c("--margin"),
     action = "store",
-    default = NULL,
+    default = 1,
     type = 'integer',
     help = "If performing CLR normalization, normalize across features (1) or cells (2)."
   ),

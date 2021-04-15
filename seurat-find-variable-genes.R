@@ -42,14 +42,14 @@ option_list = list(
   make_option(
     c("-m", "--mean-function"),
     action = "store",
-    default = 'ExpMean',
+    default = 'FastExpMean',
     type = 'character',
     help = "Function to compute x-axis value (average expression). Default is to take the mean of the detected (i.e. non-zero) values."
   ),
   make_option(
     c("-d", "--dispersion-function"),
     action = "store",
-    default = 'LogVMR',
+    default = 'FastLogVMR',
     type = 'character',
     help = "Function to compute y-axis value (dispersion). Default is to take the standard deviation of all values."
   ),
