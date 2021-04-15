@@ -147,6 +147,7 @@ export pca_dim_one=1
 export pca_dim_two=2
 export pt_size=1
 export label_size=4
+export weight_by_var="TRUE"
 export do_label='FALSE'
 export group_by='ident'
 export pca_png_width=1000
@@ -161,6 +162,9 @@ export k_param=30
 export resolution=0.8
 export cluster_algorithm=1
 export cluster_tmp_file_location='/tmp'
+
+# Find neighbours 
+export compute_snn=TRUE
 
 # t-SNE
 export tsne_do_fast='TRUE'
