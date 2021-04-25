@@ -76,9 +76,11 @@ if(!is.null(opt$metadata_rds)) {
 
 output.list <- SplitObject(seurat_object, split.by = opt$split_by)
 
+ext = list(loom="loom", singlecellexperiment="sce.rds", seurat="rds", h5seurat="h5seurat")
+
 for(output in output.list) {
   write_seurat4_object(seurat_object = output,
-                     output_path = paste0(opt$output_path, opt$split_by, output[opt$split_by][0], sep="_"),
+                     output_path = paste(paste(opt$output_path, "sep_by", opt$split_by, output[[opt$split_by]][[1]][1], sep="_"), ext[opt$output_format], sep="."),
                      format = opt$output_format)
 }
 
