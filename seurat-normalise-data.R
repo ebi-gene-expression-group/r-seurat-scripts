@@ -81,14 +81,14 @@ if ( ! file.exists(opt$input_object_file)){
 
 suppressPackageStartupMessages(require(Seurat))
 if(opt$input_format == "loom" | opt$output_format == "loom") {
-  suppressPackageStartupMessages(require(loomR))
+  suppressPackageStartupMessages(require(SeuratDisk))
 } else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
   suppressPackageStartupMessages(require(scater))
 }
 
 # Input from serialized R object
 
-seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
+seurat_object <- read_seurat4_object(input_path = opt$input_object_file, format = opt$input_format)
 normalised_seurat_object <- NormalizeData(seurat_object, 
                                           normalization.method = opt$normalization_method, 
                                           scale.factor = opt$scale_factor, 
@@ -97,6 +97,6 @@ normalised_seurat_object <- NormalizeData(seurat_object,
                                           verbose = FALSE)
 
 # Output to a serialized R object
-write_seurat3_object(seurat_object = normalised_seurat_object, 
+write_seurat4_object(seurat_object = normalised_seurat_object, 
                      output_path = opt$output_object_file, 
                      format = opt$output_format)

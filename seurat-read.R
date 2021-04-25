@@ -162,6 +162,18 @@ seurat_object <- CreateSeuratObject(sc_matrix,
                                     names.delim = opt$names_delim
                                     )
 
+if(opt$output_format == "loom") {
+  suppressPackageStartupMessages(require(SeuratDisk))
+} else if(opt$output_format == "singlecellexperiment") {
+  suppressPackageStartupMessages(require(scater))
+}
+
+# Fix for loom:
+# https://github.com/mojaveazure/loomR/issues/36
+if (opt$output_format == "loom" ) {
+  seurat_object <- FindVariableFeatures(seurat_object, verbose = FALSE)
+}
+
 cat(c(
   '# Object summary', 
   capture.output(print(seurat_object)), 
@@ -170,14 +182,8 @@ cat(c(
 ), 
 sep = '\n')
 
-# Fix for loom:
-# https://github.com/mojaveazure/loomR/issues/36
-if (opt$output_format == "loom" ) {
-  seurat_object <- FindVariableFeatures(seurat_object, verbose = FALSE)
-}
-
 # Output to a serialized R object
 # Output to a serialized R object
-write_seurat3_object(seurat_object = seurat_object, 
+write_seurat4_object(seurat_object = seurat_object, 
                      output_path = opt$output_object_file, 
                      format = opt$output_format)

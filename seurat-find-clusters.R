@@ -139,14 +139,14 @@ if (! is.null(opt$genes_use)){
 
 suppressPackageStartupMessages(require(Seurat))
 if(opt$input_format == "loom" | opt$output_format == "loom") {
-  suppressPackageStartupMessages(require(loomR))
+  suppressPackageStartupMessages(require(SeuratDisk))
 } else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
   suppressPackageStartupMessages(require(scater))
 }
 
 # Input from serialized R object
 
-seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
+seurat_object <- read_seurat4_object(input_path = opt$input_object_file, format = opt$input_format)
 
 clustered_object <- FindClusters(seurat_object, 
                                  algorithm = opt$algorithm,
@@ -177,7 +177,7 @@ rownames(cluster_table) <- cluster_table$Cluster
 cat(paste(ncol(GetAssayData(clustered_object)), 'cells fall into ', length(levels(Idents(clustered_object))), 'final clusters. Membership numbers:\n'), capture.output(cluster_table[,2, drop = FALSE]), '\nParameter values:\n', capture.output(print(opt_table)), sep = '\n')
 
 # Output to a serialized R object
-write_seurat3_object(seurat_object = clustered_object, 
+write_seurat4_object(seurat_object = clustered_object, 
                      output_path = opt$output_object_file, 
                      format = opt$output_format)
 

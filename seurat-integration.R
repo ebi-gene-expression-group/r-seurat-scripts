@@ -280,7 +280,7 @@ if (! is.null(opt$genes_use)){
 
 suppressPackageStartupMessages(require(Seurat))
 if(opt$input_format == "loom" | opt$output_format == "loom") {
-  suppressPackageStartupMessages(require(loomR))
+  suppressPackageStartupMessages(require(SeuratDisk))
 } else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
   suppressPackageStartupMessages(require(scater))
 }
@@ -288,7 +288,7 @@ if(opt$input_format == "loom" | opt$output_format == "loom") {
 # Input from serialized R object
 objects_list<-list()
 for (input in inputs) {
-  seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)  
+  seurat_object <- read_seurat4_object(input_path = opt$input_object_file, format = opt$input_format)  
   append(objects_list, seurat_object)->objects_list
 }
 
@@ -323,6 +323,6 @@ integrated<-IntegrateData(anchorset = anchors,
               dims = dims_processed)
 
 # Output to a serialized R object
-write_seurat3_object(seurat_object = integrated, 
+write_seurat4_object(seurat_object = integrated, 
                      output_path = opt$output_object_file, 
                      format = opt$output_format)

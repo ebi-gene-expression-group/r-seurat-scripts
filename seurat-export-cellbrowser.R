@@ -61,13 +61,13 @@ if ( ! file.exists(opt$input_object_file)){
 
 suppressPackageStartupMessages(require(Seurat))
 if(opt$input_format == "loom" ) {
-  suppressPackageStartupMessages(require(loomR))
+  suppressPackageStartupMessages(require(SeuratDisk))
 } else if(opt$input_format == "singlecellexperiment" ) {
   suppressPackageStartupMessages(require(scater))
 }
 
 # Input from serialized R object
-seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
+seurat_object <- read_seurat4_object(input_path = opt$input_object_file, format = opt$input_format)
 
 skip_markers = TRUE
 if(!is.null(opt$markers_file)) {

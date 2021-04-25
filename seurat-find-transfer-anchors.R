@@ -173,13 +173,13 @@ suppressPackageStartupMessages(require(Seurat))
 
 #load loomR or scater if needed
 if(opt$query_format == "loom") {
-  suppressPackageStartupMessages(require(loomR))
+  suppressPackageStartupMessages(require(SeuratDisk))
 } else if(opt$query_format == "singlecellexperiment") {
   suppressPackageStartupMessages(require(scater))
 }
 
-seurat_query <- read_seurat3_object(input_path = opt$reference_file, format = opt$reference_format)
-seurat_reference <- read_seurat3_object(input_path = opt$query_file, format = opt$query_format)
+seurat_query <- read_seurat4_object(input_path = opt$reference_file, format = opt$reference_format)
+seurat_reference <- read_seurat4_object(input_path = opt$query_file, format = opt$query_format)
 #make the function work
 anchor_object <- FindTransferAnchors(seurat_reference,
                                     seurat_query,

@@ -61,12 +61,12 @@ opt <- wsc_parse_args(option_list, mandatory = c('input_object', 'split_by'))
 
 suppressPackageStartupMessages(require(Seurat))
 if(opt$input_format == "loom" | opt$output_format == "loom") {
-  suppressPackageStartupMessages(require(loomR))
+  suppressPackageStartupMessages(require(SeuratDisk))
 } else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
   suppressPackageStartupMessages(require(scater))
 }
 
-seurat_object <- CreateSeuratObject(read_seurat3_object(input_path = opt$input_object, format = opt$input_format))
+seurat_object <- CreateSeuratObject(read_seurat4_object(input_path = opt$input_object, format = opt$input_format))
 # Maybe check if the read object is not a Seurat object and call CreateSeuratObject if not.
 
 if(!is.null(opt$metadata_rds)) {
@@ -77,7 +77,7 @@ if(!is.null(opt$metadata_rds)) {
 output.list <- SplitObject(seurat_object, split.by = opt$split_by)
 
 for(output in output.list) {
-  write_seurat3_object(seurat_object = output,
+  write_seurat4_object(seurat_object = output,
                      output_path = paste0(opt$output_path, opt$split_by, output[opt$split_by][0], sep="_"),
                      format = opt$output_format)
 }
