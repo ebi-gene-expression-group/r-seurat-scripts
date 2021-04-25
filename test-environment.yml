@@ -8,5 +8,5 @@ dependencies:
   - r-seurat=4.0.0
   - r-loom
   - bioconductor-scater
-  - r-seurat-disk
+  - r-seuratdisk
   - r-remotes
