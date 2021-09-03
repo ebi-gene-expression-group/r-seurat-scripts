@@ -16,7 +16,7 @@ option_list = list(
     action = "store",
     default = NA,
     type = 'character',
-    help = "Comman separated list of RDS/Loom/SCE serialised objects to integrate. They should all be of the same format."
+    help = "Comma separated list of RDS/Loom/SCE serialised objects to integrate. They should all be of the same format."
   ),
   make_option(
     c("--input-format"),
@@ -33,12 +33,18 @@ option_list = list(
     help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
   ),
   make_option(
-    c("--reference"),
+    c("--reference-objects"),
     action = "store",
     default = NULL,
     type = 'character',
-    metavar = "Reference",
     help = "A command separated vector specifying the object/s to be used as a reference during integration. If NULL (default), all pairwise anchors are found (no reference/s). If not NULL, the corresponding objects in object.list will be used as references. When using a set of specified references, anchors are first found between each query and each reference. The references are then integrated through pairwise integration. Each query is then mapped to the integrated reference."
+  ),
+  make_option(
+    c("--reference-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
   ),
   make_option(
     c("--assay-list"),
@@ -83,9 +89,9 @@ option_list = list(
   make_option(
     c("--reduction"),
     action = "store",
-    default = NULL,
+    default = "cca",
     metavar = "Dimensional reduction",
-    type = 'double',
+    type = 'character',
     help = "Dimensional reduction to perform when finding anchors, either cca (Canonical correlation analysis) or rpca (Reciprocal PCA)."
   ),
   make_option(
@@ -188,7 +194,7 @@ option_list = list(
     action = "store",
     default = 1,
     metavar = "Weighting bandwidth",
-    type = 'float',
+    type = 'double',
     help = "Controls the bandwidth of the Gaussian kernel for weighting"
   ),
   make_option(
@@ -216,11 +222,11 @@ option_list = list(
   )
 )
 
-opt <- wsc_parse_args(option_list, mandatory = c('input_object_file', 'output_object_file', 'vars_to_regress'))
+opt <- wsc_parse_args(option_list, mandatory = c('input_object_files', 'output_object_file'))
 
 # Check parameter values
-inputs<-strsplit(opt$input_object_files,split = ",")
-if ( lenght(inputs) <= 1 ) {
+inputs<-strsplit(opt$input_object_files,split = ",")[[1]]
+if ( length(inputs) <= 1 ) {
   stop("At least 2 input objects need to be given for integration running.")
 }
 for ( input in inputs ) {
@@ -228,6 +234,18 @@ for ( input in inputs ) {
     stop((paste('Input file', input, 'does not exist.')))
   }
 }
+
+references<-NULL
+if (!is.null(opt$reference_objects)) {
+  reference_paths<-strsplit(opt$reference_objects, split = ",")
+  for (ref in reference_paths) {
+    if ( ! file.exists(ref)) {
+      stop((paste('Reference file', ref, 'does not exist.')))
+    }
+  }
+  references<-reference_paths
+}
+
 
 weight_reduction<-NULL
 if (! is.null(opt$weight_reduction)) {
@@ -277,7 +295,6 @@ if (! is.null(opt$genes_use)){
 }
 
 # Now we're hapy with the arguments, load Seurat and do the work
-
 suppressPackageStartupMessages(require(Seurat))
 if(opt$input_format == "loom" | opt$output_format == "loom") {
   suppressPackageStartupMessages(require(SeuratDisk))
@@ -288,10 +305,20 @@ if(opt$input_format == "loom" | opt$output_format == "loom") {
 # Input from serialized R object
 objects_list<-list()
 for (input in inputs) {
-  seurat_object <- read_seurat4_object(input_path = opt$input_object_file, format = opt$input_format)  
+  seurat_object <- read_seurat4_object(input_path = input, format = opt$input_format)  
   append(objects_list, seurat_object)->objects_list
 }
 
+reference_object_list<-NULL
+if(! is.null(references)) {
+  reference_object_list<-list()
+  for (ref in references) {
+    seurat_object <- read_seurat4_object(input_path = ref, format = opt$reference_format)  
+    append(reference_object_list, seurat_object)->reference_object_list
+  }
+}
+
+options(future.globals.maxSize = 8000 * 1024^2)
 
 anchors <- FindIntegrationAnchors(object.list = objects_list, 
                                   sct.clip.range = sct_clip_range, l2.norm = opt$l2_norm, 
@@ -304,11 +331,11 @@ anchors <- FindIntegrationAnchors(object.list = objects_list,
                                   eps = opt$eps, 
                                   verbose = FALSE,
                                   assay = opt$assay_list, 
-                                  reference = opt$reference,  
+                                  reference = reference_object_list,  
                                   normalization.method = opt$normalization_method,
                                   scale = opt$do_scale,
                                   anchor.features = opt$anchor_features,
-                                  dims = dims_processsed)
+                                  dims = dims_processed)
 integrated<-IntegrateData(anchorset = anchors, 
               normalization.method = opt$normalization_method,
               k.weight = opt$k_weight, 

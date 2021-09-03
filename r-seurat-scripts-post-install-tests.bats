@@ -135,19 +135,6 @@
     [ -f  "$pca_seurat_object" ]
 }
 
-#Run transfer anchor
-
-@test "Find transfer anchors" {
-      if [ "$use_existing_outputs" = 'true' ] && [ -f "$anchor_object" ]; then
-          skip "$anchor_objet exists and use_existing_outputs is set to 'true'"
-      fi
-
-      run seurat-find-transfer-anchors.R -i $pca_seurat_object -r $pca_seurat_object -o $anchor_object --normalization-method LogNormalize --dims 1:10
-      echo "status = ${status}"
-      echo "output = ${output}"
-      [ "$status" -eq 0 ]
-}
-
 # Find Neighbours
 
 @test "Run FindNeighbours" {
@@ -225,7 +212,7 @@
     if [ "$use_existing_outputs" = 'true' ] && [ -d "$html_output_dir" ]; then
         skip "$html_output_dir exists and use_existing_outputs is set to 'true'"
     fi
-    
+
     run rm -rf $html_output_dir && seurat-export-cellbrowser.R -i $tsne_seurat_object -o $html_output_dir -n StudyTest
     echo "status = ${status}"
     echo "output = ${output}"
@@ -265,15 +252,50 @@
     [ -f "$transfer_metadata_object" ]
 }
 
-# Split data by technology for later integration
 @test "Split data by technology for later integration" {
     if [ "$use_existing_outputs" = 'true' ] && [ -f "$transfer_expression_split_obj" ]; then
         skip "$transfer_expression_split_obj exists and use_existing_outputs is set to true"
     fi
-    
+
     echo "Transfer expression object: $transfer_expression_object"
     echo "Transfer metadata object: $transfer_metadata_object"
-    run rm -f $transfer_expression_split_obj && rm -rf $transfer_out_dir && mkdir -p $transfer_out_dir  && seurat-split-object.R -i $transfer_expression_object -o $transfer_out_dir --split-by tech -m $transfer_metadata_object
+    run rm -f $transfer_expression_split_obj && \
+        rm -rf $transfer_out_dir && mkdir -p $transfer_out_dir && \
+        seurat-split-object.R -i $transfer_expression_object -o $transfer_out_dir --split-by tech -m $transfer_metadata_object
 
     [ "$status" -eq 0 ]
+}
+
+@test "Normalise and find variable features for integration" {
+    for tech in celseq celseq2 smartseq2; do
+      run seurat-normalise-data.R -i ${transfer_out_dir}/sep_by_tech_${tech}.rds -o ${transfer_out_dir}/tmp.rds &&
+        seurat-find-variable-genes.R -i ${transfer_out_dir}/tmp.rds -o ${transfer_out_dir}/sep_by_tech_${tech}_norm_fvg.rds --output-text-file ${transfer_out_dir}/gene.txt &&
+        rm -rf ${transfer_out_dir}/tmp.rds
+    done
+
+    [ "$status" -eq 0 ]
+}
+
+@test "Integrate data" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$integrated_obj" ]; then
+        skip "$integrated_obj exists and use_existing_outputs is set to true"
+    fi
+
+    echo $inputs_integration
+    run rm -rf $integrated_obj && \
+        seurat-integration.R -i $inputs_integration --anchor-features $integration_anchor_features -o $integrated_obj
+
+    [ "$status" -eq 0 ]
+}
+
+@test "Classify against reference" {
+     if [ "$use_existing_outputs" = 'true' ] && [ -f "$classify_result_object" ]; then
+         skip "$classify_result_object exists and use_existing_outputs is set to true"
+     fi
+
+
+     run rm -rf $classify_result_object && \
+         seurat-classify-against-reference.R -i $classify_query -r $integrated_obj -o $classify_result_object
+
+     [ "$status" -eq 0 ]
 }

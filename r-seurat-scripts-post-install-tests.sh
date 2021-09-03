@@ -95,6 +95,9 @@ export tsne_embeddings_file="$output_dir/tsne_embeddings.csv"
 export html_output_dir="$output_dir/html_out"
 export marker_text_file="$output_dir/markers.csv"
 export anchor_object="$output_dir/anchor_object.rds"
+export integrated_obj="$output_dir/integrated_object.rds"
+export classify_query="$transfer_out_dir/sep_by_tech_celseq.rds"
+export classify_result_object="$output_dir/classify_result.rds"
 
 
 ## Test parameters- would form config file in real workflow. DO NOT use these
@@ -163,6 +166,17 @@ export marker_test_use='wilcox'
 export marker_max_cells_per_ident='Inf'
 export marker_min_cells_gene=3
 export marker_min_cells_group=3
+
+# Integration
+inputs_integration=""
+for tech in celseq celseq2 smartseq2; do
+    inputs_integration=${inputs_integration},${transfer_out_dir}/sep_by_tech_${tech}_norm_fvg.rds
+done
+export inputs_integration=$(echo $inputs_integration | sed s/^,// )
+export integration_anchor_features=2000
+
+# Classify against reference
+
 
 ################################################################################
 # Test individual scripts
