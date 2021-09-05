@@ -52,9 +52,23 @@ option_list = list(
     help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
   ),
   make_option(
+    c("--output-anchorset-file"),
+    action = "store",
+    default = NULL,
+    type = 'character',
+    help = "File name in which to store serialized R object for the anchorset."
+  ),
+  make_option(
+    c("--output-anchorset-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
+  ),
+  make_option(
     c("-n", "--normalization-method"),
     action = "store",
-    default = 'SCT',
+    default = 'LogNormalize',
     type = 'character',
     help = "Name of normalization method used: LogNormalize or SCT."
   ),
@@ -262,8 +276,8 @@ if(opt$query_format == "singlecellexperiment" | opt$reference_format == "singlec
   suppressPackageStartupMessages(require(scater))
 }
 
-seurat_query <- read_seurat4_object(input_path = opt$reference_file, format = opt$reference_format)
-seurat_reference <- read_seurat4_object(input_path = opt$query_file, format = opt$query_format)
+seurat_query <- read_seurat4_object(input_path = opt$query_file, format = opt$query_format)
+seurat_reference <- read_seurat4_object(input_path = opt$reference_file, format = opt$reference_format)
 #make the function work
 anchor_object <- FindTransferAnchors(seurat_reference,
                                     seurat_query,
@@ -275,7 +289,7 @@ anchor_object <- FindTransferAnchors(seurat_reference,
                                     features = opt$features,
                                     npcs = opt$npcs,
                                     l2.norm = opt$l2_norm,
-                                    dims = opt$dims,
+                                    dims = dims,
                                     k.anchor = opt$k_anchor,
                                     k.filter = opt$k_filter,
                                     k.score = opt$k_score,
@@ -286,7 +300,13 @@ anchor_object <- FindTransferAnchors(seurat_reference,
                                     verbose = opt$verbose)
 
 #directly save the anchorset
-saveRDS(anchor_object, file = opt$output_file)
+if(! is.null(opt$output_anchorset_file)) {
+  print(paste0("Output anchorset: ", opt$output_anchorset_file))
+  write_seurat4_object(seurat_object = anchor_object,
+                       output_path = opt$output_anchorset_file,
+                       format = opt$output_anchorset_format
+                       )  
+}
 
 predictions<-TransferData(
   anchorset = anchor_object,
@@ -308,6 +328,7 @@ predictions<-TransferData(
 
 seurat_query <- AddMetaData(seurat_query, metadata = predictions, col.name = opt$metadata_col)
 
+print(paste0("Output classified: ", opt$output_object_file))
 # Output to a serialized R object
 write_seurat4_object(seurat_object = seurat_query, 
                      output_path = opt$output_object_file, 
