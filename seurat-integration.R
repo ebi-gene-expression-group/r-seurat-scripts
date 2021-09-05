@@ -71,12 +71,12 @@ option_list = list(
     help = "Name of normalization method used: either LogNormalize or SCT"
   ),
   make_option(
-    c("-s", "--do-scale"),
+    c("-s", "--do-not-scale"),
     action = "store_true",
     default = FALSE,
     metavar = "Scale",
     type = 'logical',
-    help = "Whether or not to scale the features provided. Only set to FALSE if you have previously scaled the features you want to use for each object in the object.list. False by default."
+    help = "Do not to scale the features provided. Only set (to avoid scaling) if you have previously scaled the features you want to use for each object in the object.list. False by default."
   ),
   make_option(
     c("--sct-clip-range"),
@@ -318,30 +318,65 @@ if(! is.null(references)) {
   }
 }
 
+anchor_features<-NULL
+if(! is.null(opt$anchor_features)) {
+  if( is.numeric(opt$anchor_features)) {
+    anchor_features<-as.numeric(opt$anchor_features)
+  } else {
+    anchor_features<-as.numeric(strsplit(opt$anchor_features, split = ","))
+  }
+}
+
 options(future.globals.maxSize = 8000 * 1024^2)
 
+print(paste0("assay = ", opt$assay_list, ", ",
+             "reference = ", reference_object_list, ", ",
+             "anchor.features = ", anchor_features, ", ",
+             "scale = ", !opt$do_not_scale, ", ",
+             "normalization.method = ", opt$normalization_method,  ", ",
+             "sct.clip.range = ", opt$sct_clip_range, ", ",
+             "reduction = ", opt$reduction, ", ",
+             "l2.norm = ", opt$l2_norm, ", ",
+             "dims = ", dims_processed, ", ",
+             "k.anchor = ", opt$k_anchor, ", ",
+             "k.filter = ", opt$k_filter, ", ",
+             "k.score = ", opt$k_score, ", ",
+             "max.features = ", opt$max_features, ", ",
+             "nn.method = ", opt$nn_method, ", ",
+             "eps = ", opt$eps, ", ",
+             "verbose = TRUE", ", "
+             ))
 anchors <- FindIntegrationAnchors(object.list = objects_list, 
-                                  sct.clip.range = sct_clip_range, l2.norm = opt$l2_norm, 
+                                  assay = opt$assay_list, 
+                                  reference = reference_object_list,  
+                                  anchor.features = anchor_features,
+                                  scale = !opt$do_not_scale,
+                                  normalization.method = opt$normalization_method,
+                                  sct.clip.range = opt$sct_clip_range, 
+                                  reduction = opt$reduction, 
+                                  l2.norm = opt$l2_norm, 
+                                  dims = dims_processed,
                                   k.anchor = opt$k_anchor, 
                                   k.filter = opt$k_filter, 
                                   k.score = opt$k_score, 
-                                  reduction = opt$reduction, 
-                                  max.features = opt$max_features, 
                                   nn.method = opt$nn_method, 
+                                  max.features = opt$max_features, 
                                   eps = opt$eps, 
-                                  verbose = FALSE,
-                                  assay = opt$assay_list, 
-                                  reference = reference_object_list,  
-                                  normalization.method = opt$normalization_method,
-                                  scale = opt$do_scale,
-                                  anchor.features = opt$anchor_features,
-                                  dims = dims_processed)
+                                  verbose = TRUE)
+
+if(! is.null(opt$features)) {
+  opt$features<-strsplit(opt$features, split=",")
+}
+if(! is.null(opt$features.to.integrate)) {
+  opt$features.to.integrate<-strsplit(opt$features.to.integrate, split = ",")
+}
+
 integrated<-IntegrateData(anchorset = anchors, 
               normalization.method = opt$normalization_method,
               k.weight = opt$k_weight, 
               sd.weight = opt$sd_weight,
-              features = strsplit(opt$features, split=","),
-              features.to.integrate = strsplit(opt$features.to.integrate, split = ",") , 
+              features = opt$features,
+              features.to.integrate = opt$features.to.integrate , 
               weight.reduction = weight_reduction, 
               sample.tree = opt$sample_tree, 
               preserve.order = opt$preserve_order, 

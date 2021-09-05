@@ -253,8 +253,11 @@
 }
 
 @test "Split data by technology for later integration" {
-    if [ "$use_existing_outputs" = 'true' ] && [ -f "$transfer_expression_split_obj" ]; then
-        skip "$transfer_expression_split_obj exists and use_existing_outputs is set to true"
+    split1=${transfer_out_dir}/sep_by_tech_celseq.rds
+    split2=${transfer_out_dir}/sep_by_tech_celseq2.rds
+    split3=${transfer_out_dir}/sep_by_tech_smartseq2.rds
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$split1" ] && [ -f "$split2" ] && [ -f "$split3" ]; then
+        skip "$split1 , $split2 and $split3 exist and use_existing_outputs is set to true"
     fi
 
     echo "Transfer expression object: $transfer_expression_object"
@@ -267,6 +270,13 @@
 }
 
 @test "Normalise and find variable features for integration" {
+    norm1=${transfer_out_dir}/sep_by_tech_celseq_norm_fvg.rds
+    norm2=${transfer_out_dir}/sep_by_tech_celseq2_norm_fvg.rds
+    norm3=${transfer_out_dir}/sep_by_tech_smartseq2_norm_fvg.rds
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$norm1" ] && [ -f "$norm2" ] && [ -f "$norm3" ]; then
+        skip "$norm1 , $norm2 and $norm3 exist and use_existing_outputs is set to true"
+    fi
+
     for tech in celseq celseq2 smartseq2; do
       run seurat-normalise-data.R -i ${transfer_out_dir}/sep_by_tech_${tech}.rds -o ${transfer_out_dir}/tmp.rds &&
         seurat-find-variable-genes.R -i ${transfer_out_dir}/tmp.rds -o ${transfer_out_dir}/sep_by_tech_${tech}_norm_fvg.rds --output-text-file ${transfer_out_dir}/gene.txt &&
