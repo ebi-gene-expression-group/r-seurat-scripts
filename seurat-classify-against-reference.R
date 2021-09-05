@@ -106,7 +106,7 @@ option_list = list(
     help = "Number of PCs to compute on reference. If null, then use an existing PCA structure in the reference object."
   ),
   make_option(
-    c("-d","--dims"),
+    c("--dims"),
     action = "store",
     default = "1:30", 
     type = 'character',
@@ -185,7 +185,7 @@ option_list = list(
     help ="Perform L2 normalization on the cell embeddings after dimensional reduction"
   ),
   make_option(
-    c("-d","--transfer-dims"),
+    c("--transfer-dims"),
     action = "store",
     default = NULL, 
     type = 'character',
@@ -220,7 +220,7 @@ option_list = list(
     help = "More trees gives higher precision when using annoy approximate nearest neighbor search."
   ),
   make_option(
-    c("-d","--transfer-slot"),
+    c("--transfer-slot"),
     action = "store",
     default = NULL, 
     type = 'character',
@@ -233,7 +233,7 @@ option_list = list(
     help ="Don't store the weights matrix used for predictions in the returned query object."
   ),
   make_option(
-    c("-d","--metadata_col"),
+    c("--metadata_col"),
     action = "store",
     default = NULL, 
     type = 'character',
@@ -242,7 +242,7 @@ option_list = list(
 )
 
 #minimum arguments to work
-opt <- wsc_parse_args(option_list, mandatory = c('query_file', 'reference_file','output_file'))
+opt <- wsc_parse_args(option_list, mandatory = c('query_file', 'reference_file','output_object_file'))
 
 # Check parameter values
 if ( ! file.exists(opt$reference_file)){
