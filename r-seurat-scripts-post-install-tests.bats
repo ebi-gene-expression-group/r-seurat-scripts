@@ -303,9 +303,10 @@
          skip "$classify_result_object exists and use_existing_outputs is set to true"
      fi
 
-
      run rm -rf $classify_result_object && \
-         seurat-classify-against-reference.R -i $classify_query -r $integrated_obj -o $classify_result_object
+         seurat-classify-against-reference.R -i $classify_query \
+          -r $integrated_obj -o $classify_result_object \
+          --transfer-refdata celltype
 
      [ "$status" -eq 0 ]
 }

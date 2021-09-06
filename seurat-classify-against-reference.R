@@ -189,6 +189,7 @@ option_list = list(
   make_option(
     c("--transfer-weight-reduction"),
     action = "store",
+    default = 'pcaproject',
     type = 'character',
     help ="Dimensional reduction to use for the weighting anchors. Options are: pcaproject - Use the projected PCA used for anchor building; pca - Use an internal PCA on the query only; cca - Use the CCA used for anchor building; custom DimReduc - User provided DimReduc paths as RDS, computed on the query cells"
   ),
@@ -227,6 +228,12 @@ option_list = list(
     help ="Error bound on the neighbor finding algorithm (from RANN), for transfer"
   ),
   make_option(
+    c("--transfer-prediction-assay"),
+    action = "store_true",
+    default = FALSE,
+    help = "Return an Assay object with the prediction scores for each class stored in the data slot."
+  ),
+  make_option(
     c("--transfer-n-trees"),
     action = "store",
     default = 50,
@@ -247,7 +254,7 @@ option_list = list(
     help ="Don't store the weights matrix used for predictions in the returned query object."
   ),
   make_option(
-    c("--metadata_col"),
+    c("--metadata-col"),
     action = "store",
     default = NULL, 
     type = 'character',
@@ -256,7 +263,7 @@ option_list = list(
 )
 
 #minimum arguments to work
-opt <- wsc_parse_args(option_list, mandatory = c('query_file', 'reference_file','output_object_file'))
+opt <- wsc_parse_args(option_list, mandatory = c('query_file', 'reference_file','output_object_file', 'transfer_refdata', 'transfer_weight_reduction'))
 
 # Check parameter values
 if ( ! file.exists(opt$reference_file)){
@@ -320,15 +327,14 @@ predictions<-TransferData(
   sd.weight = opt$transfer_sd_weight,
   eps = opt$transfer_eps,
   n.trees = opt$transfer_n_trees,
-  verbose = opt$transfer_verbose,
+  verbose = opt$verbose,
   slot = opt$transfer_slot,
-  # prediction.assay = opt$transfer_prediction_assay,
+  prediction.assay = opt$transfer_prediction_assay,
   store.weights = opt$transfer_no_store_weights
 )
 
-seurat_query <- AddMetaData(seurat_query, metadata = predictions, col.name = opt$metadata_col)
+seurat_query <- AddMetaData(seurat_query, metadata = predictions@meta.data, col.name = opt$metadata_col)
 
-print(paste0("Output classified: ", opt$output_object_file))
 # Output to a serialized R object
 write_seurat4_object(seurat_object = seurat_query, 
                      output_path = opt$output_object_file, 
