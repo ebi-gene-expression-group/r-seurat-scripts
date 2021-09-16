@@ -1,0 +1,211 @@
+commands:
+  - call: 'read_seurat4_object'
+    dependencies:
+      - workflowscriptscommon
+      - optparse
+      - scater
+      - SeuratDisk
+    options_aliases:
+      - option: input-format
+        call: format
+    options:
+      - long: input-path
+        short: i
+        type: file_in
+        human_readable: 'Input file'
+        help: "Input file with Seurat object in either RDS-Seurat, Loom or SCE"
+      - long: input-format
+        type: string
+        human_readable: 'Input format'
+        default: 'seurat'
+        help: 'Either loom, seurat, anndata or singlecellexperiment for the input format to read.'
+    output:
+      - var_name: seurat_object
+  - call: RunUMAP
+    dependencies:
+      - Seurat
+    options:
+    - long: object
+      type: internal
+      var_name: seurat_object
+    - long: dims
+      default: 'NULL'
+      evaluated: True
+      type: string
+      help: Which dimensions to use as input features, used only if list("features")  is
+        NULL
+    - long: reduction
+      default: pca
+      type: string
+      help: Which dimensional reduction (PCA or ICA) to use for the UMAP input. Default
+        is PCA
+    - long: features
+      default: 'NULL'
+      type: list
+      help: Comma-separated list of features to use. If set, run UMAP on this subset of features (instead of running on a set of
+        reduced dimensions). Not set (NULL) by default;  dims must be NULL to
+        run on features
+    - long: graph
+      default: 'NULL'
+      help: Name of graph on which to run UMAP
+      type: string
+    - long: assay
+      default: 'NULL'
+      type: string
+      help: Assay to pull data for when using  list("features") , or assay used to construct
+        Graph if running UMAP on a Graph
+    - long: nn.name
+      default: 'NULL'
+      help: Name of knn output on which to run UMAP
+      type: string
+    - long: slot
+      default: data
+      type: string
+      help: The slot used to pull data for when using  list("features") . data slot is
+        by default.
+    - long: umap.method
+      default: uwot
+      type: string
+      help: UMAP implementation to run. Can be list uwot, uwot-learn, umap-learn (rquires python umap-learn package).
+    - long: reduction.model
+      default: 'NULL'
+      type: string
+      help: list("DimReduc")  object that contains the umap model
+    - long: return.model
+      default: no
+      type: boolean
+      help: whether UMAP will return the uwot model
+    - long: n.neighbors
+      default: 30
+      type: integer
+      help: This determines the number of neighboring points used in local approximations
+        of manifold structure. Larger values will result in more global structure being
+        preserved at the loss of detailed local structure. In general this parameter should
+        often be in the range 5 to 50.
+    - long: n.components
+      default: 2
+      type: integer
+      help: The dimension of the space to embed into.
+    - long: metric
+      default: cosine
+      type: string
+      help: 'metric: This determines the choice of metric used to measure distance in
+        the input space. A wide variety of metrics are already coded, and a user defined
+        function can be passed as long as it has been JITd by numba.'
+    - long: n.epochs
+      default: 'NULL'
+      help: The number of training epochs to be used in optimizing the low dimensional
+        embedding. Larger values result in more accurate embeddings. If NULL is specified,
+        a value will be selected based on the size of the input dataset (200 for large
+        datasets, 500 for small).
+      type: integer
+    - long: learning.rate
+      default: 1
+      type: integer
+      help: The initial learning rate for the embedding optimization.
+    - long: min.dist
+      default: 0
+      type: integer
+      help: This controls how tightly the embedding is allowed compress points together.
+        Larger values ensure embedded points are moreevenly distributed, while smaller
+        values allow the algorithm to optimise more accurately with regard to local structure.
+        Sensible values are in the range 0.001 to 0.5.
+    - long: spread
+      default: 1
+      type: integer
+      help: The effective scale of embedded points. In combination with min.dist this
+        determines how clustered/clumped the embedded points are.
+    - long: set.op.mix.ratio
+      default: 1.0
+      type: double
+      help: Interpolate between (fuzzy) union and intersection as the set operation used
+        to combine local fuzzy simplicial sets to obtain a global fuzzy simplicial sets.
+        Both fuzzy set operations use the product t-norm. The value of this parameter
+        should be between 0.0 and 1.0; a value of 1.0 will use a pure fuzzy union, while
+        0.0 will use a pure fuzzy intersection.
+    - long: local.connectivity
+      default: 1
+      type: integer
+      help: The local connectivity required - i.e. the number of nearest neighbors that
+        should be assumed to be connected at a local level. The higher this value the
+        more connected the manifold becomes locally. In practice this should be not more
+        than the local intrinsic dimension of the manifold.
+    - long: repulsion.strength
+      default: 1
+      type: integer
+      help: Weighting applied to negative samples in low dimensional embedding optimization.
+        Values higher than one will result in greater weight being given to negative samples.
+    - long: negative.sample.rate
+      default: 5
+      type: integer
+      help: The number of negative samples to select per positive sample in the optimization
+        process. Increasing this value will result in greater repulsive force being applied,
+        greater optimization cost, but slightly more accuracy.
+    - long: a
+      default: 'NULL'
+      type: string
+      help: More specific parameters controlling the embedding. If NULL, these values
+        are set automatically as determined by min. dist and spread. Parameter of differentiable
+        approximation of right adjoint functor.
+    - long: b
+      default: 'NULL'
+      type: string
+      help: More specific parameters controlling the embedding. If NULL, these values
+        are set automatically as determined by min. dist and spread. Parameter of differentiable
+        approximation of right adjoint functor.
+    - long: uwot.sgd
+      default: no
+      type: boolean
+      help: Set list("uwot::umap(fast_sgd = TRUE)") ; see  list(list("umap"))  for more
+        details
+    - long: seed.use
+      default: 42
+      type: integer
+      help: Set a random seed. By default, sets the seed to 42. Setting NULL will not
+        set a seed
+    - long: metric.kwds
+      default: 'NULL'
+      type: string
+      evaluated: True
+      help: A dictionary of arguments to pass on to the metric, such as the p value for
+        Minkowski distance. If NULL then no arguments are passed on.
+    - long: angular.rp.forest
+      default: no
+      type: boolean
+      help: Whether to use an angular random projection forest to initialise the approximate
+        nearest neighbor search. This can be faster, but is mostly on useful for metric
+        that use an angular style distance such as cosine, correlation etc. In the case
+        of those metrics angular forests will be chosen automatically.
+    - long: verbose
+      default: yes
+      type: boolean
+      help: Controls verbosity
+    - long: reduction.name
+      default: umap
+      type: string
+      help: Name to store dimensional reduction under in the Seurat object
+    - long: reduction.key
+      default: UMAP
+      type: string
+      help: dimensional reduction key, specifies the string before the number for the
+        dimension names. UMAP by default
+    output:
+      - var_name: seurat_object_umap
+  - call: 'write_seurat4_object'
+    dependencies:
+      - workflowscriptscommon
+    parsing_opts:
+      - r_sep: "_"
+    options_aliases:
+      - option: output-format
+        call: format
+    options:
+      - long: seurat_object
+        type: internal
+        var_name: seurat_object_umap
+      - long: output-path
+        short: o
+        type: file_out
+      - long: output-format
+        type: string
+        default: seurat

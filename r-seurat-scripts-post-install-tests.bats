@@ -310,3 +310,44 @@
 
      [ "$status" -eq 0 ]
 }
+
+@test "Scale integrated" {
+  if [ "$use_existing_outputs" = 'true' ] && [ -f "$scaled_integrated_object" ]; then
+    skip "$scaled_integrated_object exists and use_existing_outputs is set to 'true'"
+  fi
+
+  run rm -rf $scaled_integrated_object && seurat-scale-data.R -i $integrated_obj -o $scaled_integrated_object
+
+  echo "status = ${status}"
+  echo "output = ${output}"
+
+  [ "$status" -eq 0 ]
+  [ -f  "$scaled_integrated_object" ]
+}
+
+@test "Run PCA on integrated" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$pca_integrated_object" ]; then
+        skip "$scaled_seurat_object exists and use_existing_outputs is set to 'true'"
+    fi
+
+    run rm -rf $pca_integrated_object && seurat-run-pca.R -i $scaled_integrated_object --pcs-compute 30 \
+      -o $pca_integrated_object -b $pca_integrated_embeddings -l $pca_integrated_loadings \
+      -s $pca_integrated_stdev
+
+    echo "status = ${status}"
+    echo "output = ${output}"
+
+    [ "$status" -eq 0 ]
+    [ -f  "$pca_integrated_object" ]
+}
+
+@test "Run UMAP on integrated object" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$umap_result_object" ]; then
+      skip "$umap_result_object exists and use_existing_outputs is set to true"
+    fi
+
+    run rm -rf $umap_result_object && \
+      seurat-run-umap.R -i $pca_integrated_object --dims "1:30" --reduction "pca" --return.model -o $umap_result_object
+
+    [ "$status" -eq 0 ]
+}
