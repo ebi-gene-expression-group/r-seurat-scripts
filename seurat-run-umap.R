@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 suppressPackageStartupMessages(require(optparse))
-suppressPackageStartupMessages(require(Seurat))
 suppressPackageStartupMessages(require(SeuratDisk))
 suppressPackageStartupMessages(require(scater))
+suppressPackageStartupMessages(require(Seurat))
 suppressPackageStartupMessages(require(workflowscriptscommon))
 
 option_list <- list(
@@ -245,7 +245,7 @@ option_list <- list(
                     help='FILE IN')
 )
 
-opt <- wsc_parse_args(option_list,
+opt <- wsc_parse_args(option_list, 
                       mandatory = c('input_path','output_path'))
 
 
@@ -273,7 +273,7 @@ if (! is.null(opt$metric.kwds) ) {
 }
 
 
-seurat_object <- read_seurat4_object(input_path = opt$input_path,
+seurat_object <- read_seurat4_object(input.path = opt$input_path,
                     format = opt$input_format)
 
 seurat_object_umap <- RunUMAP(object = seurat_object,
@@ -309,5 +309,5 @@ seurat_object_umap <- RunUMAP(object = seurat_object,
                     reduction.key = opt$reduction.key)
 
 write_seurat4_object(seurat_object = seurat_object_umap,
-                    output_path = opt$output_path,
+                    output.path = opt$output_path,
                     format = opt$output_format)

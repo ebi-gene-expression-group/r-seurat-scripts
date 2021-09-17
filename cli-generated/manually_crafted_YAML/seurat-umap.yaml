@@ -5,9 +5,6 @@ commands:
       - optparse
       - scater
       - SeuratDisk
-    options_aliases:
-      - option: input-format
-        call: format
     options:
       - long: input-path
         short: i
@@ -16,6 +13,7 @@ commands:
         help: "Input file with Seurat object in either RDS-Seurat, Loom or SCE"
       - long: input-format
         type: string
+        call_alias: format
         human_readable: 'Input format'
         default: 'seurat'
         help: 'Either loom, seurat, anndata or singlecellexperiment for the input format to read.'
@@ -207,5 +205,6 @@ commands:
         short: o
         type: file_out
       - long: output-format
+        call_alias: format
         type: string
         default: seurat

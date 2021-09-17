@@ -350,4 +350,5 @@
       seurat-run-umap.R -i $pca_integrated_object --dims "1:30" --reduction "pca" --return.model -o $umap_result_object
 
     [ "$status" -eq 0 ]
+    [ -f "$umap_result_object" ]
 }
