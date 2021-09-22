@@ -10,6 +10,7 @@ commands:
         short: i
         type: file_in
         human_readable: 'Input file'
+        call_alias: input_path
         help: "Input file with Seurat object in either RDS-Seurat, Loom or SCE"
       - long: input-format
         type: string
@@ -30,7 +31,7 @@ commands:
       default: 'NULL'
       evaluated: True
       type: string
-      help: Which dimensions to use as input features, used only if list("features")  is
+      help: Which dimensions to use as input features, used only if list('features')  is
         NULL
     - long: reduction
       default: pca
@@ -50,7 +51,7 @@ commands:
     - long: assay
       default: 'NULL'
       type: string
-      help: Assay to pull data for when using  list("features") , or assay used to construct
+      help: Assay to pull data for when using  list('features') , or assay used to construct
         Graph if running UMAP on a Graph
     - long: nn.name
       default: 'NULL'
@@ -59,7 +60,7 @@ commands:
     - long: slot
       default: data
       type: string
-      help: The slot used to pull data for when using  list("features") . data slot is
+      help: The slot used to pull data for when using  list('features') . data slot is
         by default.
     - long: umap.method
       default: uwot
@@ -68,7 +69,7 @@ commands:
     - long: reduction.model
       default: 'NULL'
       type: string
-      help: list("DimReduc")  object that contains the umap model
+      help: list('DimReduc')  object that contains the umap model
     - long: return.model
       default: no
       type: boolean
@@ -154,7 +155,7 @@ commands:
     - long: uwot.sgd
       default: no
       type: boolean
-      help: Set list("uwot::umap(fast_sgd = TRUE)") ; see  list(list("umap"))  for more
+      help: Set list('uwot::umap(fast_sgd = TRUE)') ; see  list('umap')  for more
         details
     - long: seed.use
       default: 42
@@ -204,6 +205,7 @@ commands:
       - long: output-path
         short: o
         type: file_out
+        call_alias: output_path
       - long: output-format
         call_alias: format
         type: string
