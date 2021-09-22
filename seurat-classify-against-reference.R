@@ -122,7 +122,7 @@ option_list = list(
   make_option(
     c("--dims"),
     action = "store",
-    default = "1:30", 
+    default = "1:30",
     type = 'character',
     help = "Which dimensions to use from the reduction to specify the neighbor search space."
   ),
@@ -134,7 +134,7 @@ option_list = list(
     help = "How many neighbors (k) to use when picking anchors."
   ),
   make_option(
-    c("--k-filter"),    
+    c("--k-filter"),
     action = "store",
     default = 200,
     type = 'integer',
@@ -202,7 +202,7 @@ option_list = list(
   make_option(
     c("--transfer-dims"),
     action = "store",
-    default = NULL, 
+    default = NULL,
     type = 'character',
     help = "Set of dimensions to use in the anchor weighting procedure."
   ),
@@ -243,7 +243,7 @@ option_list = list(
   make_option(
     c("--transfer-slot"),
     action = "store",
-    default = NULL, 
+    default = NULL,
     type = 'character',
     help = "Slot to store the imputed data. Must be either 'data' (default) or 'counts'"
   ),
@@ -256,7 +256,7 @@ option_list = list(
   make_option(
     c("--metadata-col"),
     action = "store",
-    default = NULL, 
+    default = NULL,
     type = 'character',
     help = "Col name to store metadata in."
   )
@@ -276,10 +276,10 @@ dims <- wsc_parse_numeric(opt, 'dims')
 suppressPackageStartupMessages(require(Seurat))
 
 #load loomR or scater if needed
-if(opt$query_format == "loom" | opt$reference_format == "loom" | opt$output_format == "loom") {
+if (opt$query_format == "loom" | opt$reference_format == "loom" | opt$output_format == "loom") {
   suppressPackageStartupMessages(require(SeuratDisk))
 }
-if(opt$query_format == "singlecellexperiment" | opt$reference_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
+if (opt$query_format == "singlecellexperiment" | opt$reference_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
   suppressPackageStartupMessages(require(scater))
 }
 
@@ -307,12 +307,12 @@ anchor_object <- FindTransferAnchors(seurat_reference,
                                     verbose = opt$verbose)
 
 #directly save the anchorset
-if(! is.null(opt$output_anchorset_file)) {
+if (!is.null(opt$output_anchorset_file)) {
   print(paste0("Output anchorset: ", opt$output_anchorset_file))
   write_seurat4_object(seurat_object = anchor_object,
                        output_path = opt$output_anchorset_file,
                        format = opt$output_anchorset_format
-                       )  
+                       )
 }
 
 predictions<-TransferData(
@@ -336,7 +336,7 @@ predictions<-TransferData(
 seurat_query <- AddMetaData(seurat_query, metadata = predictions@meta.data, col.name = opt$metadata_col)
 
 # Output to a serialized R object
-write_seurat4_object(seurat_object = seurat_query, 
-                     output_path = opt$output_object_file, 
+write_seurat4_object(seurat_object = seurat_query,
+                     output_path = opt$output_object_file,
                      format = opt$output_format)
 

@@ -98,12 +98,14 @@ export anchor_object="$output_dir/anchor_object.rds"
 export integrated_obj="$output_dir/integrated_object.rds"
 export classify_query="$transfer_out_dir/sep_by_tech_fluidigmc1.rds"
 export classify_result_object="$output_dir/classify_result.rds"
+export classify_result_anchors_object="$output_dir/classify_anchorset.rds"
 export pca_integrated_object="$output_dir/pca_integrated_object.rds"
 export umap_result_object="$output_dir/integrated_obj_umap.rds"
 export scaled_integrated_object="$output_dir/scaled_integrated_object.rds"
 export pca_integrated_embeddings="$output_dir/pca_integrated_embeddings.txt"
 export pca_integrated_loadings="$output_dir/pca_integrated_loadings.txt"
 export pca_integrated_stdev="$output_dir/pca_integrated_stdev.txt"
+export umap_map_query_result_object="$output_dir/umap_map_query_result_object.rds"
 
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.

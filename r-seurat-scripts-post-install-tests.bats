@@ -306,6 +306,7 @@
      run rm -rf $classify_result_object && \
          seurat-classify-against-reference.R -i $classify_query \
           -r $integrated_obj -o $classify_result_object \
+          --output-anchorset-file $classify_result_anchors_object \
           --transfer-refdata celltype
 
      [ "$status" -eq 0 ]
@@ -351,4 +352,23 @@
 
     [ "$status" -eq 0 ]
     [ -f "$umap_result_object" ]
+}
+
+@test "Run MapQuery against UMAP" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$umap_map_query_result_object" ]; then
+      skip "$umap_map_query_result_object exists and use_existing_outputs is set to true"
+    fi
+
+    run rm -rf $umap_map_query_result_object && \
+      seurat-map-query.R -q $classify_query -a $classify_result_anchors_object \
+        -r $umap_result_object -o $umap_map_query_result_object \
+        --refdata-field-or-assay "list(celltype = 'celltype')" \
+        --reference-reduction "pca" \
+        --reduction-model "umap"
+
+    echo "status = ${status}"
+    echo "output = ${output}"
+
+    [ "$status" -eq 0 ]
+    [ -f "$umap_map_query_result_object" ]
 }
