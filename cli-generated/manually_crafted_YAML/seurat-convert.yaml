@@ -18,7 +18,7 @@ commands:
         call_alias: format
         human_readable: 'Input format'
         default: 'seurat'
-        help: 'Either loom, seurat, anndata or singlecellexperiment for the input format to read.'
+        help: 'Either loom, seurat, h5seurat, anndata or singlecellexperiment for the input format to read.'
     output:
       - var_name: seurat_object
   - call: 'write_seurat4_object'
@@ -40,4 +40,4 @@ commands:
         call_alias: format
         type: string
         default: seurat
-        help: 'Either seurat, loom, singlecellexperiment or h5seurat (partial support)'
+        help: 'Either seurat, h5seurat, loom, singlecellexperiment or h5seurat (partial support)'

@@ -415,11 +415,41 @@
       seurat-convert.R -i "${loom_converted_cluster_object}.loom" \
         --input-format loom -o $seurat_from_loom_cluster_object
 
-    ls -ltr
-
     echo "status = ${status}"
     echo "output = ${output}"
 
     [ "$status" -eq 0 ]
     [ -f $seurat_from_loom_cluster_object ]
+}
+
+@test "Seurat to h5seurat" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$h5seurat_cluster_object" ]; then
+      skip "$h5seurat_cluster_object exists and use_existing_outputs is set to true"
+    fi
+
+    run rm -rf $h5seurat_cluster_object && \
+      seurat-convert.R -i $cluster_seurat_object \
+        --output-format h5seurat -o $h5seurat_cluster_object
+
+    echo "status = ${status}"
+    echo "output = ${output}"
+
+    [ "$status" -eq 0 ]
+    [ -f $h5seurat_cluster_object ]
+}
+
+@test "h5seurat to Seurat" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$h5seurat_to_seurat_cluster_object" ]; then
+      skip "$h5seurat_to_seurat_cluster_object exists and use_existing_outputs is set to true"
+    fi
+
+    run rm -rf $h5seurat_to_seurat_cluster_object && \
+      seurat-convert.R -i $h5seurat_cluster_object \
+        --input-format h5seurat -o $h5seurat_to_seurat_cluster_object
+
+    echo "status = ${status}"
+    echo "output = ${output}"
+
+    [ "$status" -eq 0 ]
+    [ -f $h5seurat_to_seurat_cluster_object ]
 }

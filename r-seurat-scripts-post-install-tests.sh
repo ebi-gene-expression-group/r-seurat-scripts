@@ -109,6 +109,8 @@ export umap_map_query_result_object="$output_dir/umap_map_query_result_object.rd
 export singlecellexperiment_converted_cluster_object="$output_dir/singlecellexperiment_converted_cluster_object.rds"
 export loom_converted_cluster_object="$output_dir/loom_converted_cluster_object"
 export seurat_from_loom_cluster_object="$output_dir/seurat_from_loom_cluster_object.rds"
+export h5seurat_cluster_object="$output_dir/h5seurat_cluster_object.h5seurat"
+export h5seurat_to_seurat_cluster_object="$output_dir/h5seurat_to_seurat_cluster_object.rds"
 
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.

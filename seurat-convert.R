@@ -5,11 +5,11 @@
 #
 # to change this file edit the input YAML and re-run the above command
 
-suppressPackageStartupMessages(require(workflowscriptscommon))
 suppressPackageStartupMessages(require(optparse))
+suppressPackageStartupMessages(require(workflowscriptscommon))
 suppressPackageStartupMessages(require(Seurat))
-suppressPackageStartupMessages(require(scater))
 suppressPackageStartupMessages(require(SeuratDisk))
+suppressPackageStartupMessages(require(scater))
 
 option_list <- list(
     make_option(
@@ -25,7 +25,7 @@ option_list <- list(
                     default = "seurat",
                     metavar = "Input format",
                     type = "character",
-                    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read.")
+                    help = "Either loom, seurat, h5seurat, anndata or singlecellexperiment for the input format to read.")
 ,
     make_option(
                     c("-o", "--output-path"),
@@ -38,7 +38,7 @@ option_list <- list(
                     action = "store",
                     default = "seurat",
                     type = "character",
-                    help = "Either seurat, loom, singlecellexperiment or h5seurat (partial support)")
+                    help = "Either seurat, h5seurat, loom, singlecellexperiment or h5seurat (partial support)")
 )
 
 opt <- wsc_parse_args(option_list, 
