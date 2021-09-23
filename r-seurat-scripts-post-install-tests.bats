@@ -372,3 +372,54 @@
     [ "$status" -eq 0 ]
     [ -f "$umap_map_query_result_object" ]
 }
+
+@test "Seurat convert to singlecellexperiment" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$singlecellexperiment_converted_cluster_object" ]; then
+      skip "$singlecellexperiment_converted_cluster_object exists and use_existing_outputs is set to true"
+    fi
+
+    run rm -rf $singlecellexperiment_converted_cluster_object && \
+      seurat-convert.R -i $cluster_seurat_object -o $singlecellexperiment_converted_cluster_object \
+        --output-format singlecellexperiment
+
+    echo "status = ${status}"
+    echo "output = ${output}"
+
+    [ "$status" -eq 0 ]
+    [ -f "$singlecellexperiment_converted_cluster_object" ]
+}
+
+@test "SingleCellExperiment convert to Loom" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "${loom_converted_cluster_object}.loom" ]; then
+      skip "${loom_converted_cluster_object}.loom exists and use_existing_outputs is set to true"
+    fi
+
+    run rm -rf ${loom_converted_cluster_object}.loom && \
+      seurat-convert.R -i $singlecellexperiment_converted_cluster_object \
+        --input-format singlecellexperiment -o $loom_converted_cluster_object \
+        --output-format loom
+
+    echo "status = ${status}"
+    echo "output = ${output}"
+
+    [ "$status" -eq 0 ]
+    [ -f "${loom_converted_cluster_object}.loom" ]
+}
+
+@test "Loom to Seurat" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$seurat_from_loom_cluster_object" ]; then
+      skip "$seurat_from_loom_cluster_object exists and use_existing_outputs is set to true"
+    fi
+
+    run rm -rf $seurat_from_loom_cluster_object && \
+      seurat-convert.R -i "${loom_converted_cluster_object}.loom" \
+        --input-format loom -o $seurat_from_loom_cluster_object
+
+    ls -ltr
+
+    echo "status = ${status}"
+    echo "output = ${output}"
+
+    [ "$status" -eq 0 ]
+    [ -f $seurat_from_loom_cluster_object ]
+}

@@ -106,6 +106,9 @@ export pca_integrated_embeddings="$output_dir/pca_integrated_embeddings.txt"
 export pca_integrated_loadings="$output_dir/pca_integrated_loadings.txt"
 export pca_integrated_stdev="$output_dir/pca_integrated_stdev.txt"
 export umap_map_query_result_object="$output_dir/umap_map_query_result_object.rds"
+export singlecellexperiment_converted_cluster_object="$output_dir/singlecellexperiment_converted_cluster_object.rds"
+export loom_converted_cluster_object="$output_dir/loom_converted_cluster_object"
+export seurat_from_loom_cluster_object="$output_dir/seurat_from_loom_cluster_object.rds"
 
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.
