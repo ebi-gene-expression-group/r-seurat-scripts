@@ -6,7 +6,7 @@ dependencies:
   - r-cairo
   - r-workflowscriptscommon
   - r-seurat =3.2.3
-  - r-base >=4.0.0 <4.1
+  - r-base >=4.0.0,<4.1
   - r-matrix <=1.3_2
   - r-spatstat <=1.64_1
   - r-spatstat.data <=1.64_1
