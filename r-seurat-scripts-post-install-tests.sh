@@ -31,8 +31,10 @@ fi
 test_data_url='https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz'
 test_data_transfer_url='https://www.dropbox.com/s/1zxbn92y5du9pu0/pancreas_v3_files.tar.gz?dl=1'
 test_working_dir=`pwd`/'post_install_tests'
+test_anndata_url="https://www.dropbox.com/s/ngs3p8n2i8y33hj/pbmc3k.h5ad?dl=0"
 export test_data_transfer_file=$test_working_dir/pancreas_v3_files.tar.gz
 export test_data_archive=$test_working_dir/`basename $test_data_url`
+export test_anndata_file=$test_working_dir/$(basename $test_anndata_url | sed 's/?dl=0//')
 
 # Clean up if specified
 
@@ -61,6 +63,10 @@ mkdir -p $data_dir
 if [ ! -e "$test_data_archive" ]; then
     wget $test_data_url -P $test_working_dir
     wget $test_data_transfer_url -O $test_data_transfer_file
+fi
+
+if [ ! -e "$test_anndata_file" ]; then
+    wget $test_anndata_url -O $test_anndata_file
 fi
 
 ################################################################################
@@ -92,6 +98,11 @@ export tsne_embeddings_file="$output_dir/tsne_embeddings.csv"
 export html_output_dir="$output_dir/html_out"
 export marker_text_file="$output_dir/markers.csv"
 export anchor_object="$output_dir/anchor_object.rds"
+export singlecellexperiment_converted_cluster_object="$output_dir/singlecellexperiment_converted_cluster_object.rds"
+export loom_converted_cluster_object="$output_dir/loom_converted_cluster_object"
+export seurat_from_loom_cluster_object="$output_dir/seurat_from_loom_cluster_object.rds"
+export anndata_cluster_object=$test_anndata_file
+export seurat_from_anndata_cluster_object="${anndata_cluster_object}.rds"
 
 
 ## Test parameters- would form config file in real workflow. DO NOT use these
