@@ -13,3 +13,4 @@ dependencies:
   - r-spatstat.utils <=1.64_1
   - r-loom
   - bioconductor-scater
+  - r-remotes
