@@ -28,6 +28,8 @@ if [ "$use_existing_outputs" != 'true' ] && [ "$use_existing_outputs" != 'false'
     usage
 fi
 
+R -e 'remotes::install_github("ebi-gene-expression-group/workflowscriptscommon@feature/seurat_4_io", dependencies=FALSE, )'
+
 test_data_url='https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz'
 test_data_transfer_url='https://www.dropbox.com/s/1zxbn92y5du9pu0/pancreas_v3_files.tar.gz?dl=1'
 test_working_dir=`pwd`/'post_install_tests'

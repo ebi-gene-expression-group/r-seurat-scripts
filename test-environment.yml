@@ -4,7 +4,7 @@ dependencies:
   - r-optparse
   - libpng
   - r-cairo
-  - r-workflowscriptscommon
+  # - r-workflowscriptscommon # depend on repo until seurat 4 IO branch merged.
   - r-seurat =3.2.3
   - r-base >=4.0.0,<4.1
   - r-matrix <=1.3_2
