@@ -276,11 +276,11 @@
 }
 
 @test "SingleCellExperiment convert to Loom" {
-    if [ "$use_existing_outputs" = 'true' ] && [ -f "${loom_converted_cluster_object}.loom" ]; then
-      skip "${loom_converted_cluster_object}.loom exists and use_existing_outputs is set to true"
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$loom_converted_cluster_object" ]; then
+      skip "${loom_converted_cluster_object} exists and use_existing_outputs is set to true"
     fi
 
-    run rm -rf ${loom_converted_cluster_object}.loom && \
+    run rm -rf $loom_converted_cluster_object && \
       seurat-convert.R -i $singlecellexperiment_converted_cluster_object \
         --input-format singlecellexperiment -o $loom_converted_cluster_object \
         --output-format loom
@@ -289,7 +289,7 @@
     echo "output = ${output}"
 
     [ "$status" -eq 0 ]
-    [ -f "${loom_converted_cluster_object}.loom" ]
+    [ -f "$loom_converted_cluster_object" ]
 }
 
 @test "Loom to Seurat" {
@@ -298,7 +298,7 @@
     fi
 
     run rm -rf $seurat_from_loom_cluster_object && \
-      seurat-convert.R -i "${loom_converted_cluster_object}.loom" \
+      seurat-convert.R -i "$loom_converted_cluster_object" \
         --input-format loom -o $seurat_from_loom_cluster_object
 
     echo "status = ${status}"
