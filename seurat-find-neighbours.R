@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript 
+#!/usr/bin/env Rscript
 
 # Load optparse we need to check inputs
 
@@ -46,10 +46,10 @@ option_list = list(
     help = "Defines k for the k-nearest neighbor algorithm"
   ),
   make_option(
-    c("--compute-snn"),
-    action = "store",
+    c("--no-compute-snn"),
+    action = "store_false",
     default = TRUE,
-    help = "Also compute the shared nearest neighbor graph. Default: TRUE"
+    help = "Avoid computing the shared nearest neighbor graph. Default is to have it computed."
   ),
   make_option(
     c("--prune-snn"),
@@ -176,8 +176,8 @@ if(opt$input_format == "loom" | opt$output_format == "loom") {
 seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
 
 neighbours_object <- FindNeighbors(object = seurat_object,
-                                  k.param = opt$k_param, 
-                                  compute.SNN = opt$compute_snn,
+                                  k.param = opt$k_param,
+                                  compute.SNN = opt$no_compute_snn,
                                   prune.SNN = opt$prune_snn,
                                   nn.method = opt$nn_method,
                                   annoy.metric = opt$annoy_metric,
@@ -202,6 +202,6 @@ opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)
 opt_table <- opt_table[! rownames(opt_table) %in% nonreport_params, , drop = FALSE]
 
 # Output to a serialized R object
-write_seurat3_object(seurat_object = neighbours_object, 
-                     output_path = opt$output_object_file, 
+write_seurat3_object(seurat_object = neighbours_object,
+                     output_path = opt$output_object_file,
                      format = opt$output_format)
