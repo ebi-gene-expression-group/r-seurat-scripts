@@ -30,7 +30,7 @@ option_list = list(
     action = "store",
     default = NA,
     type = 'character',
-    help = 'Which dimensionality reduction to use. Default is "pca", can also be "tsne", or "ica", assuming these are precomputed.'
+    help = 'Which dimensionality reduction to use. Default is "umap", can also be "tsne", or "pca", assuming these are precomputed.'
   ),
   make_option(
     c("-a", "--dim-1"),

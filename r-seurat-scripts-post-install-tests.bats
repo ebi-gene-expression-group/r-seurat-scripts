@@ -155,7 +155,7 @@
         skip "$neighbours_seurat_object exists and use_existing_outputs is set to 'true'"
     fi
 
-    run rm -rf $neighbours_seurat_object && seurat-find-neighbours.R -i $pca_seurat_object -o $neighbours_seurat_object --dims 1,2,3,4,5 --compute-snn --reduction pca
+    run rm -rf $neighbours_seurat_object && seurat-find-neighbours.R -i $pca_seurat_object -o $neighbours_seurat_object --dims 1,2,3,4,5 --reduction pca
     echo "status = ${status}"
     echo "output = ${output}"
 
