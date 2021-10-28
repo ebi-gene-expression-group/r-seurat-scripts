@@ -33,8 +33,10 @@ R -e 'remotes::install_github("ebi-gene-expression-group/workflowscriptscommon@f
 test_data_url='https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz'
 test_data_transfer_url='https://www.dropbox.com/s/1zxbn92y5du9pu0/pancreas_v3_files.tar.gz?dl=1'
 test_working_dir=`pwd`/'post_install_tests'
+test_anndata_url="https://www.dropbox.com/s/ngs3p8n2i8y33hj/pbmc3k.h5ad?dl=0"
 export test_data_transfer_file=$test_working_dir/pancreas_v3_files.tar.gz
 export test_data_archive=$test_working_dir/`basename $test_data_url`
+export test_anndata_file=$test_working_dir/$(basename $test_anndata_url | sed 's/?dl=0//')
 
 # Clean up if specified
 
@@ -63,6 +65,10 @@ mkdir -p $data_dir
 if [ ! -e "$test_data_archive" ]; then
     wget $test_data_url -P $test_working_dir
     wget $test_data_transfer_url -O $test_data_transfer_file
+fi
+
+if [ ! -e "$test_anndata_file" ]; then
+    wget $test_anndata_url -O $test_anndata_file
 fi
 
 ################################################################################
@@ -152,6 +158,7 @@ export pca_dim_one=1
 export pca_dim_two=2
 export pt_size=1
 export label_size=4
+export weight_by_var="TRUE"
 export do_label='FALSE'
 export group_by='ident'
 export pca_png_width=1000
@@ -166,6 +173,9 @@ export k_param=30
 export resolution=0.8
 export cluster_algorithm=1
 export cluster_tmp_file_location='/tmp'
+
+# Find neighbours
+export compute_snn=TRUE
 
 # t-SNE
 export tsne_do_fast='TRUE'

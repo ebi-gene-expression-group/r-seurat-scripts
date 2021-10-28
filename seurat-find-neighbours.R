@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript 
+#!/usr/bin/env Rscript
 
 # Load optparse we need to check inputs
 
@@ -35,7 +35,7 @@ option_list = list(
   make_option(
     c("-d", "--distance-matrix"),
     action = "store_true",
-    default = TRUE,
+    default = FALSE,
     help = "Boolean value of whether the provided matrix is a distance matrix; note, for objects of class dist, this parameter will be set automatically."
   ),
   make_option(
@@ -46,15 +46,15 @@ option_list = list(
     help = "Defines k for the k-nearest neighbor algorithm"
   ),
   make_option(
-    c("--compute-snn"),
-    action = "store_true",
-    default = FALSE,
-    help = "Also compute the shared nearest neighbor graph"
+    c("--no-compute-snn"),
+    action = "store_false",
+    default = TRUE,
+    help = "Avoid computing the shared nearest neighbor graph. Default is to have it computed."
   ),
   make_option(
     c("--prune-snn"),
     action = "store",
-    default = 0,
+    default = 1/15,
     type = 'double',
     help = "Sets the cutoff for acceptable Jaccard index when computing the neighborhood overlap for the SNN construction. Any edges with values less than or equal to this will be set to 0 and removed from the SNN graph. Essentially sets the strigency of pruning (0 --- no pruning, 1 --- prune everything)."
   ),
@@ -176,8 +176,8 @@ if(opt$input_format == "loom" | opt$output_format == "loom") {
 seurat_object <- read_seurat4_object(input_path = opt$input_object_file, format = opt$input_format)
 
 neighbours_object <- FindNeighbors(object = seurat_object,
-                                  k.param = opt$k_param, 
-                                  compute.SNN = opt$compute_snn,
+                                  k.param = opt$k_param,
+                                  compute.SNN = opt$no_compute_snn,
                                   prune.SNN = opt$prune_snn,
                                   nn.method = opt$nn_method,
                                   annoy.metric = opt$annoy_metric,
@@ -202,6 +202,6 @@ opt_table <- data.frame(value=unlist(opt), stringsAsFactors = FALSE)
 opt_table <- opt_table[! rownames(opt_table) %in% nonreport_params, , drop = FALSE]
 
 # Output to a serialized R object
-write_seurat4_object(seurat_object = neighbours_object, 
-                     output_path = opt$output_object_file, 
+write_seurat4_object(seurat_object = neighbours_object,
+                     output_path = opt$output_object_file,
                      format = opt$output_format)

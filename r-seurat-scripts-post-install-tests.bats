@@ -142,7 +142,7 @@
         skip "$neighbours_seurat_object exists and use_existing_outputs is set to 'true'"
     fi
 
-    run rm -rf $neighbours_seurat_object && seurat-find-neighbours.R -i $pca_seurat_object -o $neighbours_seurat_object --dims 1,2,3,4,5 --compute-snn --reduction pca
+    run rm -rf $neighbours_seurat_object && seurat-find-neighbours.R -i $pca_seurat_object -o $neighbours_seurat_object --dims 1,2,3,4,5 --reduction pca
     echo "status = ${status}"
     echo "output = ${output}"
 
@@ -236,20 +236,67 @@
 }
 
 # Extract the transfer test data
-@test "Extract transfer test data from archive" {
-    if [ "$use_existing_outputs" = 'true' ] && [ -f "$transfer_expression_object" ] && [ -f "$transfer_metadata_object" ]; then
-        skip "$transfer_expression_object and $transfer_metadata_object exist and use_existing_outputs is set to 'true'"
+# @test "Extract transfer test data from archive" {
+#     if [ "$use_existing_outputs" = 'true' ] && [ -f "$transfer_expression_object" ] && [ -f "$transfer_metadata_object" ]; then
+#         skip "$transfer_expression_object and $transfer_metadata_object exist and use_existing_outputs is set to 'true'"
+#     fi
+#
+#     run rm -f $raw_matrix && tar -xvzf $test_data_transfer_file --strip-components 1 -C $data_dir
+#     echo "status = ${status}"
+#     echo "output = ${output}"
+#
+#     [ "$status" -eq 0 ]
+#     [ -f "$transfer_expression_object" ]
+#     [ -f "$transfer_metadata_object" ]
+# }
+
+@test "Seurat convert to singlecellexperiment" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$singlecellexperiment_converted_cluster_object" ]; then
+      skip "$singlecellexperiment_converted_cluster_object exists and use_existing_outputs is set to true"
     fi
 
-    echo "Transfer file: $test_data_transfer_file"
-    echo "Data dir: $data_dir"
-    run rm -f $transfer_expression_object $transfer_metadata_object && tar -xvzf $test_data_transfer_file --strip-components 1 -C $data_dir
+    run rm -rf $singlecellexperiment_converted_cluster_object && \
+      seurat-convert.R -i $cluster_seurat_object -o $singlecellexperiment_converted_cluster_object \
+        --output-format singlecellexperiment
+
     echo "status = ${status}"
     echo "output = ${output}"
 
     [ "$status" -eq 0 ]
-    [ -f "$transfer_expression_object" ]
-    [ -f "$transfer_metadata_object" ]
+    [ -f "$singlecellexperiment_converted_cluster_object" ]
+}
+
+@test "SingleCellExperiment convert to Loom" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$loom_converted_cluster_object" ]; then
+      skip "${loom_converted_cluster_object} exists and use_existing_outputs is set to true"
+    fi
+
+    run rm -rf $loom_converted_cluster_object && \
+      seurat-convert.R -i $singlecellexperiment_converted_cluster_object \
+        --input-format singlecellexperiment -o $loom_converted_cluster_object \
+        --output-format loom
+
+    echo "status = ${status}"
+    echo "output = ${output}"
+
+    [ "$status" -eq 0 ]
+    [ -f "$loom_converted_cluster_object" ]
+}
+
+@test "Loom to Seurat" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$seurat_from_loom_cluster_object" ]; then
+      skip "$seurat_from_loom_cluster_object exists and use_existing_outputs is set to true"
+    fi
+
+    run rm -rf $seurat_from_loom_cluster_object && \
+      seurat-convert.R -i "$loom_converted_cluster_object" \
+        --input-format loom -o $seurat_from_loom_cluster_object
+
+    echo "status = ${status}"
+    echo "output = ${output}"
+
+    [ "$status" -eq 0 ]
+    [ -f $seurat_from_loom_cluster_object ]
 }
 
 @test "Split data by technology for later integration" {

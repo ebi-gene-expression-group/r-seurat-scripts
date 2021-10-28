@@ -41,7 +41,7 @@ option_list <- list(
                     help = "Either seurat, h5seurat, loom, singlecellexperiment or h5seurat (partial support)")
 )
 
-opt <- wsc_parse_args(option_list, 
+opt <- wsc_parse_args(option_list,
                       mandatory = c("input_path", "output_path"))
 
 
