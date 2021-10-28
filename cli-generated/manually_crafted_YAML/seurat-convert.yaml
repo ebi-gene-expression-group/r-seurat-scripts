@@ -7,18 +7,18 @@ commands:
       - loomR
       - Seurat
     options:
-      - long: input-path
+      - long: input-object-file
         short: i
         type: file_in
         human_readable: 'Input file'
         call_alias: input_path
-        help: "Input file in either RDS-Seurat, Loom, AnnData or SCE"
+        help: "Input file with Seurat object in either RDS-Seurat, Loom or SCE"
       - long: input-format
         type: string
         call_alias: format
         human_readable: 'Input format'
         default: 'seurat'
-        help: 'Either loom, seurat, anndata or singlecellexperiment for the input format to read.'
+        help: 'Either loom, seurat, h5seurat, anndata or singlecellexperiment for the input format to read.'
     output:
       - var_name: seurat_object
   - call: 'write_seurat3_object'
@@ -31,7 +31,7 @@ commands:
       - long: seurat_object
         type: internal
         var_name: seurat_object
-      - long: output-path
+      - long: output-object-file
         short: o
         type: file_out
         call_alias: output_path
@@ -40,4 +40,4 @@ commands:
         call_alias: format
         type: string
         default: seurat
-        help: 'Either seurat, loom, singlecellexperiment or h5seurat (partial support)'
+        help: 'Either seurat, h5seurat, loom, singlecellexperiment or h5seurat (partial support)'
