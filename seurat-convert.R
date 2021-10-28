@@ -8,12 +8,12 @@
 suppressPackageStartupMessages(require(optparse))
 suppressPackageStartupMessages(require(workflowscriptscommon))
 suppressPackageStartupMessages(require(Seurat))
-suppressPackageStartupMessages(require(SeuratDisk))
 suppressPackageStartupMessages(require(scater))
+suppressPackageStartupMessages(require(SeuratDisk))
 
 option_list <- list(
     make_option(
-                    c("-i", "--input-path"),
+                    c("-i", "--input-object-file"),
                     action = "store",
                     metavar = "Input file",
                     type = "character",
@@ -28,7 +28,7 @@ option_list <- list(
                     help = "Either loom, seurat, h5seurat, anndata or singlecellexperiment for the input format to read.")
 ,
     make_option(
-                    c("-o", "--output-path"),
+                    c("-o", "--output-object-file"),
                     action = "store",
                     type = "character",
                     help = "Path to the output file, when using Loom as output, the final file will contain .loom at the end of the given file name.")
@@ -41,18 +41,18 @@ option_list <- list(
                     help = "Either seurat, h5seurat, loom, singlecellexperiment or h5seurat (partial support)")
 )
 
-opt <- wsc_parse_args(option_list,
-                      mandatory = c("input_path", "output_path"))
+opt <- wsc_parse_args(option_list, 
+                      mandatory = c("input_object_file", "output_object_file"))
 
 
-if (!file.exists(opt$input_path)) {
-    stop((paste("File", opt$input_path, "does not exist")))
+if (!file.exists(opt$input_object_file)) {
+    stop((paste("File", opt$input_object_file, "does not exist")))
 }
 
 
-seurat_object <- read_seurat4_object(input_path = opt$input_path,
+seurat_object <- read_seurat4_object(input_path = opt$input_object_file,
                     format = opt$input_format)
 
 write_seurat4_object(seurat_object = seurat_object,
-                    output_path = opt$output_path,
+                    output_path = opt$output_object_file,
                     format = opt$output_format)

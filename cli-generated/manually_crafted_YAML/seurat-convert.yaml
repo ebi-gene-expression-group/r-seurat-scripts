@@ -7,7 +7,7 @@ commands:
       - SeuratDisk
       - Seurat
     options:
-      - long: input-path
+      - long: input-object-file
         short: i
         type: file_in
         human_readable: 'Input file'
@@ -31,7 +31,7 @@ commands:
       - long: seurat_object
         type: internal
         var_name: seurat_object
-      - long: output-path
+      - long: output-object-file
         short: o
         type: file_out
         call_alias: output_path
