@@ -299,6 +299,23 @@
     [ -f $seurat_from_loom_cluster_object ]
 }
 
+# Extract the transfer test data
+@test "Extract transfer test data from archive" {
+    if [ "$use_existing_outputs" = 'true' ] && [ -f "$transfer_expression_object" ] && [ -f "$transfer_metadata_object" ]; then
+        skip "$transfer_expression_object and $transfer_metadata_object exist and use_existing_outputs is set to 'true'"
+    fi
+
+    echo "Transfer file: $test_data_transfer_file"
+    echo "Data dir: $data_dir"
+    run rm -f $transfer_expression_object $transfer_metadata_object && tar -xvzf $test_data_transfer_file --strip-components 1 -C $data_dir
+    echo "status = ${status}"
+    echo "output = ${output}"
+
+    [ "$status" -eq 0 ]
+    [ -f "$transfer_expression_object" ]
+    [ -f "$transfer_metadata_object" ]
+}
+
 @test "Split data by technology for later integration" {
     split1=${transfer_out_dir}/sep_by_tech_celseq.rds
     split2=${transfer_out_dir}/sep_by_tech_celseq2.rds
