@@ -8,12 +8,12 @@
 suppressPackageStartupMessages(require(workflowscriptscommon))
 suppressPackageStartupMessages(require(scater))
 suppressPackageStartupMessages(require(optparse))
-suppressPackageStartupMessages(require(SeuratDisk))
 suppressPackageStartupMessages(require(Seurat))
+suppressPackageStartupMessages(require(SeuratDisk))
 
 option_list <- list(
     make_option(
-                    c("-i", "--input-path"),
+                    c("-i", "--input-object-file"),
                     action = "store",
                     metavar = "Input file",
                     type = "character",
@@ -238,7 +238,7 @@ option_list <- list(
                     help = "dimensional reduction key, specifies the string before the number for the dimension names. UMAP by default")
 ,
     make_option(
-                    c("-o", "--output-path"),
+                    c("-o", "--output-object-file"),
                     action = "store",
                     type = "character",
                     help = "FILE IN")
@@ -252,11 +252,11 @@ option_list <- list(
 )
 
 opt <- wsc_parse_args(option_list, 
-                      mandatory = c("input_path", "output_path"))
+                      mandatory = c("input_object_file", "output_object_file"))
 
 
-if (!file.exists(opt$input_path)) {
-    stop((paste("File", opt$input_path, "does not exist")))
+if (!file.exists(opt$input_object_file)) {
+    stop((paste("File", opt$input_object_file, "does not exist")))
 }
 
 
@@ -279,7 +279,7 @@ if (!is.null(opt$metric.kwds)) {
 }
 
 
-seurat_object <- read_seurat4_object(input_path = opt$input_path,
+seurat_object <- read_seurat4_object(input_path = opt$input_object_file,
                     format = opt$input_format)
 
 seurat_object_umap <- RunUMAP(object = seurat_object,
@@ -315,5 +315,5 @@ seurat_object_umap <- RunUMAP(object = seurat_object,
                     reduction.key = opt$reduction.key)
 
 write_seurat4_object(seurat_object = seurat_object_umap,
-                    output_path = opt$output_path,
+                    output_path = opt$output_object_file,
                     format = opt$output_format)
