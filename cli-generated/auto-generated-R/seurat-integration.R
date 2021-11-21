@@ -262,7 +262,7 @@ option_list <- list(
     )
 )
 
-opt <- wsc_parse_args(option_list,
+opt <- wsc_parse_args(option_list, 
                       mandatory = c("input_object_files", "output_object_file"))
                 # Check parameter values
 inputs<-strsplit(opt$input_object_files,split = ",")[[1]]
@@ -378,11 +378,11 @@ anchors <- FindIntegrationAnchors(object.list = seurat_objects,
                     assay = opt$assay_list,
                     reference = reference_objects,
                     anchor.features = opt$anchor_features,
-                    scale = opt$do_not_scale,
+                    scale = !opt$do_not_scale,
                     normalization.method = opt$normalization_method,
                     sct.clip.range = opt$sct_clip_range,
                     reduction = opt$reduction,
-                    l2.norm = opt$do_not_l2_norm,
+                    l2.norm = !opt$do_not_l2_norm,
                     dims = opt$dims,
                     k.anchor = opt$k_anchor,
                     k.filter = opt$k_filter,
