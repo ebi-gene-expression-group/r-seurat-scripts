@@ -1,4 +1,17 @@
 cli_call: 'seurat-integration.R'
+galaxy_tool:
+  id: seurat_integration
+  name: Seurat integration
+  description: merges datasets based on internal anchors or reference based
+  profile: 18.01
+  version: "@SEURAT_VERSION@"
+  macros:
+    - seurat_macros.xml
+  macro_expands_header:
+    - requirements
+    - version
+  macro_expands_footer:
+    - citations
 commands:
   - call: Preprocess
     rcode: |
@@ -141,6 +154,7 @@ commands:
         human_readable: 'Input files for reference objects'
         call_alias: input_path_list
         default: NULL
+        optional: True
         help: "A vector specifying the object/s to be used as a reference during integration.
           If NULL (default), all pairwise anchors are found (no reference/s). If not NULL,
           the corresponding objects in this list will be used as references.
@@ -159,25 +173,6 @@ commands:
           - anndata: AnnData
         default: 'seurat'
         help: 'Either loom, seurat, anndata or singlecellexperiment for the input format to read.'
-      - long: 'ident_for_adata'
-        type: string
-        human_readable: 'Ident for AnnData object'
-        default: 'louvain'
-        optional: True
-        help: 'If using an AnnData as input, which identity should be used.'
-      - long: 'references-assay'
-        type: string
-        human_readable: 'References assay'
-        default: 'RNA'
-        optional: True
-        call_alias: assay
-        help: "The Seurat assay used for references"
-      - long: 'update_seurat_object'
-        type: boolean
-        default: False
-        optional: True
-        human_readable: 'Update Seurat object'
-        help: "Whether the Seurat objects given should be passed by the Seurat updater method."
     output:
       - var_name: reference_objects
   - call: FindIntegrationAnchors
@@ -271,6 +266,9 @@ commands:
       default: annoy
       type: string
       optional: True
+      options:
+        - rann
+        - annoy
       help: 'Method for nearest neighbor finding. Options include: rann, annoy'
     - long: n.trees
       default: 50
