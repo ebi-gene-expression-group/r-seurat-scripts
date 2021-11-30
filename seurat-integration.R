@@ -5,9 +5,9 @@
 #
 # to change this file edit the input YAML and re-run the above command
 
+suppressPackageStartupMessages(require(optparse))
 suppressPackageStartupMessages(require(Seurat))
 suppressPackageStartupMessages(require(workflowscriptscommon))
-suppressPackageStartupMessages(require(optparse))
 
 option_list <- list(
     make_option(
@@ -40,30 +40,6 @@ option_list <- list(
         metavar = "Reference input format",
         type = "character",
         help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
-    ),
-    make_option(
-        c("--ident_for_adata"),
-        action = "store",
-        default = "louvain",
-        metavar = "Ident for AnnData object",
-        type = "character",
-        help = "If using an AnnData as input, which identity should be used."
-    ),
-    make_option(
-        c("--references-assay"),
-        action = "store",
-        default = "RNA",
-        metavar = "References assay",
-        type = "character",
-        help = "The Seurat assay used for references"
-    ),
-    make_option(
-        c("--update_seurat_object"),
-        action = "store_true",
-        default = FALSE,
-        metavar = "Update Seurat object",
-        type = "logical",
-        help = "Whether the Seurat objects given should be passed by the Seurat updater method."
     ),
     make_option(
         c("--assay-list"),
@@ -262,7 +238,7 @@ option_list <- list(
     )
 )
 
-opt <- wsc_parse_args(option_list,
+opt <- wsc_parse_args(option_list, 
                       mandatory = c("input_object_files", "output_object_file"))
                 # Check parameter values
 inputs<-strsplit(opt$input_object_files,split = ",")[[1]]
@@ -369,10 +345,7 @@ seurat_objects <- read_multiple_seurat4_objects(input_path_list = opt$input_obje
                     format = opt$input_format)
 
 reference_objects <- read_multiple_seurat4_objects(input_path_list = opt$reference_object_files,
-                    format = opt$reference_format,
-                    ident_for_adata = opt$ident_for_adata,
-                    assay = opt$references_assay,
-                    update_seurat_object = opt$update_seurat_object)
+                    format = opt$reference_format)
 
 anchors <- FindIntegrationAnchors(object.list = seurat_objects,
                     assay = opt$assay_list,
