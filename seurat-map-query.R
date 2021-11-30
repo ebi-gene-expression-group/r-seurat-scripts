@@ -5,15 +5,15 @@
 #
 # to change this file edit the input YAML and re-run the above command
 
-suppressPackageStartupMessages(require(optparse))
+suppressPackageStartupMessages(require(scater))
 suppressPackageStartupMessages(require(Seurat))
 suppressPackageStartupMessages(require(SeuratDisk))
-suppressPackageStartupMessages(require(scater))
+suppressPackageStartupMessages(require(optparse))
 suppressPackageStartupMessages(require(workflowscriptscommon))
 
 option_list <- list(
     make_option(
-        c("-q", "--query-path"),
+        c("-q", "--query-object-file"),
         action = "store",
         metavar = "Input file",
         type = "character",
@@ -28,7 +28,7 @@ option_list <- list(
         help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
     ),
     make_option(
-        c("-a", "--anchors-path"),
+        c("-a", "--anchors-object-file"),
         action = "store",
         metavar = "Seurat transfer anchors file",
         type = "character",
@@ -43,7 +43,7 @@ option_list <- list(
         help = "Either loom, seurat, anndata or singlecellexperiment for the anchors format to read."
     ),
     make_option(
-        c("-r", "--reference-path"),
+        c("-r", "--reference-object-file"),
         action = "store",
         default = NULL,
         metavar = "Seurat reference object file",
@@ -107,7 +107,7 @@ option_list <- list(
         help = "A named list of additional arguments to ProjectUMAP, written in R syntax .ie list( argument = 'value' )"
     ),
     make_option(
-        c("-o", "--output-path"),
+        c("-o", "--output-object-file"),
         action = "store",
         type = "character",
         help = "FILE IN"
@@ -122,23 +122,23 @@ option_list <- list(
 )
 
 opt <- wsc_parse_args(option_list, 
-                      mandatory = c("query_path", "anchors_path", "refdata_field_or_assay", "output_path"))
+                      mandatory = c("query_object_file", "anchors_object_file", "refdata_field_or_assay", "output_object_file"))
                 
 
-if (!file.exists(opt$query_path)) {
-    stop((paste("File", opt$query_path, "does not exist")))
+if (!file.exists(opt$query_object_file)) {
+    stop((paste("File", opt$query_object_file, "does not exist")))
 }
 
 
 
-if (!file.exists(opt$anchors_path)) {
-    stop((paste("File", opt$anchors_path, "does not exist")))
+if (!file.exists(opt$anchors_object_file)) {
+    stop((paste("File", opt$anchors_object_file, "does not exist")))
 }
 
 
 
-if (!file.exists(opt$reference_path)) {
-    stop((paste("File", opt$reference_path, "does not exist")))
+if (!file.exists(opt$reference_object_file)) {
+    stop((paste("File", opt$reference_object_file, "does not exist")))
 }
 
 
@@ -168,13 +168,13 @@ if (!is.null(opt$project_umap_args)) {
 
 load_seurat4_packages_for_format(formats = c(opt$query_format, opt$anchors_format, opt$reference_format))
 
-seurat_object <- read_seurat4_object(input_path = opt$query_path,
+seurat_object <- read_seurat4_object(input_path = opt$query_object_file,
                     format = opt$query_format)
 
-anchors_object <- read_seurat4_object(input_path = opt$anchors_path,
+anchors_object <- read_seurat4_object(input_path = opt$anchors_object_file,
                     format = opt$anchors_format)
 
-reference_object <- read_seurat4_object(input_path = opt$reference_path,
+reference_object <- read_seurat4_object(input_path = opt$reference_object_file,
                     format = opt$reference_format)
 
 mapped_object <- MapQuery(query = seurat_object,
@@ -189,5 +189,5 @@ mapped_object <- MapQuery(query = seurat_object,
                     projectumap.args = opt$project_umap_args)
 
 write_seurat4_object(seurat_object = mapped_object,
-                    output_path = opt$output_path,
+                    output_path = opt$output_object_file,
                     format = opt$output_format)
