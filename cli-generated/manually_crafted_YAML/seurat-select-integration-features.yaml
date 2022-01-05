@@ -1,0 +1,87 @@
+cli_call: 'seurat-select-integration-features.R'
+galaxy_tool:
+  id: seurat_select_integration_features
+  name: Seurat select integration features
+  description: from a list of studies
+  profile: 18.01
+  version: "@SEURAT_VERSION@"
+  macros:
+    - seurat_macros.xml
+  macro_expands_header:
+    - requirements
+    - version
+  macro_expands_footer:
+    - citations
+commands:
+  - call: 'load_seurat4_packages_for_format'
+    dependencies:
+      - workflowscriptscommon
+      - optparse
+    options:
+      - long: formats
+        type: internal
+        # var_name: option_list
+        value: 'c(opt$input_format)'
+  - call: 'read_multiple_seurat4_objects'
+    options:
+      - long: input-object-files
+        short: i
+        type: string
+        human_readable: 'Input files'
+        call_alias: input_path_list
+        multiple: True
+        help: "A list of Seurat objects between which to find anchors for
+          downstream integration. Input files in either RDS-Seurat, Loom or SCE, comma separated."
+      - long: input-format
+        type: string
+        call_alias: format
+        human_readable: 'Input format'
+        options:
+          - loom: Loom
+          - seurat: Seurat
+          - singlecellexperiment: Single Cell Experiment
+          - h5seurat: H5 Seurat
+          - anndata: AnnData
+        default: 'seurat'
+        help: 'Either loom, seurat, anndata or singlecellexperiment for the input format to read.'
+    output:
+      - var_name: seurat_objects
+  - call: SelectIntegrationFeatures
+    dependencies:
+      - Seurat
+    options:
+    - long: object.list
+      type: internal
+      var_name: seurat_objects
+    - long: nfeatures
+      default: 2000
+      type: integer
+      help: Number of features to return
+      human_readable: Number of features
+    - long: assay-list
+      default: 'NULL'
+      type: string
+      call_alias: assay
+      optional: True
+      help: Name or vector of assay names (one for each object) from which to pull the
+        variable features.
+    - long: verbose
+      default: yes
+      type: boolean
+      help: Print messages
+    - long: fvf.nfeatures
+      default: 2000
+      optional: True
+      type: integer
+      help: nfeatures for FindVariableFeatures. Used if VariableFeatures have
+        not been set for any object in input.
+    output:
+      - var_name: features
+  - call: saveRDS
+    options:
+    - long: object
+      type: internal
+      var_name: features
+    - long: file-out
+      type: file_out
+      call_alias: file

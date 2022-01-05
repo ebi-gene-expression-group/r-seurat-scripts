@@ -286,6 +286,18 @@
     [ "$status" -eq 0 ]
 }
 
+@test "Select integration features" {
+  if [ "$use_existing_outputs" = 'true' ] && [ -f "$features_obj" ]; then
+      skip "$features_obj exists and use_existing_outputs is set to true"
+  fi
+
+  echo $inputs_integration
+  run rm -rf $features_obj && \
+    seurat-select-integration-features.R -i $inputs_integration --nfeatures 500 --file-out $features_obj
+
+  [ "$status" -eq 0 ]
+}
+
 @test "Integrate data" {
     if [ "$use_existing_outputs" = 'true' ] && [ -f "$integrated_obj" ]; then
         skip "$integrated_obj exists and use_existing_outputs is set to true"
