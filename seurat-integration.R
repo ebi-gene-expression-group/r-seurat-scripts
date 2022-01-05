@@ -1,12 +1,12 @@
 #!/usr/bin/env Rscript
 # This script has been automatically generated through
 #
-# YAML2RScript.py -i ../r-seurat-scripts/cli-generated/manually_crafted_YAML/seurat-integration.yaml -o ../r-seurat-scripts/cli-generated/auto-generated-R/seurat-integration.R
+# YAML2RScript.py -i ../r-seurat-scripts/cli-generated/manually_crafted_YAML/seurat-integration.yaml -o ../r-seurat-scripts/seurat-integration.R
 #
 # to change this file edit the input YAML and re-run the above command
 
-suppressPackageStartupMessages(require(optparse))
 suppressPackageStartupMessages(require(Seurat))
+suppressPackageStartupMessages(require(optparse))
 suppressPackageStartupMessages(require(workflowscriptscommon))
 
 option_list <- list(
@@ -329,7 +329,7 @@ if (! is.null(opt$genes_use)){
   genes_use <- NULL
 }
 
-if ( !is.null(opt$ancho_features) && is.character(opt$anchor_features)) {
+if ( !is.null(opt$anchor_features) && is.character(opt$anchor_features)) {
   # this could be a number as well.
   opt$anchor_features <- strsplit(opt$anchor_features, split = ",")
 }

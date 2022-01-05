@@ -104,7 +104,7 @@ commands:
         genes_use <- NULL
       }
 
-      if ( !is.null(opt$ancho_features) && is.character(opt$anchor_features)) {
+      if ( !is.null(opt$anchor_features) && is.character(opt$anchor_features)) {
         # this could be a number as well.
         opt$anchor_features <- strsplit(opt$anchor_features, split = ",")
       }
@@ -300,14 +300,8 @@ commands:
       type: string
       help: Name for the new assay containing the integrated data
     - long: normalization.method
-      short: n
-      default: LogNormalize
-      type: string
-      optional: True
-      options:
-        - LogNormalize
-        - SCT
-      help: 'Name of normalization method used: LogNormalize or SCT'
+      type: internal
+      var_name: opt$normalization_method
     - long: integrate-features-pca
       default: 'NULL'
       optional: True
@@ -369,10 +363,8 @@ commands:
       call_alias: eps
       help: Error bound on the neighbor finding algorithm (from 'RANN')
     - long: verbose
-      default: no
-      optional: True
-      type: boolean
-      help: Print progress bars and output
+      type: internal
+      var_name: opt$verbose
     output:
       - var_name: integrated
   - call: 'write_seurat4_object'
