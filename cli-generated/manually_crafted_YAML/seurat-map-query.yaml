@@ -1,12 +1,33 @@
+cli_call: 'seurat-map-query.R'
+galaxy_tool:
+  id: seurat_map_query
+  name: Seurat map query
+  description: maps against a UMAP layout
+  profile: 18.01
+  version: "@SEURAT_VERSION@"
+  macros:
+    - seurat_macros.xml
+  macro_expands_header:
+    - requirements
+    - version
+  macro_expands_footer:
+    - citations
 commands:
-  - call: 'read_seurat4_object'
+  - call: 'load_seurat4_packages_for_format'
     dependencies:
       - workflowscriptscommon
       - optparse
+    options:
+      - long: formats
+        type: internal
+        # var_name: option_list
+        value: 'c(opt$query_format, opt$anchors_format, opt$reference_format)'
+  - call: 'read_seurat4_object'
+    dependencies:
       - scater
       - SeuratDisk
     options:
-      - long: query-path
+      - long: query-object-file
         short: q
         type: file_in
         call_alias: input_path
@@ -22,7 +43,7 @@ commands:
       - var_name: seurat_object
   - call:  'read_seurat4_object'
     options:
-      - long: anchors-path
+      - long: anchors-object-file
         short: a
         type: file_in
         human_readable: 'Seurat transfer anchors file'
@@ -38,7 +59,7 @@ commands:
       - var_name: anchors_object
   - call:  'read_seurat4_object'
     options:
-      - long: reference-path
+      - long: reference-object-file
         short: r
         type: file_in
         human_readable: 'Seurat reference object file'
@@ -70,28 +91,34 @@ commands:
         type: string
         evaluated: true
         call_alias: refdata
+        optional: true
         help: "The name of the metadata field or assay from the reference object provided. This requires the reference parameter to be specified."
       - long: new-reduction-name
         type: string
         default: 'NULL'
+        optional: true
         help: "Name for new integrated dimensional reduction."
       - long: reference-reduction
         type: string
         default: 'NULL'
+        optional: true
         help: "Name of reduction to use from the reference for neighbor finding"
       - long: reduction-model
         type: string
         default: 'NULL'
+        optional: true
         help: "DimReduc object name that contains the umap model"
       - long: transferdata-args
         type: string
         evaluated: true
+        optional: true
         call_alias: "transferdata.args"
         default: 'NULL'
         help: "A named list of additional arguments to TransferData, written in R syntax .ie list( argument = 'value' )"
       - long: integrated-embedding-args
         type: string
         evaluated: true
+        optional: true
         call_alias: "integrateembeddings.args"
         default: 'NULL'
         help: "A named list of additional arguments to IntegrateEmbeddings, written in R syntax .ie list( argument = 'value' )"
@@ -99,6 +126,7 @@ commands:
         call_alias: projectumap.args
         type: string
         evaluated: true
+        optional: true
         default: 'NULL'
         help: "A named list of additional arguments to ProjectUMAP, written in R syntax .ie list( argument = 'value' )"
     output:
@@ -115,7 +143,7 @@ commands:
       - long: seurat_object
         type: internal
         var_name: mapped_object
-      - long: output-path
+      - long: output-object-file
         call_alias: output_path
         short: o
         type: file_out
@@ -123,3 +151,4 @@ commands:
         call_alias: format
         type: string
         default: seurat
+        help: Either loom, seurat, anndata or singlecellexperiment for the anchors format to read.'

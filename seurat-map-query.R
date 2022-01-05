@@ -1,15 +1,15 @@
 #!/usr/bin/env Rscript
 # This script has been automatically generated through
 #
-# YAML2RScript.py -i ../r-seurat-scripts/cli-generated/manually_crafted_YAML/seurat-map-query.yaml -o ../r-seurat-scripts/cli-generated/auto-generated-R/seurat-map-query.R
+# YAML2RScript.py -i ../r-seurat-scripts/cli-generated/manually_crafted_YAML/seurat-map-query.yaml -o ../r-seurat-scripts/seurat-map-query.R
 #
 # to change this file edit the input YAML and re-run the above command
 
-suppressPackageStartupMessages(require(scater))
-suppressPackageStartupMessages(require(Seurat))
-suppressPackageStartupMessages(require(SeuratDisk))
-suppressPackageStartupMessages(require(optparse))
 suppressPackageStartupMessages(require(workflowscriptscommon))
+suppressPackageStartupMessages(require(Seurat))
+suppressPackageStartupMessages(require(optparse))
+suppressPackageStartupMessages(require(scater))
+suppressPackageStartupMessages(require(SeuratDisk))
 
 option_list <- list(
     make_option(
