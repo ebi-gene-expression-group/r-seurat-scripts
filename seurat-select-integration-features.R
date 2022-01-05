@@ -57,6 +57,7 @@ option_list <- list(
     make_option(
         c("--file-out"),
         action = "store",
+        metavar = "Rdata file with features",
         type = "character",
         help = "FILE IN"
     )

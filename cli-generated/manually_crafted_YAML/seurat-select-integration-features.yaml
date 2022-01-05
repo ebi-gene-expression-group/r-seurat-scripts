@@ -84,4 +84,6 @@ commands:
       var_name: features
     - long: file-out
       type: file_out
+      format: rdata
+      human_readable: Rdata file with features
       call_alias: file
