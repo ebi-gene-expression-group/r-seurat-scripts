@@ -194,11 +194,11 @@ commands:
       var_name: reference_objects
     - long: anchor-features
       default: 2000
-      type: integer
+      type: string_or_file
       call_alias: anchor.features
       optional: True
       help: "A numeric value (this will call 'SelectIntegrationFeatures' to select the provided
-        number of features to be used in anchor finding) or a
+        number of features to be used in anchor finding) or a file with a
         vector of features to be used as input to the anchor finding process (comma separated)"
     - long: scale
       short: s

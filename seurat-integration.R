@@ -52,8 +52,8 @@ option_list <- list(
         c("--anchor-features"),
         action = "store",
         default = 2000,
-        type = "integer",
-        help = "A numeric value (this will call 'SelectIntegrationFeatures' to select the provided number of features to be used in anchor finding) or a vector of features to be used as input to the anchor finding process (comma separated)"
+        type = "character",
+        help = "A numeric value (this will call 'SelectIntegrationFeatures' to select the provided number of features to be used in anchor finding) or a file with a vector of features to be used as input to the anchor finding process (comma separated)"
     ),
     make_option(
         c("-s", "--do-not-scale"),
@@ -240,7 +240,19 @@ option_list <- list(
 
 opt <- wsc_parse_args(option_list, 
                       mandatory = c("input_object_files", "output_object_file"))
-                # Check parameter values
+                
+
+if (!is.na(as.numeric(opt$anchor_features))) {
+    # this case also covers variables that can accept a numeric entry, but if the number is passed as a string
+    # the R method can often fail with unspecific errors.
+    opt$anchor_features <- as.numeric(opt$anchor_features)
+} else if (file.exists(opt$anchor_features)) {
+    # if the file exists, then we load it, otherwise the variable keeps its content.
+    tmp <- readRDS(opt$anchor_features)
+    opt$anchor_features <- tmp
+}
+
+# Check parameter values
 inputs<-strsplit(opt$input_object_files,split = ",")[[1]]
 if ( length(inputs) <= 1 ) {
   stop("At least 2 input objects need to be given for integration running.")
