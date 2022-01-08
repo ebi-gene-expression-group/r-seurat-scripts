@@ -5,7 +5,8 @@ dependencies:
   - libpng
   - r-cairo
   - r-workflowscriptscommon
-  - r-seurat=4.0.0
+  - r-seurat=4.0.5
+  - r-uwot <0.1.11
   - r-loom
   - bioconductor-scater
   - r-seuratdisk
