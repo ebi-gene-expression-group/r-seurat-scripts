@@ -366,6 +366,23 @@
     [ -f "$umap_result_object" ]
 }
 
+@test "Run find conserved markers on integrated data" {
+  if [ "$use_existing_outputs" = 'true' ] && [ -f "$conserved_markers_result" ]; then
+    skip "$conserved_markers_result exists and use_existing_outputs is set to true"
+  fi
+
+  run rm -rf $conserved_markers_result && \
+    rm -f $tmp_conserved_markers_fn_object $tmp_conserved_markers_cl_object && \
+    seurat-find-neighbours.R -i $umap_result_object --reduction "pca" --dims "1:30" \
+      -o $tmp_conserved_markers_fn_object && \
+    seurat-find-clusters.R -i $tmp_conserved_markers_fn_object --resolution 0.5 \
+      -o $tmp_conserved_markers_cl_object -t $cluster_text_file".conserved_tmp.txt" && \
+    seurat-find-conserved-markers.R -i $tmp_conserved_markers_cl_object --ident-1 6 --ident-2 4 --grouping-var "tech" -o $conserved_markers_result
+
+  [ "$status" -eq 0 ]
+  [ -f "$conserved_markers_result" ]
+}
+
 @test "Run MapQuery against UMAP" {
     if [ "$use_existing_outputs" = 'true' ] && [ -f "$umap_map_query_result_object" ]; then
       skip "$umap_map_query_result_object exists and use_existing_outputs is set to true"

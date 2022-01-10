@@ -11,3 +11,5 @@ dependencies:
   - bioconductor-scater
   - r-seuratdisk
   - r-remotes
+  - bioconductor-multtest
+  - r-metap

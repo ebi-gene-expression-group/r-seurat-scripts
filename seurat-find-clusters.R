@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript 
+#!/usr/bin/env Rscript
 
 # Load optparse we need to check inputs
 
@@ -84,7 +84,7 @@ option_list = list(
   make_option(
     c("--graph-name"),
     action = "store",
-    default = "RNA_nn",
+    default = NULL,
     type = 'character',
     help = "Name of graph to use for the clustering algorithm."
   ),
@@ -148,7 +148,7 @@ if(opt$input_format == "loom" | opt$output_format == "loom") {
 
 seurat_object <- read_seurat4_object(input_path = opt$input_object_file, format = opt$input_format)
 
-clustered_object <- FindClusters(seurat_object, 
+clustered_object <- FindClusters(seurat_object,
                                  algorithm = opt$algorithm,
                                  modularity.fxn = opt$modularity_fxn,
                                  method = opt$method,
@@ -156,8 +156,8 @@ clustered_object <- FindClusters(seurat_object,
                                  n.iter = opt$n_iterations,
                                  random.seed = opt$random_seed,
                                  group.singletons = opt$no_group_singletons,
-                                 verbose = TRUE, 
-                                 resolution = opt$resolution, 
+                                 verbose = TRUE,
+                                 resolution = opt$resolution,
                                  graph.name = opt$graph_name,
                                  temp.file.location = opt$temp_file_location)
 
@@ -177,8 +177,8 @@ rownames(cluster_table) <- cluster_table$Cluster
 cat(paste(ncol(GetAssayData(clustered_object)), 'cells fall into ', length(levels(Idents(clustered_object))), 'final clusters. Membership numbers:\n'), capture.output(cluster_table[,2, drop = FALSE]), '\nParameter values:\n', capture.output(print(opt_table)), sep = '\n')
 
 # Output to a serialized R object
-write_seurat4_object(seurat_object = clustered_object, 
-                     output_path = opt$output_object_file, 
+write_seurat4_object(seurat_object = clustered_object,
+                     output_path = opt$output_object_file,
                      format = opt$output_format)
 
 # Output variable genes to a simple text file
