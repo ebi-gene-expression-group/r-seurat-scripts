@@ -5,11 +5,11 @@
 #
 # to change this file edit the input YAML and re-run the above command
 
-suppressPackageStartupMessages(require(workflowscriptscommon))
-suppressPackageStartupMessages(require(optparse))
 suppressPackageStartupMessages(require(SeuratDisk))
+suppressPackageStartupMessages(require(optparse))
 suppressPackageStartupMessages(require(scater))
 suppressPackageStartupMessages(require(Seurat))
+suppressPackageStartupMessages(require(workflowscriptscommon))
 
 option_list <- list(
     make_option(
@@ -196,9 +196,9 @@ option_list <- list(
     )
 )
 
-opt <- wsc_parse_args(option_list,
+opt <- wsc_parse_args(option_list, 
                       mandatory = c("input_object_file", "markers_output_file"))
-
+                
 
 if (!file.exists(opt$input_object_file)) {
     stop((paste("File", opt$input_object_file, "does not exist")))
@@ -209,6 +209,8 @@ load_seurat4_packages_for_format(formats = c(opt$query_format, opt$anchors_forma
 
 seurat_object <- read_seurat4_object(input_path = opt$input_object_file,
                     format = opt$input_format)
+# transform method name into actual R function. This should probably be sanitised in Galaxy
+opt$meta_method <- eval(parse(text=opt$meta_method))
 
 conserved_markers <- FindConservedMarkers(object = seurat_object,
                     ident.1 = opt$ident_1,
@@ -216,7 +218,7 @@ conserved_markers <- FindConservedMarkers(object = seurat_object,
                     grouping.var = opt$grouping_var,
                     assay = opt$assay,
                     slot = opt$slot,
-                    meta.method = eval(parse(text=opt$meta_method)),
+                    meta.method = opt$meta_method,
                     reduction = opt$reduction,
                     features = opt$features,
                     logfc.threshold = opt$logfc_threshold,
