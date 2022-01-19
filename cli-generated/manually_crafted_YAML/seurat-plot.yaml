@@ -43,7 +43,7 @@ commands:
   - call_carousel: Plot
     long: plot-type
     default: FeaturePlot
-    help: Either FeaturePlot, RidgePlot, DimPlot or
+    help: Either FeaturePlot, RidgePlot, DimPlot, VlnPlot or DotPlot.
     selector:
     - call: DimPlot
       dependencies:
@@ -53,11 +53,11 @@ commands:
       options:
       - long: object
         type: internal
-        var_name: seurab_object
+        var_name: seurat_object
       - long: dims
         default: "1,2"
         optional: true
-        type: list
+        type: list_numeric
         help: Dimensions to plot, must be a two-length numeric vector specifying x- and
           y-dimensions
       - long: cells
@@ -179,13 +179,14 @@ commands:
       options:
       - long: object
         type: internal
-        var_name: seurab_object
+        var_name: seurat_object
       - long: features
         default: ''
-        type: string
+        type: list
         help: Features to plot (gene expression, metrics, PC scores, anything that can be
           retreived by FetchData)
-      - long: cols
+      - long: cols-ridgplot
+        call_alias: cols
         default: 'NULL'
         type: list
         optional: true
@@ -252,7 +253,7 @@ commands:
       options:
       - long: object
         type: internal
-        var_name: seurab_object
+        var_name: seurat_object
       - long: features
         type: list
         help: "Vector of features to plot. Features can come from: an assay feature (e.g. a gene name - MS4A1), a
@@ -261,15 +262,18 @@ commands:
           to the cell embedding values (e.g. the PC 1 scores - PC_1)."
       - long: dims
         default: "1,2"
-        type: list
+        type: list_numeric
+        optional: true
         help: Dimensions to plot, must be a two-length numeric vector specifying x- and
           y-dimensions
       - long: cells
         default: 'NULL'
         type: list
         help: Vector of cells to plot (default is all cells)
-      - long: cols
+      - long: cols-feature-plot
+        call_alias: cols
         optional: true
+        default: "lightgrey,blue"
         type: list
         help: The two colors to form the gradient over. Provide as string vector with the
           first color corresponding to low values, the second to high. Also accepts a Brewer
@@ -391,10 +395,10 @@ commands:
       options:
       - long: object
         type: internal
-        var_name: seurab_object
+        var_name: seurat_object
       - long: features
         default: ''
-        type: string
+        type: list
         help: Features to plot (gene expression, metrics, PC scores, anything that can be
           retreived by FetchData)
       - long: cols
@@ -487,7 +491,7 @@ commands:
       options:
       - long: object
         type: internal
-        var_name: seurab_object
+        var_name: seurat_object
       - long: assay
         default: 'NULL'
         optional: true
@@ -496,11 +500,11 @@ commands:
       - long: features
         default: ''
         type: list
-        optional: true
         help: Input vector of features, or named list of feature vectors if feature-grouped
           panels are desired (replicates the functionality of the old SplitDotPlotGG)
-      - long: cols
-        default: "lightgrey,blue"
+      - long: cols-dot-plot
+        call_alias: cols
+        default: "yellow,lightgrey,blue"
         type: list
         optional: true
         help: 'Colors to plot: the name of a palette from RColorBrewer::brewer.pal.info
@@ -544,7 +548,7 @@ commands:
         optional: true
         type: string
         help: Factor to split the groups by (replicates the functionality of the old SplitDotPlotGG);
-          see  list(list("FetchData"))  for more details
+          see  'FetchData' for more details.
       - long: cluster.idents
         default: no
         type: boolean
@@ -626,11 +630,11 @@ commands:
       help: Multiplicative scaling factor.
     - long: width
       type: double
-      default: 10
+      default: 20
       help: Width of the figure, in the selected units.
     - long: height
       type: double
-      default: 10
+      default: 20
       help: Height of the figure, in the selected units.
     - long: units
       default: cm
@@ -643,7 +647,11 @@ commands:
       help: Units for the plot dimensions.
     - long: dpi
       default: 300
-      type: string
+      type: integer
+      options:
+        - 320: Retina
+        - 300: Print
+        - 72: screen
       help: "Plot resolution. Also accepts a string input: retina (320), print (300),
         or screen (72). Applies only to raster output types."
     - long: limitsize

@@ -5,13 +5,13 @@
 #
 # to change this file edit the input YAML and re-run the above command
 
-suppressPackageStartupMessages(require(SeuratDisk))
+suppressPackageStartupMessages(require(Seurat))
+suppressPackageStartupMessages(require(scater))
 suppressPackageStartupMessages(require(optparse))
 suppressPackageStartupMessages(require(workflowscriptscommon))
-suppressPackageStartupMessages(require(Seurat))
 suppressPackageStartupMessages(require(ggplot2))
+suppressPackageStartupMessages(require(SeuratDisk))
 suppressPackageStartupMessages(require(patchwork))
-suppressPackageStartupMessages(require(scater))
 
 option_list <- list(
     make_option(
@@ -34,7 +34,7 @@ option_list <- list(
         action = "store",
         default = "FeaturePlot",
         type = "character",
-        help = "FILE IN"
+        help = "Either FeaturePlot, RidgePlot, DimPlot, VlnPlot or DotPlot."
     ),
     make_option(
         c("--dims"),
@@ -191,6 +191,13 @@ option_list <- list(
         help = "Features to plot (gene expression, metrics, PC scores, anything that can be retreived by FetchData)"
     ),
     make_option(
+        c("--cols-ridgplot"),
+        action = "store",
+        default = NULL,
+        type = "character",
+        help = "Colors to use for plotting, comma separated"
+    ),
+    make_option(
         c("--idents"),
         action = "store",
         default = NULL,
@@ -252,6 +259,13 @@ option_list <- list(
         default = "feature",
         type = "character",
         help = "Color violins/ridges based on either 'feature' or 'ident'"
+    ),
+    make_option(
+        c("--cols-feature-plot"),
+        action = "store",
+        default = "lightgrey,blue",
+        type = "character",
+        help = "The two colors to form the gradient over. Provide as string vector with the first color corresponding to low values, the second to high. Also accepts a Brewer color scale or vector of colors."
     ),
     make_option(
         c("--min-cutoff"),
@@ -322,6 +336,13 @@ option_list <- list(
         default = FALSE,
         type = "logical",
         help = "flip plot orientation (identities on x-axis)"
+    ),
+    make_option(
+        c("--cols-dot-plot"),
+        action = "store",
+        default = "yellow,lightgrey,blue",
+        type = "character",
+        help = "Colors to plot: the name of a palette from RColorBrewer::brewer.pal.info , a pair of colors defining a gradient, or 3+ colors defining multiple gradients (if split.by is set)"
     ),
     make_option(
         c("--col-min"),
@@ -416,14 +437,14 @@ option_list <- list(
     make_option(
         c("--width"),
         action = "store",
-        default = 10,
+        default = 20,
         type = "double",
         help = "Width of the figure, in the selected units."
     ),
     make_option(
         c("--height"),
         action = "store",
-        default = 10,
+        default = 20,
         type = "double",
         help = "Height of the figure, in the selected units."
     ),
@@ -438,7 +459,7 @@ option_list <- list(
         c("--dpi"),
         action = "store",
         default = 300,
-        type = "character",
+        type = "integer",
         help = "Plot resolution. Also accepts a string input: retina (320), print (300), or screen (72). Applies only to raster output types."
     ),
     make_option(
@@ -469,154 +490,168 @@ if (!file.exists(opt$input_object_file)) {
 
 dims <- opt$dims
 if (!is.null(dims)) {
-    dims <- unlist(strsplit(opt$dims, sep = ","))
+    dims <- as.numeric(unlist(strsplit(opt$dims, split = ",")))
 }
 
 
 
 cells <- opt$cells
 if (!is.null(cells)) {
-    cells <- unlist(strsplit(opt$cells, sep = ","))
+    cells <- unlist(strsplit(opt$cells, split = ","))
 }
 
 
 
 cols <- opt$cols
 if (!is.null(cols)) {
-    cols <- unlist(strsplit(opt$cols, sep = ","))
+    cols <- unlist(strsplit(opt$cols, split = ","))
 }
 
 
 
 group_by <- opt$group_by
 if (!is.null(group_by)) {
-    group_by <- unlist(strsplit(opt$group_by, sep = ","))
+    group_by <- unlist(strsplit(opt$group_by, split = ","))
 }
 
 
 
 order <- opt$order
 if (!is.null(order)) {
-    order <- unlist(strsplit(opt$order, sep = ","))
+    order <- unlist(strsplit(opt$order, split = ","))
 }
 
 
 
 cells_highlight <- opt$cells_highlight
 if (!is.null(cells_highlight)) {
-    cells_highlight <- unlist(strsplit(opt$cells_highlight, sep = ","))
+    cells_highlight <- unlist(strsplit(opt$cells_highlight, split = ","))
 }
 
 
 
 cols_highlight <- opt$cols_highlight
 if (!is.null(cols_highlight)) {
-    cols_highlight <- unlist(strsplit(opt$cols_highlight, sep = ","))
-}
-
-
-
-cols <- opt$cols
-if (!is.null(cols)) {
-    cols <- unlist(strsplit(opt$cols, sep = ","))
-}
-
-
-
-idents <- opt$idents
-if (!is.null(idents)) {
-    idents <- unlist(strsplit(opt$idents, sep = ","))
-}
-
-
-
-group_by <- opt$group_by
-if (!is.null(group_by)) {
-    group_by <- unlist(strsplit(opt$group_by, sep = ","))
+    cols_highlight <- unlist(strsplit(opt$cols_highlight, split = ","))
 }
 
 
 
 features <- opt$features
 if (!is.null(features)) {
-    features <- unlist(strsplit(opt$features, sep = ","))
+    features <- unlist(strsplit(opt$features, split = ","))
+}
+
+
+
+cols_ridgplot <- opt$cols_ridgplot
+if (!is.null(cols_ridgplot)) {
+    cols_ridgplot <- unlist(strsplit(opt$cols_ridgplot, split = ","))
+}
+
+
+
+idents <- opt$idents
+if (!is.null(idents)) {
+    idents <- unlist(strsplit(opt$idents, split = ","))
+}
+
+
+
+group_by <- opt$group_by
+if (!is.null(group_by)) {
+    group_by <- unlist(strsplit(opt$group_by, split = ","))
+}
+
+
+
+features <- opt$features
+if (!is.null(features)) {
+    features <- unlist(strsplit(opt$features, split = ","))
 }
 
 
 
 dims <- opt$dims
 if (!is.null(dims)) {
-    dims <- unlist(strsplit(opt$dims, sep = ","))
+    dims <- as.numeric(unlist(strsplit(opt$dims, split = ",")))
 }
 
 
 
 cells <- opt$cells
 if (!is.null(cells)) {
-    cells <- unlist(strsplit(opt$cells, sep = ","))
+    cells <- unlist(strsplit(opt$cells, split = ","))
 }
 
 
 
-cols <- opt$cols
-if (!is.null(cols)) {
-    cols <- unlist(strsplit(opt$cols, sep = ","))
+cols_feature_plot <- opt$cols_feature_plot
+if (!is.null(cols_feature_plot)) {
+    cols_feature_plot <- unlist(strsplit(opt$cols_feature_plot, split = ","))
 }
 
 
 
 min_cutoff <- opt$min_cutoff
 if (!is.null(min_cutoff)) {
-    min_cutoff <- unlist(strsplit(opt$min_cutoff, sep = ","))
+    min_cutoff <- unlist(strsplit(opt$min_cutoff, split = ","))
 }
 
 
 
 max_cutoff <- opt$max_cutoff
 if (!is.null(max_cutoff)) {
-    max_cutoff <- unlist(strsplit(opt$max_cutoff, sep = ","))
-}
-
-
-
-cols <- opt$cols
-if (!is.null(cols)) {
-    cols <- unlist(strsplit(opt$cols, sep = ","))
-}
-
-
-
-group_by <- opt$group_by
-if (!is.null(group_by)) {
-    group_by <- unlist(strsplit(opt$group_by, sep = ","))
+    max_cutoff <- unlist(strsplit(opt$max_cutoff, split = ","))
 }
 
 
 
 features <- opt$features
 if (!is.null(features)) {
-    features <- unlist(strsplit(opt$features, sep = ","))
+    features <- unlist(strsplit(opt$features, split = ","))
 }
 
 
 
 cols <- opt$cols
 if (!is.null(cols)) {
-    cols <- unlist(strsplit(opt$cols, sep = ","))
-}
-
-
-
-idents <- opt$idents
-if (!is.null(idents)) {
-    idents <- unlist(strsplit(opt$idents, sep = ","))
+    cols <- unlist(strsplit(opt$cols, split = ","))
 }
 
 
 
 group_by <- opt$group_by
 if (!is.null(group_by)) {
-    group_by <- unlist(strsplit(opt$group_by, sep = ","))
+    group_by <- unlist(strsplit(opt$group_by, split = ","))
+}
+
+
+
+features <- opt$features
+if (!is.null(features)) {
+    features <- unlist(strsplit(opt$features, split = ","))
+}
+
+
+
+cols_dot_plot <- opt$cols_dot_plot
+if (!is.null(cols_dot_plot)) {
+    cols_dot_plot <- unlist(strsplit(opt$cols_dot_plot, split = ","))
+}
+
+
+
+idents <- opt$idents
+if (!is.null(idents)) {
+    idents <- unlist(strsplit(opt$idents, split = ","))
+}
+
+
+
+group_by <- opt$group_by
+if (!is.null(group_by)) {
+    group_by <- unlist(strsplit(opt$group_by, split = ","))
 }
 
 
@@ -625,7 +660,7 @@ load_seurat4_packages_for_format(formats = c(opt$query_format, opt$anchors_forma
 seurat_object <- read_seurat4_object(input_path = opt$input_object_file,
                     format = opt$input_format)
 if ( opt$plot_type == 'DimPlot' ) { 
-plot_object <- DimPlot(object = seurab_object,
+plot_object <- DimPlot(object = seurat_object,
                     dims = dims,
                     cells = cells,
                     cols = cols,
@@ -648,9 +683,9 @@ plot_object <- DimPlot(object = seurab_object,
                     na.value = opt$na_value,
                     ncol = opt$ncol)
 } else if ( opt$plot_type == 'RidgePlot' ) { 
-plot_object <- RidgePlot(object = seurab_object,
-                    features = opt$features,
-                    cols = cols,
+plot_object <- RidgePlot(object = seurat_object,
+                    features = features,
+                    cols = cols_ridgplot,
                     idents = idents,
                     sort = opt$sort,
                     assay = opt$assay,
@@ -663,11 +698,11 @@ plot_object <- RidgePlot(object = seurab_object,
                     stack = opt$stack,
                     fill.by = opt$fill_by)
 } else if ( opt$plot_type == 'FeaturePlot' ) { 
-plot_object <- FeaturePlot(object = seurab_object,
+plot_object <- FeaturePlot(object = seurat_object,
                     features = features,
                     dims = dims,
                     cells = cells,
-                    cols = cols,
+                    cols = cols_feature_plot,
                     pt.size = opt$pt_size,
                     order = opt$order,
                     min.cutoff = min_cutoff,
@@ -686,8 +721,8 @@ plot_object <- FeaturePlot(object = seurab_object,
                     coord.fixed = opt$coord_fixed,
                     by.col = opt$do_not_by_col)
 } else if ( opt$plot_type == 'VlnPlot' ) { 
-plot_object <- VlnPlot(object = seurab_object,
-                    features = opt$features,
+plot_object <- VlnPlot(object = seurat_object,
+                    features = features,
                     cols = cols,
                     pt.size = opt$pt_size,
                     idents = opt$idents,
@@ -706,10 +741,10 @@ plot_object <- VlnPlot(object = seurab_object,
                     fill.by = opt$fill_by,
                     flip = opt$flip)
 } else if ( opt$plot_type == 'DotPlot' ) { 
-plot_object <- DotPlot(object = seurab_object,
+plot_object <- DotPlot(object = seurat_object,
                     assay = opt$assay,
                     features = features,
-                    cols = cols,
+                    cols = cols_dot_plot,
                     col.min = opt$col_min,
                     col.max = opt$col_max,
                     dot.min = opt$dot_min,
