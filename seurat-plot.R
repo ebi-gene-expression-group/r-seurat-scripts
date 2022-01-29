@@ -5,13 +5,13 @@
 #
 # to change this file edit the input YAML and re-run the above command
 
-suppressPackageStartupMessages(require(Seurat))
 suppressPackageStartupMessages(require(scater))
-suppressPackageStartupMessages(require(optparse))
 suppressPackageStartupMessages(require(workflowscriptscommon))
+suppressPackageStartupMessages(require(Seurat))
 suppressPackageStartupMessages(require(ggplot2))
-suppressPackageStartupMessages(require(SeuratDisk))
 suppressPackageStartupMessages(require(patchwork))
+suppressPackageStartupMessages(require(SeuratDisk))
+suppressPackageStartupMessages(require(optparse))
 
 option_list <- list(
     make_option(
@@ -191,7 +191,7 @@ option_list <- list(
         help = "Features to plot (gene expression, metrics, PC scores, anything that can be retreived by FetchData)"
     ),
     make_option(
-        c("--cols-ridgplot"),
+        c("--cols-ridgeplot"),
         action = "store",
         default = NULL,
         type = "character",
@@ -544,9 +544,9 @@ if (!is.null(features)) {
 
 
 
-cols_ridgplot <- opt$cols_ridgplot
-if (!is.null(cols_ridgplot)) {
-    cols_ridgplot <- unlist(strsplit(opt$cols_ridgplot, split = ","))
+cols_ridgeplot <- opt$cols_ridgeplot
+if (!is.null(cols_ridgeplot)) {
+    cols_ridgeplot <- unlist(strsplit(opt$cols_ridgeplot, split = ","))
 }
 
 
@@ -685,7 +685,7 @@ plot_object <- DimPlot(object = seurat_object,
 } else if ( opt$plot_type == 'RidgePlot' ) { 
 plot_object <- RidgePlot(object = seurat_object,
                     features = features,
-                    cols = cols_ridgplot,
+                    cols = cols_ridgeplot,
                     idents = idents,
                     sort = opt$sort,
                     assay = opt$assay,

@@ -185,7 +185,7 @@ commands:
         type: list
         help: Features to plot (gene expression, metrics, PC scores, anything that can be
           retreived by FetchData)
-      - long: cols-ridgplot
+      - long: cols-ridgeplot
         call_alias: cols
         default: 'NULL'
         type: list
@@ -268,6 +268,7 @@ commands:
           y-dimensions
       - long: cells
         default: 'NULL'
+        optional: true
         type: list
         help: Vector of cells to plot (default is all cells)
       - long: cols-feature-plot
@@ -618,7 +619,7 @@ commands:
         - ps: PostScript
         - tex: TeX (pictex)
         - pdf: PDF
-        - jpeg: JPEG
+        - jpg: JPG
         - tiff: TIFF
         - svg: SVG
       help: Format to use, either PNG, EPS, PostScript, TeX, PDF, JPEG, TIFF or SVG
@@ -662,6 +663,7 @@ commands:
         in pixels.
     - long: bg
       default: 'NULL'
+      optional: true
       type: string
       help: Background colour. If NULL, uses the plot.background fill
         value from the plot theme.
