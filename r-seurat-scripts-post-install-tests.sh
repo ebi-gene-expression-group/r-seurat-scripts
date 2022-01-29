@@ -121,7 +121,11 @@ export loom_converted_cluster_object="$output_dir/loom_converted_cluster_object"
 export seurat_from_loom_cluster_object="$output_dir/seurat_from_loom_cluster_object.rds"
 export h5seurat_cluster_object="$output_dir/h5seurat_cluster_object.h5seurat"
 export h5seurat_to_seurat_cluster_object="$output_dir/h5seurat_to_seurat_cluster_object.rds"
-
+export feature_plot_png_result="$output_dir/feature_plot_png_result.png"
+export vln_plot_pdf_result="$output_dir/vln_plot_pdf_result.png"
+export ridge_plot_eps_result="$output_dir/ridge_plot_eps_result.png"
+export dot_plot_jpg_result="$output_dir/dot_plot_jpg_result.png"
+export dim_plot_svg_result="$output_dir/dim_plot_svg_result.png"
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.
 

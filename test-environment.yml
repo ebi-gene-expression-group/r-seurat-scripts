@@ -8,6 +8,7 @@ dependencies:
   - r-seurat=4.0.0
   - r-uwot <0.1.11
   - r-loom
+  - r-svglite
   - bioconductor-scater
   - r-seuratdisk
   - r-remotes

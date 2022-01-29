@@ -366,6 +366,71 @@
     [ -f "$umap_result_object" ]
 }
 
+@test "Plot feature plot png" {
+  if [ "$use_existing_outputs" = 'true' ] && [ -f "$feature_plot_png_result" ]; then
+    skip "$feature_plot_png_result exists and use_existing_outputs is set to true"
+  fi
+
+  run rm -rf $feature_plot_png_result && \
+    seurat-plot.R -plot-type FeaturePlot --plot-out $feature_plot_png_result \
+      --features "GPC5-AS1,MAFB,FAP,PPY" -i $umap_result_object
+
+  [ "$status" -eq 0 ]
+  [ -f "$feature_plot_png_result" ]
+}
+
+@test "Plot violin plot pdf" {
+  if [ "$use_existing_outputs" = 'true' ] && [ -f "$vln_plot_pdf_result" ]; then
+    skip "$vln_plot_pdf_result exists and use_existing_outputs is set to true"
+  fi
+
+  run rm -rf $vln_plot_pdf_result && \
+    seurat-plot.R -plot-type VlnPlot --plot-out $vln_plot_pdf_result \
+      --features "GPC5-AS1,MAFB,FAP,PPY" -i $umap_result_object --plot-format pdf
+
+  [ "$status" -eq 0 ]
+  [ -f "$vln_plot_pdf_result" ]
+}
+
+@test "Plot ridge plot eps" {
+  if [ "$use_existing_outputs" = 'true' ] && [ -f "$ridge_plot_eps_result" ]; then
+    skip "$ridge_plot_eps_result exists and use_existing_outputs is set to true"
+  fi
+
+  run rm -rf $ridge_plot_eps_result && \
+    seurat-plot.R -plot-type RidgePlot --plot-out $ridge_plot_eps_result \
+      --features "GPC5-AS1,MAFB,FAP,PPY" -i $umap_result_object --plot-format eps
+
+  [ "$status" -eq 0 ]
+  [ -f "$ridge_plot_eps_result" ]
+}
+
+@test "Plot dot plot jpg" {
+  if [ "$use_existing_outputs" = 'true' ] && [ -f "$dot_plot_jpg_result" ]; then
+    skip "$dot_plot_jpg_result exists and use_existing_outputs is set to true"
+  fi
+
+  run rm -rf $dot_plot_jpg_result && \
+    seurat-plot.R -plot-type DotPlot --plot-out $dot_plot_jpg_result \
+      --features "GPC5-AS1,MAFB,FAP,PPY" -i $umap_result_object --plot-format jpg
+
+  [ "$status" -eq 0 ]
+  [ -f "$dot_plot_jpg_result" ]
+}
+
+@test "Plot dim plot svg" {
+  if [ "$use_existing_outputs" = 'true' ] && [ -f "$dim_plot_svg_result" ]; then
+    skip "$dim_plot_svg_result exists and use_existing_outputs is set to true"
+  fi
+
+  run rm -rf $dim_plot_svg_result && \
+    seurat-plot.R -plot-type DotPlot --plot-out $dim_plot_svg_result \
+      --features "GPC5-AS1,MAFB,FAP,PPY" -i $umap_result_object --plot-format jpg
+
+  [ "$status" -eq 0 ]
+  [ -f "$dim_plot_svg_result" ]
+}
+
 @test "Run find conserved markers on integrated data" {
   if [ "$use_existing_outputs" = 'true' ] && [ -f "$conserved_markers_result" ]; then
     skip "$conserved_markers_result exists and use_existing_outputs is set to true"
