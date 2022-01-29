@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest", "macos-latest"]
+        os: ["self-hosted"]
     defaults:
       run:
         shell: bash -l {0}
@@ -33,6 +33,8 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: test
+          # for self hosted
+          installer-url: https://github.com/conda-forge/miniforge/releases/download/4.11.0-0/Miniforge-pypy3-4.11.0-0-Linux-x86_64.sh
           environment-file: test-environment.yml
           python-version: 3.6
           channels: conda-forge,bioconda,defaults
