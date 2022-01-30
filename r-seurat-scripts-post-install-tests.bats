@@ -372,7 +372,7 @@
   fi
 
   run rm -rf $feature_plot_png_result && \
-    seurat-plot.R -plot-type FeaturePlot --plot-out $feature_plot_png_result \
+    seurat-plot.R --plot-type FeaturePlot --plot-out $feature_plot_png_result \
       --features "GPC5-AS1,MAFB,FAP,PPY" -i $umap_result_object
 
   [ "$status" -eq 0 ]
@@ -385,7 +385,7 @@
   fi
 
   run rm -rf $vln_plot_pdf_result && \
-    seurat-plot.R -plot-type VlnPlot --plot-out $vln_plot_pdf_result \
+    seurat-plot.R --plot-type VlnPlot --plot-out $vln_plot_pdf_result \
       --features "GPC5-AS1,MAFB,FAP,PPY" -i $umap_result_object --plot-format pdf
 
   [ "$status" -eq 0 ]
@@ -398,7 +398,7 @@
   fi
 
   run rm -rf $ridge_plot_eps_result && \
-    seurat-plot.R -plot-type RidgePlot --plot-out $ridge_plot_eps_result \
+    seurat-plot.R --plot-type RidgePlot --plot-out $ridge_plot_eps_result \
       --features "GPC5-AS1,MAFB,FAP,PPY" -i $umap_result_object --plot-format eps
 
   [ "$status" -eq 0 ]
@@ -411,7 +411,7 @@
   fi
 
   run rm -rf $dot_plot_jpg_result && \
-    seurat-plot.R -plot-type DotPlot --plot-out $dot_plot_jpg_result \
+    seurat-plot.R --plot-type DotPlot --plot-out $dot_plot_jpg_result \
       --features "GPC5-AS1,MAFB,FAP,PPY" -i $umap_result_object --plot-format jpg
 
   [ "$status" -eq 0 ]
@@ -424,7 +424,7 @@
   fi
 
   run rm -rf $dim_plot_svg_result && \
-    seurat-plot.R -plot-type DotPlot --plot-out $dim_plot_svg_result \
+    seurat-plot.R --plot-type DotPlot --plot-out $dim_plot_svg_result \
       --features "GPC5-AS1,MAFB,FAP,PPY" -i $umap_result_object --plot-format jpg
 
   [ "$status" -eq 0 ]
