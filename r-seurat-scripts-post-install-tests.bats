@@ -418,6 +418,19 @@
   [ -f "$dot_plot_jpg_result" ]
 }
 
+@test "Heatmap plot jpg" {
+  if [ "$use_existing_outputs" = 'true' ] && [ -f "$do_heatmap_jpg_result" ]; then
+    skip "$do_heatmap_jpg_result exists and use_existing_outputs is set to true"
+  fi
+
+  run rm -rf $dot_plot_jpg_result && \
+    seurat-plot.R --plot-type DoHeatmap --plot-out $do_heatmap_jpg_result \
+      --features "GPC5-AS1,MAFB,FAP,PPY" -i $umap_result_object --plot-format jpg
+
+  [ "$status" -eq 0 ]
+  [ -f "$do_heatmap_jpg_result" ]
+}
+
 @test "Plot dim plot svg" {
   if [ "$use_existing_outputs" = 'true' ] && [ -f "$dim_plot_svg_result" ]; then
     skip "$dim_plot_svg_result exists and use_existing_outputs is set to true"

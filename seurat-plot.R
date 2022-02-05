@@ -5,13 +5,13 @@
 #
 # to change this file edit the input YAML and re-run the above command
 
-suppressPackageStartupMessages(require(scater))
-suppressPackageStartupMessages(require(workflowscriptscommon))
-suppressPackageStartupMessages(require(Seurat))
-suppressPackageStartupMessages(require(ggplot2))
-suppressPackageStartupMessages(require(patchwork))
 suppressPackageStartupMessages(require(SeuratDisk))
+suppressPackageStartupMessages(require(Seurat))
+suppressPackageStartupMessages(require(scater))
 suppressPackageStartupMessages(require(optparse))
+suppressPackageStartupMessages(require(workflowscriptscommon))
+suppressPackageStartupMessages(require(patchwork))
+suppressPackageStartupMessages(require(ggplot2))
 
 option_list <- list(
     make_option(
@@ -186,9 +186,114 @@ option_list <- list(
     make_option(
         c("--features"),
         action = "store",
-        default = "",
+        default = NULL,
         type = "character",
-        help = "Features to plot (gene expression, metrics, PC scores, anything that can be retreived by FetchData)"
+        help = "A vector of features to plot, defaults to VariableFeatures of the object."
+    ),
+    make_option(
+        c("--do-not-group-bar"),
+        action = "store_false",
+        default = TRUE,
+        type = "logical",
+        help = "Add a color bar showing group status for cells"
+    ),
+    make_option(
+        c("--group-colors"),
+        action = "store",
+        default = NULL,
+        type = "character",
+        help = "Colors to use for the color bar, comma separated."
+    ),
+    make_option(
+        c("--disp-min"),
+        action = "store",
+        default = -2,
+        type = "integer",
+        help = "Minimum display value (all values below are clipped)"
+    ),
+    make_option(
+        c("--disp-max"),
+        action = "store",
+        default = NULL,
+        type = "integer",
+        help = "Maximum display value (all values above are clipped); defaults to 2.5 if slot is 'scale.data', 6 otherwise"
+    ),
+    make_option(
+        c("--slot"),
+        action = "store",
+        default = "scale.data",
+        type = "character",
+        help = "Data slot to use, choose from raw.data, data, or scale.data"
+    ),
+    make_option(
+        c("--assay"),
+        action = "store",
+        default = NULL,
+        type = "character",
+        help = "Assay to pull from"
+    ),
+    make_option(
+        c("--do-not-label"),
+        action = "store_false",
+        default = TRUE,
+        type = "logical",
+        help = "Label the cell identies above the color bar"
+    ),
+    make_option(
+        c("--size"),
+        action = "store",
+        default = 5,
+        type = "integer",
+        help = "Size of text above color bar"
+    ),
+    make_option(
+        c("--hjust"),
+        action = "store",
+        default = 0,
+        type = "integer",
+        help = "Horizontal justification of text above color bar"
+    ),
+    make_option(
+        c("--angle"),
+        action = "store",
+        default = 45,
+        type = "integer",
+        help = "Angle of text above color bar"
+    ),
+    make_option(
+        c("--do-not-raster"),
+        action = "store_false",
+        default = TRUE,
+        type = "logical",
+        help = "If true, plot with geom_raster, else use geom_tile. geom_raster may look blurry on some viewing applications such as Preview due to how the raster is interpolated. Set this to FALSE if you are encountering that issue (note that plots may take longer to produce/render)."
+    ),
+    make_option(
+        c("--do-not-draw-lines"),
+        action = "store_false",
+        default = TRUE,
+        type = "logical",
+        help = "Include white lines to separate the groups"
+    ),
+    make_option(
+        c("--lines-width"),
+        action = "store",
+        default = NULL,
+        type = "integer",
+        help = "Integer number to adjust the width of the separating white lines. Corresponds to the number of cells between each group."
+    ),
+    make_option(
+        c("--group-bar-height"),
+        action = "store",
+        default = 0,
+        type = "integer",
+        help = "Scale the height of the color bar"
+    ),
+    make_option(
+        c("--do-not-combine"),
+        action = "store_false",
+        default = TRUE,
+        type = "logical",
+        help = "Combine plots into a single patchwork or ed ggplot object. If FALSE return a list of ggplot objects."
     ),
     make_option(
         c("--cols-ridgeplot"),
@@ -212,13 +317,6 @@ option_list <- list(
         help = "Sort identity classes (on the x-axis) by the average expression of the attribute being potted, can also pass 'increasing' or 'decreasing' to change sort direction"
     ),
     make_option(
-        c("--assay"),
-        action = "store",
-        default = NULL,
-        type = "character",
-        help = "Name of assay to use, defaults to the active assay"
-    ),
-    make_option(
         c("--y-max"),
         action = "store",
         default = NULL,
@@ -238,13 +336,6 @@ option_list <- list(
         default = FALSE,
         type = "logical",
         help = "plot the feature axis on log scale"
-    ),
-    make_option(
-        c("--slot"),
-        action = "store",
-        default = "data",
-        type = "character",
-        help = "Use non-normalized counts data for plotting"
     ),
     make_option(
         c("--stack"),
@@ -544,6 +635,27 @@ if (!is.null(features)) {
 
 
 
+cells <- opt$cells
+if (!is.null(cells)) {
+    cells <- unlist(strsplit(opt$cells, split = ","))
+}
+
+
+
+group_colors <- opt$group_colors
+if (!is.null(group_colors)) {
+    group_colors <- unlist(strsplit(opt$group_colors, split = ","))
+}
+
+
+
+features <- opt$features
+if (!is.null(features)) {
+    features <- unlist(strsplit(opt$features, split = ","))
+}
+
+
+
 cols_ridgeplot <- opt$cols_ridgeplot
 if (!is.null(cols_ridgeplot)) {
     cols_ridgeplot <- unlist(strsplit(opt$cols_ridgeplot, split = ","))
@@ -682,6 +794,26 @@ plot_object <- DimPlot(object = seurat_object,
                     sizes.highlight = opt$sizes_highlight,
                     na.value = opt$na_value,
                     ncol = opt$ncol)
+} else if ( opt$plot_type == 'DoHeatmap' ) { 
+plot_object <- DoHeatmap(object = seurat_object,
+                    features = features,
+                    cells = cells,
+                    group.by = opt$group_by,
+                    group.bar = opt$do_not_group_bar,
+                    group.colors = group_colors,
+                    disp.min = opt$disp_min,
+                    disp.max = opt$disp_max,
+                    slot = opt$slot,
+                    assay = opt$assay,
+                    label = opt$do_not_label,
+                    size = opt$size,
+                    hjust = opt$hjust,
+                    angle = opt$angle,
+                    raster = opt$do_not_raster,
+                    draw.lines = opt$do_not_draw_lines,
+                    lines.width = opt$lines_width,
+                    group.bar.height = opt$group_bar_height,
+                    combine = opt$do_not_combine)
 } else if ( opt$plot_type == 'RidgePlot' ) { 
 plot_object <- RidgePlot(object = seurat_object,
                     features = features,

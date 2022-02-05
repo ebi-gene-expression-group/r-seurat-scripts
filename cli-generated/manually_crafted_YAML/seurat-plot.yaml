@@ -171,6 +171,112 @@ commands:
         help: Number of columns for display when combining plots
       output:
         - var_name: plot_object
+    - call: DoHeatmap
+      dependencies:
+        - Seurat
+        - ggplot2
+        - patchwork
+      options:
+      - long: object
+        type: internal
+        var_name: seurat_object
+      - long: features
+        default: 'NULL'
+        type: list
+        optional: true
+        help: A vector of features to plot, defaults to VariableFeatures of the
+          object.
+      - long: cells
+        default: 'NULL'
+        type: list
+        help: A vector of cells to plot, comma separated
+      - long: group.by
+        default: ident
+        optional: true
+        type: string
+        help: A vector of variables to group cells by; pass 'ident' to group by cell identity
+          classes
+      - long: group.bar
+        default: yes
+        type: boolean
+        help: Add a color bar showing group status for cells
+      - long: group.colors
+        default: 'NULL'
+        optional: true
+        type: list
+        help: Colors to use for the color bar, comma separated.
+      - long: disp.min
+        default: -2
+        type: integer
+        optional: true
+        help: Minimum display value (all values below are clipped)
+      - long: disp.max
+        default: 'NULL'
+        type: integer
+        optional: true
+        help: Maximum display value (all values above are clipped); defaults to 2.5 if slot is
+          'scale.data', 6 otherwise
+      - long: slot
+        default: scale.data
+        options:
+          - scale.data: Scale data
+          - data: Data
+          - raw.data: Raw data
+        type: string
+        help: Data slot to use, choose from raw.data, data, or scale.data
+      - long: assay
+        default: 'NULL'
+        optional: true
+        type: string
+        help: Assay to pull from
+      - long: label
+        default: yes
+        type: boolean
+        help: Label the cell identies above the color bar
+      - long: size
+        default: 5
+        type: integer
+        optional: true
+        help: Size of text above color bar
+      - long: hjust
+        default: 0
+        type: integer
+        optional: true
+        help: Horizontal justification of text above color bar
+      - long: angle
+        default: 45
+        type: integer
+        optional: true
+        help: Angle of text above color bar
+      - long: raster
+        default: yes
+        type: boolean
+        help: If true, plot with geom_raster, else use geom_tile. geom_raster may look blurry
+          on some viewing applications such as Preview due to how the raster is interpolated.
+          Set this to FALSE if you are encountering that issue (note that plots may take
+          longer to produce/render).
+      - long: draw.lines
+        default: yes
+        type: boolean
+        help: Include white lines to separate the groups
+      - long: lines.width
+        default: 'NULL'
+        optional: true
+        type: integer
+        help: Integer number to adjust the width of the separating white lines. Corresponds
+          to the number of cells between each group.
+      - long: group.bar.height
+        default: 0
+        type: integer
+        optional: true
+        help: Scale the height of the color bar
+      - long: combine
+        default: yes
+        type: boolean
+        help: Combine plots into a single patchwork or ed ggplot object.
+          If FALSE return a list of ggplot objects.
+      output:
+        - var_name: plot_object
     - call: RidgePlot
       dependencies:
         - Seurat

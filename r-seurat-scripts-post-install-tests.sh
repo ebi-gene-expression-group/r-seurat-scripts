@@ -126,6 +126,7 @@ export vln_plot_pdf_result="$output_dir/vln_plot_pdf_result.png"
 export ridge_plot_eps_result="$output_dir/ridge_plot_eps_result.png"
 export dot_plot_jpg_result="$output_dir/dot_plot_jpg_result.png"
 export dim_plot_svg_result="$output_dir/dim_plot_svg_result.png"
+export do_heatmap_jpg_result="$output_dir/heatmap_plot_jpj_result.jpg"
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.
 
