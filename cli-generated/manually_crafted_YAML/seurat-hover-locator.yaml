@@ -17,6 +17,8 @@ commands:
     - call: 'readRDS'
       dependencies:
         - ggplot2
+        - optparse
+        - workflowscriptscommon
       options:
         - long: plot-rds
           call_alias: file

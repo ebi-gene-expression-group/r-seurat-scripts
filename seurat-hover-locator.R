@@ -5,11 +5,13 @@
 #
 # to change this file edit the input YAML and re-run the above command
 
-suppressPackageStartupMessages(require(plotly))
-suppressPackageStartupMessages(require(data.table))
-suppressPackageStartupMessages(require(ggplot2))
 suppressPackageStartupMessages(require(Seurat))
+suppressPackageStartupMessages(require(workflowscriptscommon))
+suppressPackageStartupMessages(require(plotly))
+suppressPackageStartupMessages(require(ggplot2))
+suppressPackageStartupMessages(require(data.table))
 suppressPackageStartupMessages(require(htmlwidgets))
+suppressPackageStartupMessages(require(optparse))
 
 option_list <- list(
     make_option(
@@ -87,13 +89,13 @@ opt <- wsc_parse_args(option_list,
                       mandatory = c("plot_rds", "output_html"))
                 
 
-if (!file.exists(opt$plot_rds)) {
+if ( !file.exists(opt$plot_rds)) {
     stop((paste("File", opt$plot_rds, "does not exist")))
 }
 
 
 
-if (!file.exists(opt$information_table)) {
+if (!is.null(opt$information_table) && !file.exists(opt$information_table)) {
     stop((paste("File", opt$information_table, "does not exist")))
 }
 
