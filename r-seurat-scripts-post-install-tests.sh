@@ -127,6 +127,8 @@ export ridge_plot_eps_result="$output_dir/ridge_plot_eps_result.png"
 export dot_plot_jpg_result="$output_dir/dot_plot_jpg_result.png"
 export dim_plot_svg_result="$output_dir/dim_plot_svg_result.png"
 export do_heatmap_jpg_result="$output_dir/heatmap_plot_jpj_result.jpg"
+export feature_plot_rds_result="$output_dir/feature_plot_rds_result.rds"
+export HoverLocator_result="$output_dir/HoverLocator_result.html"
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.
 

@@ -373,10 +373,23 @@
 
   run rm -rf $feature_plot_png_result && \
     seurat-plot.R --plot-type FeaturePlot --plot-out $feature_plot_png_result \
-      --features "GPC5-AS1,MAFB,FAP,PPY" -i $umap_result_object
+      --features "GPC5-AS1,MAFB,FAP,PPY" -i $umap_result_object \
+      --output-rds-file $feature_plot_rds_result
 
   [ "$status" -eq 0 ]
   [ -f "$feature_plot_png_result" ]
+}
+
+@test "HoverLocator over feature plot" {
+  if [ "$use_existing_outputs" = 'true' ] && [ -f "$HoverLocator_result" ]; then
+    skip "$HoverLocator_result exists and use_existing_outputs is set to true"
+  fi
+
+  run rm -rf $HoverLocator_result && \
+    seurat-hover-locator.R --plot-rds $feature_plot_rds_result --output-html $HoverLocator_result
+
+  [ "$status" -eq 0 ]
+  [ -f "$HoverLocator_result" ]
 }
 
 @test "Plot violin plot pdf" {
