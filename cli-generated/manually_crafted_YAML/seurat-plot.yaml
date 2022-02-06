@@ -189,6 +189,7 @@ commands:
       - long: cells
         default: 'NULL'
         type: list
+        optional: true
         help: A vector of cells to plot, comma separated
       - long: group.by
         default: ident
