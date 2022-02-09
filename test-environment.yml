@@ -14,3 +14,4 @@ dependencies:
   - r-remotes
   - bioconductor-multtest
   - r-metap
+  - pandoc
