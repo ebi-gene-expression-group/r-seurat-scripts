@@ -34,6 +34,7 @@ jobs:
         with:
           activate-environment: test
           environment-file: test-environment.yml
+          mamba-version: "*"
           python-version: 3.6
           channels: conda-forge,bioconda,defaults
           allow-softlinks: true
