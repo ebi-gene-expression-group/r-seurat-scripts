@@ -83,4 +83,3 @@ for(output in output.list) {
                      output_path = paste(file.path(opt$output_path, paste("sep_by", opt$split_by, output[[opt$split_by]][[1]][1], sep="_")), ext[opt$output_format], sep="."),
                      format = opt$output_format)
 }
-

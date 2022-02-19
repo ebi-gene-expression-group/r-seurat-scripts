@@ -238,9 +238,9 @@ option_list <- list(
     )
 )
 
-opt <- wsc_parse_args(option_list, 
+opt <- wsc_parse_args(option_list,
                       mandatory = c("input_object_files", "output_object_file"))
-                
+
 
 if (!is.na(as.numeric(opt$anchor_features))) {
     # this case also covers variables that can accept a numeric entry, but if the number is passed as a string

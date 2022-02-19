@@ -136,7 +136,6 @@
 }
 
 # Find Neighbours
-
 @test "Run FindNeighbours" {
     if [ "$use_existing_outputs" = 'true' ] && [ -f "$neighbours_seurat_object" ]; then
         skip "$neighbours_seurat_object exists and use_existing_outputs is set to 'true'"
@@ -151,7 +150,6 @@
 }
 
 # Generate clusters
-
 @test "Generate cell clusters from expression values" {
     if [ "$use_existing_outputs" = 'true' ] && [ -f "$cluster_text_file" ]; then
         skip "$pca_image_file exists and use_existing_outputs is set to 'true'"

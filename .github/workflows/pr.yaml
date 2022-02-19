@@ -34,10 +34,10 @@ jobs:
         with:
           activate-environment: test
           environment-file: test-environment.yml
-          use-mamba: true
-          miniforge-version: latest
           mamba-version: "*"
           miniforge-variant: Mambaforge
+          use-mamba: true
+          miniforge-version: latest
           python-version: 3.6
           channels: conda-forge,bioconda,defaults
           allow-softlinks: true
