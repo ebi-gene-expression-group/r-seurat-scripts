@@ -23,14 +23,14 @@ option_list = list(
     action = "store",
     default = "seurat",
     type = 'character',
-    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
+    help = "Either 'loom', 'seurat', 'anndata' or 'singlecellexperiment' for the input format to read."
   ),
   make_option(
     c("--output-format"),
     action = "store",
     default = "seurat",
     type = 'character',
-    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
+    help = "Either 'loom', 'seurat' or 'singlecellexperiment' for the output format."
   ),
   make_option(
     c("-o", "--output-object-file"),
