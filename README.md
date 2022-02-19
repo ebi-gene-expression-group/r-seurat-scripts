@@ -1,4 +1,4 @@
-# seurat-scripts 0.0.8 for Seurat 3.1.1 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/seurat-scripts/README.html)
+# seurat-scripts 0.3.0 for Seurat 3.2.3 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/seurat-scripts/README.html)
 
 In order to wrap Seurat's internal workflow in any given workflow language, it's important to have scripts to call each of those steps, which is what this package provides.
 
@@ -6,7 +6,7 @@ This version of seurat-scripts uses native conversions to Loom (thoroughly teste
 
 ## Install
 
-The recommended method for script installation is via a Bioconda recipe called seurat-scripts. 
+The recommended method for script installation is via a Bioconda recipe called seurat-scripts.
 
 With the [Bioconda channels](https://bioconda.github.io/#set-up-channels) configured the latest release version of the package can be installed via the regular conda install command:
 
@@ -22,13 +22,13 @@ There is a test script included:
 r-seurat-scripts-post-install-tests.sh
 ```
 
-This downloads [a well-known test 10X dataset]('https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz) and executes all of the scripts described below.
+This downloads a number of datasets and executes all of the scripts described below and more.
 
 ## Commands
 
 Currently wrapped Seurat functions are described below. Each script has usage instructions available via --help, consult function documentation in Seurat for further details.
 
-These instructions might be currently outdated for Seurat 3.1.1, the best source of information is `--help` on each command.
+These instructions might be currently outdated for Seurat 3.2.3, the best source of information is `--help` on each command.
 
 ###  Read10X(): read 10X data and create Seurat object from the matrix
 
@@ -40,7 +40,7 @@ seurat-read-10x.R -d <10x data directory> -o <output matrix object in .rds forma
 
 ```
 seurat-filter-cells.R -i <raw Seurat object in .rds format> -s nGene,nUMI -l <min_genes>,<min_umi> -o <output Seurat object in .rds format>
-``` 
+```
 
 ### NormalizeData(): normalise the expression values
 
@@ -92,11 +92,31 @@ seurat-find-clusters.r -i <<Seurat object with computed dimension reductions, .r
 
 ## Accessory scripts
 
-### Get a random set of genes 
+### Get a random set of genes
 
 ```
 seurat-get-random-genes.R <Seurat object in .rds format> <output text file> <ngenes>
 ```
+
+### Convert formats
+
+Multiple format conversion through Seurat 3:
+- Possible input formats:
+  - Seurat
+  - AnnData (versions contemporary to Seurat 3).
+  - Loom (versions contemporary to Seurat 3)
+  - SingleCellExperiment
+- Possible output formats:
+  - Seurat
+  - Loom
+  - SingleCellExperiment
+
+
+```
+seurat-convert.R -i inputfile.rds --input-format seurat -o output.loom --output-format loom
+```
+
+This functionality should be used with care, as some elements of the objects can be lost in some conversions. When converting to and from Loom, be careful about table headers that might have offending characters for R tables.
 
 ### Export to CellBrowser
 
