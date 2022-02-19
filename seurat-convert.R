@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript 
+#!/usr/bin/env Rscript
 
 # Load optparse we need to check inputs
 
@@ -23,28 +23,14 @@ option_list = list(
     action = "store",
     default = "seurat",
     type = 'character',
-    help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
+    help = "Either 'loom', 'seurat', 'anndata' or 'singlecellexperiment' for the input format to read."
   ),
   make_option(
     c("--output-format"),
     action = "store",
     default = "seurat",
     type = 'character',
-    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
-  ),
-  make_option(
-    c("-n", "--normalization-method"),
-    action = "store",
-    default = 'LogNormalize',
-    type = 'character',
-    help = "Method for normalization. Default is log-normalization (LogNormalize). Can be 'CLR' or 'RC' additionally."
-  ),
-  make_option(
-    c("-s", "--scale-factor"),
-    action = "store",
-    default = 10000,
-    type = 'integer',
-    help = "Sets the scale factor for cell-level normalization."
+    help = "Either 'loom', 'seurat' or 'singlecellexperiment' for the output format."
   ),
   make_option(
     c("-o", "--output-object-file"),
@@ -52,20 +38,6 @@ option_list = list(
     default = NA,
     type = 'character',
     help = "File name in which to store serialized R object of type 'Seurat'.'"
-  ),
-  make_option(
-    c("--margin"),
-    action = "store",
-    default = 1,
-    type = 'integer',
-    help = "If performing CLR normalization, normalize across features (1) or cells (2)."
-  ),
-  make_option(
-    c("--block-size"),
-    action = "store",
-    default = NULL,
-    type = 'integer',
-    help = "How many cells should be run in each chunk, will try to split evenly across threads"
   )
 )
 
@@ -87,16 +59,9 @@ if(opt$input_format == "loom" | opt$output_format == "loom") {
 }
 
 # Input from serialized R object
-
 seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
-normalised_seurat_object <- NormalizeData(seurat_object, 
-                                          normalization.method = opt$normalization_method, 
-                                          scale.factor = opt$scale_factor, 
-                                          margin = opt$margin, 
-                                          block.size = opt$block_size,
-                                          verbose = FALSE)
 
 # Output to a serialized R object
-write_seurat3_object(seurat_object = normalised_seurat_object, 
-                     output_path = opt$output_object_file, 
+write_seurat3_object(seurat_object = seurat_object,
+                     output_path = opt$output_object_file,
                      format = opt$output_format)

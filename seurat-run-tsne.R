@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript 
+#!/usr/bin/env Rscript
 
 # Load optparse we need to check inputs
 
@@ -51,7 +51,7 @@ option_list = list(
     action = "store",
     default = 30,
     type = 'integer',
-    help = 'Perplexity value for tSNE, if none is set, the default from seurat, 30, is used.'
+    help = 'Perplexity value for tSNE, if none is set, the default from seurat (30) is used.'
   ),
   make_option(
     c("-c", "--cells-use"),
@@ -176,17 +176,17 @@ if(opt$input_format == "loom" | opt$output_format == "loom") {
 
 seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
 
-tsne_seurat_object <- RunTSNE( seurat_object, 
-                               reduction = opt$reduction_use, 
+tsne_seurat_object <- RunTSNE( seurat_object,
+                               reduction = opt$reduction_use,
                                tsne.method = opt$tsne_method,
                                dim.embed = opt$dim_embed,
-                               cells = cells_use, 
-                               dims = dims_use, 
-                               seed.use = opt$random_seed, 
+                               cells = cells_use,
+                               dims = dims_use,
+                               seed.use = opt$random_seed,
                                add.iter = opt$add_iter,
                                perplexity = opt$perplexity,
-                               reduction.key = opt$reduction_key, 
-                               reduction.name = opt$reduction_name, 
+                               reduction.key = opt$reduction_key,
+                               reduction.name = opt$reduction_name,
                                features = genes_use
                               )
 
@@ -197,4 +197,3 @@ write.csv(tsne_seurat_object[['tsne']]@cell.embeddings, file = opt$output_embedd
 # Output to a serialized R object
 
 saveRDS(tsne_seurat_object, file = opt$output_object_file)
-

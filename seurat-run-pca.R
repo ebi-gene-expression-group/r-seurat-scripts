@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript 
+#!/usr/bin/env Rscript
 
 # Load optparse we need to check inputs
 
@@ -89,12 +89,12 @@ option_list = list(
     help = "File name in which to store PC stdev values (one per line)."
   ),
   make_option(
-    c("--weight-by-var"),
-    action = "store_true",
-    default = FALSE,
-    metavar = "Weight by variance of each PC",
+    c("--no-weight-by-var"),
+    action = "store_false",
+    default = TRUE,
+    metavar = "Do not weight by variance of each PC",
     type = 'logical',
-    help = "Weight the cell embeddings by the variance of each PC (weights the gene loadings if rev.pca is TRUE)"
+    help = "Do not weight the cell embeddings by the variance of each PC (weights the gene loadings if rev.pca is TRUE)"
   ),
   make_option(
     c("--ndims-print"),
@@ -174,16 +174,16 @@ features<-pc_genes
 if(opt$reverse_pca) {
   features<-pc_cells
 }
-pca_seurat_object <- RunPCA(seurat_object, 
-                            features = features, 
-                            npcs = opt$pcs_compute, 
-                            rev.pca = opt$reverse_pca, 
-                            weight.by.var = opt$weight_by_var, 
-                            ndims.print = opt$ndims_print, 
-                            nfeatures.print = opt$nfeatures_print, 
-                            reduction.key = opt$reduction_key, 
-                            reduction.name = opt$reduction_name, 
-                            verbose=FALSE)
+pca_seurat_object <- RunPCA(seurat_object,
+                            features = features,
+                            npcs = opt$pcs_compute,
+                            rev.pca = opt$reverse_pca,
+                            weight.by.var = opt$no_weight_by_var,
+                            ndims.print = opt$ndims_print,
+                            nfeatures.print = opt$nfeatures_print,
+                            reduction.key = opt$reduction_key,
+                            reduction.name = opt$reduction_name,
+                            verbose = FALSE)
 
 # Output to text-format components
 # Review question: Do we need to revert this for the reverse PCA case?
@@ -192,7 +192,6 @@ write.csv(pca_seurat_object[['pca']]@feature.loadings, file = opt$output_loading
 writeLines(con=opt$output_stdev_file, as.character(pca_seurat_object[['pca']]@stdev))
 
 # Output to a serialized R object
-write_seurat3_object(seurat_object = pca_seurat_object, 
-                     output_path = opt$output_object_file, 
+write_seurat3_object(seurat_object = pca_seurat_object,
+                     output_path = opt$output_object_file,
                      format = opt$output_format)
-
