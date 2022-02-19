@@ -29,8 +29,12 @@ if [ "$use_existing_outputs" != 'true' ] && [ "$use_existing_outputs" != 'false'
 fi
 
 test_data_url='https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz'
+test_data_transfer_url='https://www.dropbox.com/s/1zxbn92y5du9pu0/pancreas_v3_files.tar.gz?dl=1'
 test_working_dir=`pwd`/'post_install_tests'
+test_anndata_url="https://www.dropbox.com/s/ngs3p8n2i8y33hj/pbmc3k.h5ad?dl=0"
+export test_data_transfer_file=$test_working_dir/pancreas_v3_files.tar.gz
 export test_data_archive=$test_working_dir/`basename $test_data_url`
+export test_anndata_file=$test_working_dir/$(basename $test_anndata_url | sed 's/?dl=0//')
 
 # Clean up if specified
 
@@ -41,7 +45,7 @@ if [ "$action" = 'clean' ]; then
 elif [ "$action" != 'test' ]; then
     echo "Invalid action '$action' supplied"
     exit 1
-fi 
+fi
 
 # Initialise directories
 
@@ -53,14 +57,18 @@ mkdir -p $output_dir
 mkdir -p $data_dir
 
 ################################################################################
-# Fetch test data 
+# Fetch test data
 ################################################################################
 
 if [ ! -e "$test_data_archive" ]; then
     wget $test_data_url -P $test_working_dir
-    
+    wget $test_data_transfer_url -O $test_data_transfer_file
 fi
-    
+
+if [ ! -e "$test_anndata_file" ]; then
+    wget $test_anndata_url -O $test_anndata_file
+fi
+
 ################################################################################
 # List tool outputs/ inputs
 ################################################################################
@@ -69,6 +77,8 @@ export raw_matrix="$data_dir/matrix.mtx"
 export raw_matrix_object="$output_dir/raw_matrix.rds"
 export raw_seurat_object="$output_dir/raw_seurat.rds"
 export raw_seurat_object_from_tab="$output_dir/raw_seurat_from_tab.rds"
+export transfer_metadata_object="$data_dir/pancreas_metadata.rds"
+export transfer_expression_object="$data_dir/pancreas_expression_matrix.rds"
 export filtered_seurat_object="$output_dir/filtered_seurat.rds"
 export normalised_seurat_object="$output_dir/normalised_seurat.rds"
 export variable_genes_seurat_object="$output_dir/variable_genes_seurat.rds"
@@ -84,11 +94,15 @@ export neighbours_seurat_object="$output_dir/neighbours_seurat.rds"
 export cluster_seurat_object="$output_dir/cluster_seurat.rds"
 export cluster_text_file="$output_dir/clusters.txt"
 export tsne_seurat_object="$output_dir/tsne_seurat.rds"
-export tsne_seurat_object_perplexity="$output_dir/tsne_seurat_perplexity.rds"
 export tsne_embeddings_file="$output_dir/tsne_embeddings.csv"
 export html_output_dir="$output_dir/html_out"
 export marker_text_file="$output_dir/markers.csv"
 export anchor_object="$output_dir/anchor_object.rds"
+export singlecellexperiment_converted_cluster_object="$output_dir/singlecellexperiment_converted_cluster_object.rds"
+export loom_converted_cluster_object="$output_dir/loom_converted_cluster_object.loom"
+export seurat_from_loom_cluster_object="$output_dir/seurat_from_loom_cluster_object.rds"
+export anndata_cluster_object=$test_anndata_file
+export seurat_from_anndata_cluster_object="${anndata_cluster_object}.rds"
 
 
 ## Test parameters- would form config file in real workflow. DO NOT use these
@@ -131,16 +145,12 @@ export pca_dim_one=1
 export pca_dim_two=2
 export pt_size=1
 export label_size=4
+export weight_by_var="TRUE"
 export do_label='FALSE'
 export group_by='ident'
-export pca_plot_title='Test PCA plot'
 export pca_png_width=1000
 export pca_png_height=1000
-export pca_do_bare='TRUE'
 export pca_cols_use='red,blue,green,yellow,orange,pink,purple,black'
-export pca_coord_fixed='TRUE'
-export pca_no_axes='TRUE'
-export pca_dark_theme='TRUE'
 export pca_plot_order='7,6,5,4,3,2,1,0'
 
 # Find clusters
@@ -150,6 +160,9 @@ export k_param=30
 export resolution=0.8
 export cluster_algorithm=1
 export cluster_tmp_file_location='/tmp'
+
+# Find neighbours 
+export compute_snn=TRUE
 
 # t-SNE
 export tsne_do_fast='TRUE'

@@ -42,14 +42,14 @@ option_list = list(
   make_option(
     c("-m", "--mean-function"),
     action = "store",
-    default = 'ExpMean',
+    default = 'FastExpMean',
     type = 'character',
     help = "Function to compute x-axis value (average expression). Default is to take the mean of the detected (i.e. non-zero) values."
   ),
   make_option(
     c("-d", "--dispersion-function"),
     action = "store",
-    default = 'LogVMR',
+    default = 'FastLogVMR',
     type = 'character',
     help = "Function to compute y-axis value (dispersion). Default is to take the standard deviation of all values."
   ),
@@ -161,8 +161,8 @@ seurat_object@assays$RNA@meta.features<-data.frame(row.names = rownames(seurat_o
 variable_genes_seurat_object <- FindVariableFeatures(seurat_object, 
                                                   selection.method = opt$selection_method,
                                                   nfeatures = opt$nfeatures,
-                                                  mean.function = get(opt$mean_function), 
-                                                  dispersion.function = get(opt$dispersion_function), 
+                                                  mean.function = opt$mean_function, 
+                                                  dispersion.function = opt$dispersion_function, 
                                                   mean.cutoff = c(opt$x_low_cutoff, opt$x_high_cutoff),
                                                   dispersion.cutoff = c(opt$y_low_cutoff, opt$y_high_cutoff),
                                                   loess.span = opt$loess_span,
