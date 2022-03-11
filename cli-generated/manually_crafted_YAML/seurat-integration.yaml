@@ -1,0 +1,387 @@
+cli_call: 'seurat-integration.R'
+galaxy_tool:
+  id: seurat_integration
+  name: Seurat integration
+  description: merges datasets based on internal anchors or reference based
+  profile: 18.01
+  version: "@SEURAT_VERSION@"
+  macros:
+    - seurat_macros.xml
+  macro_expands_header:
+    - requirements
+    - version
+  macro_expands_footer:
+    - citations
+commands:
+  - call: Preprocess
+    rcode: |
+      # Check parameter values
+      inputs<-strsplit(opt$input_object_files,split = ",")[[1]]
+      if ( length(inputs) <= 1 ) {
+        stop("At least 2 input objects need to be given for integration running.")
+      }
+      for ( input in inputs ) {
+        if ( ! file.exists(input)){
+          stop((paste('Input file', input, 'does not exist.')))
+        }
+      }
+
+      references<-NULL
+      if (!is.null(opt$reference_objects)) {
+        reference_paths<-strsplit(opt$reference_objects, split = ",")
+        for (ref in reference_paths) {
+          if ( ! file.exists(ref)) {
+            stop((paste('Reference file', ref, 'does not exist.')))
+          }
+        }
+        references<-reference_paths
+      }
+
+
+      weight_reduction<-NULL
+      if (! is.null(opt$weight_reduction)) {
+        if ( grepl(pattern=',', x=opt$weight_reduction ) ) {
+          weight_reduction<-strsplit(opt$weight_reduction, split=",")
+          if (length(weight_reduction) != length(inputs) ) {
+            stop(cat("--weight-reduction and --input-object-files need to be of the same lenght, currently", length(weight_reduction),"and", length(inputs)))
+          }
+        } else {
+          weight_reduction<-opt$weight_reduction
+        }
+      }
+
+      expand_sequence <- function(dims_processed, dim_entry) {
+        dims_processed[!dims_processed %in% c(dim_entry)]->dims_processed
+        from<-unlist(strsplit(dim_entry, split=":"))[1]
+        to<-unlist(strsplit(dim_entry, split=":"))[2]
+        dims_processed<-append(dims_processed, seq(from=from, to=to, by=1))
+      }
+
+      dims_processed<-NULL
+      # handle dims listed as "1,2,3" or "1:3" or a combination of both.
+      if ( !is.null(opt$dims) ) {
+        if ( grepl(pattern = ",", x=opt$dims)) {
+          dims_processed<-unlist(strsplit(opt$dims, split = ","))
+          for(dim_entry in dims_processed) {
+            if ( grepl(pattern = ":", x=dim_entry)) {
+              dims_processed<-expand_sequence(dims_processed, dim_entry)
+            }
+          }
+          dims_processed<-as.numeric(dims_processed)
+        } else if ( grepl(pattern = ":", x=opt$dims) ) {
+          dims_processed<-expand_sequence(c(), opt$dims)
+        } else {
+          dims_processed<-opt$dims
+        }
+        opt$dims<-dims_processed
+      }
+
+      dims_processed<-NULL
+      if( ! is.null(opt$integrate_dims) ){
+        if ( grepl(pattern = ",", x=opt$integrate_dims)) {
+          dims_processed<-unlist(strsplit(opt$integrate_dims, split = ","))
+          for(dim_entry in dims_processed) {
+            if ( grepl(pattern = ":", x=dim_entry)) {
+              dims_processed<-expand_sequence(dims_processed, dim_entry)
+            }
+          }
+          dims_processed<-as.numeric(dims_processed)
+        } else if ( grepl(pattern = ":", x=opt$integrate_dims) ) {
+          dims_processed<-expand_sequence(c(), opt$integrate_dims)
+        } else {
+          dims_processed<-opt$dims
+        }
+        opt$integrate_dims<-dims_processed
+      }
+
+      if (! is.null(opt$genes_use)){
+        if (! file.exists(opt$genes_use)){
+          stop((paste('Supplied genes file', opt$genes_use, 'does not exist')))
+        }else{
+          genes_use <- readLines(opt$genes_use)
+        }
+      }else{
+        genes_use <- NULL
+      }
+
+      if ( !is.null(opt$anchor_features) && is.character(opt$anchor_features)) {
+        # this could be a number as well.
+        opt$anchor_features <- strsplit(opt$anchor_features, split = ",")
+      }
+      if(! is.null(opt$features_to_integrate)) {
+        opt$features_to_integrate <- strsplit(opt$features_to_integrate, split = ",")
+      }
+
+      options(future.globals.maxSize = 8000 * 1024^2)
+  - call: 'load_seurat4_packages_for_format'
+    dependencies:
+      - workflowscriptscommon
+      - optparse
+    options:
+      - long: formats
+        type: internal
+        # var_name: option_list
+        value: 'c(opt$input_format, opt$reference_format)'
+  - call: 'read_multiple_seurat4_objects'
+    options:
+      - long: input-object-files
+        short: i
+        type: string
+        human_readable: 'Input files'
+        call_alias: input_path_list
+        multiple: True
+        help: "A list of Seurat objects between which to find anchors for
+          downstream integration. Input files in either RDS-Seurat, Loom or SCE, comma separated."
+      - long: input-format
+        type: string
+        call_alias: format
+        human_readable: 'Input format'
+        options:
+          - loom: Loom
+          - seurat: Seurat
+          - singlecellexperiment: Single Cell Experiment
+          - h5seurat: H5 Seurat
+          - anndata: AnnData
+        default: 'seurat'
+        help: 'Either loom, seurat, anndata or singlecellexperiment for the input format to read.'
+    output:
+      - var_name: seurat_objects
+  - call: 'read_multiple_seurat4_objects'
+    options:
+      - long: reference-object-files
+        type: string
+        multiple: True
+        human_readable: 'Input files for reference objects'
+        call_alias: input_path_list
+        default: NULL
+        optional: True
+        help: "A vector specifying the object/s to be used as a reference during integration.
+          If NULL (default), all pairwise anchors are found (no reference/s). If not NULL,
+          the corresponding objects in this list will be used as references.
+          When using a set of specified references, anchors are first found between each
+          query and each reference. The references are then integrated through pairwise
+          integration. Each query is then mapped to the integrated reference."
+      - long: reference-format
+        type: string
+        call_alias: format
+        human_readable: 'Reference input format'
+        options:
+          - loom: Loom
+          - seurat: Seurat
+          - singlecellexperiment: Single Cell Experiment
+          - h5seurat: H5 Seurat
+          - anndata: AnnData
+        default: 'seurat'
+        help: 'Either loom, seurat, anndata or singlecellexperiment for the input format to read.'
+    output:
+      - var_name: reference_objects
+  - call: FindIntegrationAnchors
+    dependencies:
+      - Seurat
+    options:
+    - long: object.list
+      type: internal
+      var_name: seurat_objects
+    - long: assay-list
+      default: 'NULL'
+      type: string
+      call_alias: assay
+      optional: True
+      help: A vector of assay names specifying which assay to use when constructing anchors.
+        If NULL, the current default assay for each object is used.
+    - long: reference
+      type: internal
+      var_name: reference_objects
+    - long: anchor-features
+      default: 2000
+      type: string_or_file
+      call_alias: anchor.features
+      optional: True
+      help: "A numeric value (this will call 'SelectIntegrationFeatures' to select the provided
+        number of features to be used in anchor finding) or a file with a
+        vector of features to be used as input to the anchor finding process (comma separated)"
+    - long: scale
+      short: s
+      default: True
+      type: boolean
+      help: Whether or not to scale the features provided. Only call if you have
+        previously scaled the features you want to use for each object in the object.list
+      call_alias: scale
+    - long: normalization.method
+      default: LogNormalize
+      short: n
+      type: string
+      optional: True
+      options:
+        - LogNormalize
+        - SCT
+      help: 'Name of normalization method used: LogNormalize or SCT'
+    - long: sct.clip.range
+      default: 'NULL'
+      type: string
+      optional: True
+      help: Numeric of length two specifying the min and max values the Pearson residual
+        will be clipped to
+    - long: reduction
+      default: cca
+      type: string
+      optional: True
+      options:
+        - cca: Canonical correlation analysis
+        - rpca: Reciprocal PCA
+      help: 'Dimensional reduction to perform when finding anchors. Can be cca (Canonical correlation analysis) or
+        rpca (Reciprocal PCA)'
+    - long: l2.norm
+      default: yes
+      type: boolean
+      help: Perform L2 normalization on the CCA cell embeddings after dimensional reduction
+    - long: dims
+      short: d
+      default: '1:30'
+      type: string
+      optional: True
+      help: Which dimensions to use from the CCA to specify the neighbor search space
+    - long: k.anchor
+      default: 5
+      type: integer
+      optional: True
+      help: How many neighbors (k) to use when picking anchors
+    - long: k.filter
+      default: 200
+      type: integer
+      optional: True
+      help: How many neighbors (k) to use when filtering anchors
+    - long: k.score
+      default: 30
+      type: integer
+      optional: True
+      help: How many neighbors (k) to use when scoring anchors
+    - long: max.features
+      default: 200
+      type: integer
+      optional: True
+      help: The maximum number of features to use when specifying the neighborhood search
+        space in the anchor filtering
+    - long: nn.method
+      default: annoy
+      type: string
+      optional: True
+      options:
+        - rann
+        - annoy
+      help: 'Method for nearest neighbor finding. Options include: rann, annoy'
+    - long: n.trees
+      default: 50
+      type: integer
+      optional: True
+      help: More trees gives higher precision when using annoy approximate nearest neighbor
+        search
+    - long: eps
+      default: 0
+      type: integer
+      optional: True
+      help: Error bound on the neighbor finding algorithm (from RANN)
+    - long: verbose
+      default: no
+      type: boolean
+      help: Print progress bars and output
+    output:
+      - var_name: anchors
+  - call: IntegrateData
+    dependencies:
+      - Seurat
+    options:
+    - long: anchorset
+      type: internal
+      var_name: anchors
+    - long: new.assay.name
+      default: integrated
+      optional: True
+      type: string
+      help: Name for the new assay containing the integrated data
+    - long: normalization.method
+      type: internal
+      var_name: opt$normalization_method
+    - long: integrate-features-pca
+      default: 'NULL'
+      optional: True
+      type: string
+      help: Vector of features to use when computing the PCA to determine the weights.
+        Only set if you want a different set from those used in the anchor finding process
+      call_alias: features
+    - long: features.to.integrate
+      default: 'NULL'
+      optional: True
+      type: string
+      help: Vector of features to integrate. By default, will use the features used in
+        anchor finding.
+    - long: integrate-dims
+      default: '1:30'
+      optional: True
+      type: string
+      help: Number of dimensions to use in the anchor weighting procedure
+      call_alias: dims
+    - long: k.weight
+      default: 100
+      optional: True
+      type: integer
+      help: Number of neighbors to consider when weighting anchors
+    - long: weight.reduction
+      default: 'NULL'
+      optional: True
+      type: string
+      help: 'Dimension reduction to use when calculating anchor weights. This can be one
+        of: A string, specifying the name of a dimension
+        reduction present in all objects to be integrated;
+        A vector of strings, specifying the name of a dimension reduction to
+        use for each object to be integrated; A vector
+        of DimReduc objects, specifying the object to use
+        for each object in the integration; NULL, in which
+        case a new PCA will be calculated and used to calculate anchor weights.
+        Note that, if specified, the requested dimension reduction will only be
+        used for calculating anchor weights in the first merge between reference and query,
+        as the merged object will subsequently contain more cells than was in query, and
+        weights will need to be calculated for all cells in the object.'
+    - long: sd.weight
+      default: 1
+      type: integer
+      optional: True
+      help: Controls the bandwidth of the Gaussian kernel for weighting
+    - long: sample.tree
+      default: 'NULL'
+      optional: True
+      type: string
+      help: Specify the order of integration. If NULL, will compute automatically.
+    - long: preserve.order
+      default: no
+      type: boolean
+      help: Do not reorder objects based on size for each pairwise integration.
+    - long: integrate-eps
+      default: 0
+      optional: True
+      type: integer
+      call_alias: eps
+      help: Error bound on the neighbor finding algorithm (from 'RANN')
+    - long: verbose
+      type: internal
+      var_name: opt$verbose
+    output:
+      - var_name: integrated
+  - call: 'write_seurat4_object'
+    dependencies:
+      - workflowscriptscommon
+    parsing_opts:
+      - r_sep: "_"
+    options:
+      - long: seurat_object
+        type: internal
+        var_name: integrated
+      - long: output-object-file
+        short: o
+        type: file_out
+        call_alias: output_path
+      - long: output-format
+        call_alias: format
+        type: string
+        default: seurat
+        help: Output format

@@ -1,0 +1,188 @@
+cli_call: 'seurat-find-conserved-markers.R'
+galaxy_tool:
+  id: seurat_find_conserved_markers
+  name: Seurat find conserved markers
+  description: between groups
+  profile: 18.01
+  version: "@SEURAT_VERSION@"
+  macros:
+    - seurat_macros.xml
+  macro_expands_header:
+    - requirements
+    - version
+  macro_expands_footer:
+    - citations
+commands:
+  - call: 'load_seurat4_packages_for_format'
+    dependencies:
+      - workflowscriptscommon
+      - optparse
+    options:
+      - long: formats
+        type: internal
+        # var_name: option_list
+        value: 'c(opt$query_format, opt$anchors_format, opt$reference_format)'
+  - call: 'read_seurat4_object'
+    dependencies:
+      - scater
+      - SeuratDisk
+    options:
+      - long: input-object-file
+        short: i
+        type: file_in
+        call_alias: input_path
+        human_readable: 'Input file'
+        help: "Query file with Seurat object in either RDS-Seurat, Loom or SCE"
+      - long: input-format
+        type: string
+        call_alias: format
+        human_readable: 'Input format'
+        default: 'seurat'
+        help: 'Either loom, seurat, anndata or singlecellexperiment for the input format to read.'
+    output:
+      - var_name: seurat_object
+  - call: Preprocess
+    rcode: |
+      # transform method name into actual R function. This should probably be sanitised in Galaxy
+      opt$meta_method <- eval(parse(text=opt$meta_method))
+  - call: FindConservedMarkers
+    dependencies:
+      - Seurat
+    options:
+    - long: object
+      type: internal
+      var_name: seurat_object
+    - long: ident.1
+      default: ''
+      type: string
+      help: Identity class to define markers for
+    - long: ident.2
+      default: 'NULL'
+      type: string
+      optional: True
+      help: A second identity class for comparison. If NULL (default) - use all other
+        cells for comparison.
+    - long: grouping.var
+      default: ''
+      type: string
+      help: grouping variable
+    - long: assay
+      default: RNA
+      type: string
+      help: of assay to fetch data for (default is RNA)
+    - long: slot
+      default: data
+      type: string
+      help: Slot to pull data from; note that if test.use is negbinom, poisson,
+        or DESeq2, slot  will be set to counts.
+    - long: meta.method
+      default: "metap::minimump"
+      type: string
+      help: 'method for combining p-values. Should be a function from the metap package
+        (NOTE: pass the function, not a string)'
+    - long: reduction
+      default: 'NULL'
+      type: string
+      help: Reduction to use in differential expression testing - will test for DE on
+        cell embeddings
+    - long: features
+      type: string
+      default: 'NULL'
+      help: Genes to test. Default is to use all genes
+    - long: logfc.threshold
+      default: 0
+      type: integer
+      help: Limit testing to genes which show, on average, at least X-fold difference
+        (log-scale) between the two groups of cells. Default is 0.25 Increasing logfc.threshold
+        speeds up the function, but can miss weaker signals.
+    - long: test.use
+      default: wilcox
+      type: string
+      help: "Identifies differentially expressed genes between two groups using (see options)"
+      options:
+        - wilcox: "Wilcoxon: Identifies differentially expressed genes between two groups of cells using a Wilcoxon Rank Sum test."
+        - bimod: "Likelihood-ratio test for single cell gene expression (McDavid et al., Bioinformatics, 2013)"
+        - roc: "ROC: Identifies markers of gene expression using ROC and AUC (per gene) analysis."
+        - t: "Student's t-test: Identify differentially expressed genes between two groups of cells using the Student's t-test."
+        - negbinom: "Negative binomial: Identifies differentially expressed genes between two groups of cells using a negative binomial GLM. Only for UMI-based datasets."
+        - poisson: "Poisson: Identifies differentially expressed genes between two groups of cells using a poisson generalized linear model. Only for UMI-based datasets."
+        - LR: "Logistic regression: Uses a LR framework to determine differentially expressed genes."
+        - MAST: "MAST: Identifies differentially expressed genes between two groups of cells using a hurdle model tailored to scRNA-seq data."
+        - DESeq2: "DESeq2: Identifies differentially expressed genes between two groups based on a model using DESeq2 which uses a negative binomial distribution (Love et al, Genome Biology, 2014)"
+    - long: min.pct
+      default: 0
+      type: integer
+      help: only test genes that are detected in a minimum fraction of min.pct cells in
+        either of the two populations. Meant to speed up the function by not testing genes
+        that are very infrequently expressed. Default is 0.1
+    - long: min.diff.pct
+      default: -Inf
+      type: double
+      help: only test genes that show a minimum difference in the fraction of detection
+        between the two groups. Set to -Inf by default
+    - long: verbose
+      default: yes
+      type: boolean
+      help: Print a progress bar once expression testing begins
+    - long: only.pos
+      default: no
+      type: boolean
+      help: Only return positive markers (FALSE by default)
+    - long: max.cells.per.ident
+      default: Inf
+      type: double
+      help: Down sample each identity class to a max number. Default is no downsampling.
+        Not activated by default (set to Inf)
+    - long: random.seed
+      default: 1
+      type: integer
+      help: Random seed for downsampling
+    - long: latent.vars
+      default: 'NULL'
+      type: string
+      help: Variables to test, used only when test.use is one of LR, negbinom,
+        poisson, or MAST.
+    - long: min.cells.feature
+      default: 3
+      type: integer
+      help: Minimum number of cells expressing the feature in at least one of the two
+        groups, currently only used for poisson and negative binomial tests
+    - long: min.cells.group
+      default: 3
+      type: integer
+      help: Minimum number of cells in one of the groups
+    - long: pseudocount.use
+      default: 1
+      type: integer
+      help: Pseudocount to add to averaged expression values when calculating logFC. 1
+        by default.
+    - long: mean.fxn
+      default: 'NULL'
+      type: string
+      help: Function to use for fold change or average difference calculation. If NULL,
+        the appropriate function will be chose according to the slot used
+    - long: fc.name
+      default: 'NULL'
+      type: string
+      help: Name of the fold change, average difference, or custom function column in
+        the output data.frame. If NULL, the fold change column will be named according
+        to the logarithm base (eg, avg_log2FC), or if using the scale.data slot avg_diff.
+    - long: base
+      default: 2
+      type: integer
+      help: The base with respect to which logarithms are computed.
+    output:
+      - var_name: conserved_markers
+  - call: write.table
+    options:
+    - long: x
+      type: internal
+      var_name: conserved_markers
+    - long: markers_output_file
+      type: file_out
+      call_alias: file
+      short: o
+      help: Output path for tab separated conserved marker genes file.
+    - long: sep
+      type: internal
+      value: "\"\\t\""

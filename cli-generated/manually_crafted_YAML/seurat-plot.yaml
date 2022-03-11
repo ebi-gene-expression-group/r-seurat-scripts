@@ -1,0 +1,776 @@
+cli_call: 'seurat-plot.R'
+galaxy_tool:
+  id: seurat_plot
+  name: Plot
+  description: with Seurat
+  profile: 18.01
+  version: "@SEURAT_VERSION@"
+  macros:
+    - seurat_macros.xml
+  macro_expands_header:
+    - requirements
+    - version
+  macro_expands_footer:
+    - citations
+commands:
+  - call: 'load_seurat4_packages_for_format'
+    dependencies:
+      - workflowscriptscommon
+      - optparse
+    options:
+      - long: formats
+        type: internal
+        value: 'c(opt$query_format, opt$anchors_format, opt$reference_format)'
+  - call: 'read_seurat4_object'
+    dependencies:
+      - scater
+      - SeuratDisk
+    options:
+      - long: input-object-file
+        short: i
+        type: file_in
+        call_alias: input_path
+        human_readable: 'Input file'
+        help: "Query file with Seurat object in either RDS-Seurat, Loom or SCE"
+      - long: input-format
+        type: string
+        call_alias: format
+        human_readable: 'Input format'
+        default: 'seurat'
+        help: 'Either loom, seurat, anndata or singlecellexperiment for the input format to read.'
+    output:
+      - var_name: seurat_object
+  - call_carousel: Plot
+    long: plot-type
+    default: FeaturePlot
+    help: Either FeaturePlot, RidgePlot, DimPlot, VlnPlot or DotPlot.
+    selector:
+    - call: DimPlot
+      dependencies:
+        - Seurat
+        - ggplot2
+        - patchwork
+      options:
+      - long: object
+        type: internal
+        var_name: seurat_object
+      - long: dims
+        default: "1,2"
+        optional: true
+        type: list_numeric
+        help: Dimensions to plot, must be a two-length numeric vector specifying x- and
+          y-dimensions
+      - long: cells
+        default: 'NULL'
+        optional: true
+        type: list
+        help: Vector of cells to plot (default is all cells)
+      - long: cols
+        default: 'NULL'
+        optional: true
+        type: list
+        help: Vector of colors, each color corresponds to an identity class. This may also
+          be a single character or numeric value corresponding to a palette as specified
+          by brewer.pal.info. By default, ggplot2 assigns colors. We also
+          include a number of palettes from the pals package. See 'DiscretePalette' for
+          details.
+      - long: pt.size
+        default: 'NULL'
+        optional: true
+        type: integer
+        help: Adjust point size for plotting
+      - long: reduction
+        default: 'NULL'
+        optional: true
+        type: string
+        help: Which dimensionality reduction to use. If not specified, first searches for
+          umap, then tsne, then pca
+      - long: group.by
+        default: 'NULL'
+        optional: true
+        type: list
+        help: Name of one or more metadata columns to group (color) cells by (for example,
+          orig.ident); pass 'ident' to group by identity class
+      - long: split.by
+        default: 'NULL'
+        type: string
+        optional: true
+        help: Name of a metadata column to split plot by; see 'FetchData' for
+          more details
+      - long: shape.by
+        default: 'NULL'
+        optional: true
+        type: string
+        help: If NULL, all points are circles (default). You can specify any cell attribute
+          (that can be pulled with FetchData) allowing for both different colors and different
+          shapes on cells.  Only applicable if raster is FALSE.
+      - long: order
+        default: 'NULL'
+        type: list
+        optional: true
+        help: Specify the order of plotting for the idents. This can be useful for crowded
+          plots if points of interest are being buried. Provide either a full list of valid
+          idents or a subset to be plotted last (on top)
+      - long: shuffle
+        default: no
+        type: boolean
+        help: Whether to randomly shuffle the order of points. This can be useful for crowded
+          plots if points of interest are being buried. (default is FALSE)
+      - long: seed
+        default: 1
+        type: integer
+        help: Sets the seed if randomly shuffling the order of points.
+      - long: label
+        default: no
+        type: boolean
+        help: Whether to label the clusters
+      - long: label.size
+        default: 4
+        type: integer
+        help: Sets size of labels
+      - long: label.color
+        default: black
+        type: string
+        help: Sets the color of the label text
+      - long: label.box
+        default: no
+        type: boolean
+        help: Whether to put a box around the label text (geom_text vs geom_label)
+      - long: repel
+        default: no
+        type: boolean
+        help: Repel labels
+      - long: cells.highlight
+        default: 'NULL'
+        type: list
+        optional: true
+        help: A list of character or numeric vectors of cells to highlight. If only one
+          group of cells desired, can simply pass a vector instead of a list. If set, colors
+          selected cells to the color(s) in  'cols.highlight'  and other cells black
+          (white if dark.theme = TRUE); will also resize to the size(s) passed to 'sizes.highlight'.
+      - long: cols.highlight
+        default: '#DE2D26'
+        type: list
+        optional: true
+        help: A vector of colors to highlight the cells as; will repeat to the length groups
+          in cells.highlight. Comma separated.
+      - long: sizes.highlight
+        default: 1
+        type: integer
+        optional: true
+        help: Size of highlighted cells; will repeat to the length groups in cells.highlight
+      - long: na.value
+        default: grey50
+        type: string
+        optional: true
+        help: Color value for NA points when using custom scale
+      - long: ncol
+        default: 'NULL'
+        optional: true
+        type: integer
+        help: Number of columns for display when combining plots
+      output:
+        - var_name: plot_object
+    - call: DoHeatmap
+      dependencies:
+        - Seurat
+        - ggplot2
+        - patchwork
+      options:
+      - long: object
+        type: internal
+        var_name: seurat_object
+      - long: features
+        default: 'NULL'
+        type: list
+        optional: true
+        help: A vector of features to plot, defaults to VariableFeatures of the
+          object.
+      - long: cells
+        default: 'NULL'
+        type: list
+        optional: true
+        help: A vector of cells to plot, comma separated
+      - long: group.by
+        default: ident
+        optional: true
+        type: string
+        help: A vector of variables to group cells by; pass 'ident' to group by cell identity
+          classes
+      - long: group.bar
+        default: yes
+        type: boolean
+        help: Add a color bar showing group status for cells
+      - long: group.colors
+        default: 'NULL'
+        optional: true
+        type: list
+        help: Colors to use for the color bar, comma separated.
+      - long: disp.min
+        default: -2
+        type: integer
+        optional: true
+        help: Minimum display value (all values below are clipped)
+      - long: disp.max
+        default: 'NULL'
+        type: integer
+        optional: true
+        help: Maximum display value (all values above are clipped); defaults to 2.5 if slot is
+          'scale.data', 6 otherwise
+      - long: slot
+        default: scale.data
+        options:
+          - scale.data: Scale data
+          - data: Data
+          - raw.data: Raw data
+        type: string
+        help: Data slot to use, choose from raw.data, data, or scale.data
+      - long: assay
+        default: 'NULL'
+        optional: true
+        type: string
+        help: Assay to pull from
+      - long: label
+        default: yes
+        type: boolean
+        help: Label the cell identies above the color bar
+      - long: size
+        default: 5
+        type: integer
+        optional: true
+        help: Size of text above color bar
+      - long: hjust
+        default: 0
+        type: integer
+        optional: true
+        help: Horizontal justification of text above color bar
+      - long: angle
+        default: 45
+        type: integer
+        optional: true
+        help: Angle of text above color bar
+      - long: raster
+        default: yes
+        type: boolean
+        help: If true, plot with geom_raster, else use geom_tile. geom_raster may look blurry
+          on some viewing applications such as Preview due to how the raster is interpolated.
+          Set this to FALSE if you are encountering that issue (note that plots may take
+          longer to produce/render).
+      - long: draw.lines
+        default: yes
+        type: boolean
+        help: Include white lines to separate the groups
+      - long: lines.width
+        default: 'NULL'
+        optional: true
+        type: integer
+        help: Integer number to adjust the width of the separating white lines. Corresponds
+          to the number of cells between each group.
+      - long: group.bar.height
+        default: 0
+        type: integer
+        optional: true
+        help: Scale the height of the color bar
+      - long: combine
+        default: yes
+        type: boolean
+        help: Combine plots into a single patchwork or ed ggplot object.
+          If FALSE return a list of ggplot objects.
+      output:
+        - var_name: plot_object
+    - call: RidgePlot
+      dependencies:
+        - Seurat
+        - ggplot2
+        - patchwork
+      options:
+      - long: object
+        type: internal
+        var_name: seurat_object
+      - long: features
+        default: ''
+        type: list
+        help: Features to plot (gene expression, metrics, PC scores, anything that can be
+          retreived by FetchData)
+      - long: cols-ridgeplot
+        call_alias: cols
+        default: 'NULL'
+        type: list
+        optional: true
+        help: Colors to use for plotting, comma separated
+      - long: idents
+        default: 'NULL'
+        optional: true
+        type: list
+        help: Which classes to include in the plot (default is all)
+      - long: sort
+        default: no
+        type: boolean
+        help: Sort identity classes (on the x-axis) by the average expression of the attribute
+          being potted, can also pass 'increasing' or 'decreasing' to change sort direction
+      - long: assay
+        default: 'NULL'
+        optional: true
+        type: string
+        help: Name of assay to use, defaults to the active assay
+      - long: group.by
+        default: 'NULL'
+        optional: true
+        type: list
+        help: Group (color) cells in different ways (for example, orig.ident)
+      - long: y.max
+        default: 'NULL'
+        optional: true
+        type: double
+        help: Maximum y axis value
+      - long: same.y.lims
+        default: no
+        type: boolean
+        help: Set all the y-axis limits to the same values
+      - long: log
+        default: no
+        type: boolean
+        help: plot the feature axis on log scale
+      - long: ncol
+        default: 'NULL'
+        optional: true
+        type: integer
+        help: Number of columns if multiple plots are displayed
+      - long: slot
+        default: data
+        optional: true
+        type: string
+        help: Use non-normalized counts data for plotting
+      - long: stack
+        default: no
+        type: boolean
+        help: Horizontally stack plots for each feature
+      - long: fill.by
+        default: feature
+        type: string
+        optional: true
+        help: Color violins/ridges based on either 'feature' or 'ident'
+      output:
+        - var_name: plot_object
+    - call: FeaturePlot
+      dependencies:
+        - Seurat
+        - ggplot2
+        - patchwork
+      options:
+      - long: object
+        type: internal
+        var_name: seurat_object
+      - long: features
+        type: list
+        help: "Vector of features to plot. Features can come from: an assay feature (e.g. a gene name - MS4A1), a
+          column name from meta.data (e.g. mitochondrial percentage - percent.mito),
+          a column name from a DimReduc object corresponding
+          to the cell embedding values (e.g. the PC 1 scores - PC_1)."
+      - long: dims
+        default: "1,2"
+        type: list_numeric
+        optional: true
+        help: Dimensions to plot, must be a two-length numeric vector specifying x- and
+          y-dimensions
+      - long: cells
+        default: 'NULL'
+        optional: true
+        type: list
+        help: Vector of cells to plot (default is all cells)
+      - long: cols-feature-plot
+        call_alias: cols
+        optional: true
+        default: "lightgrey,blue"
+        type: list
+        help: The two colors to form the gradient over. Provide as string vector with the
+          first color corresponding to low values, the second to high. Also accepts a Brewer
+          color scale or vector of colors.
+      - long: pt.size
+        default: 'NULL'
+        optional: true
+        type: integer
+        help: Adjust point size for plotting
+      - long: order
+        default: no
+        optional: true
+        type: boolean
+        help: Boolean determining whether to plot cells in order of expression. Can be useful
+          if cells expressing given feature are getting buried.
+      - long: min.cutoff
+        default: NA
+        optional: true
+        type: list
+        help: Vector of minimum cutoff values for
+          each feature, may specify quantile in the form of 'q##' where
+          '##' is the quantile (eg, 'q1', 'q10')
+      - long: max.cutoff
+        default: NA
+        optional: true
+        type: list
+        help: Vector of maximum cutoff values for
+          each feature, may specify quantile in the form of 'q##' where
+          '##' is the quantile (eg, 'q1', 'q10')
+      - long: reduction
+        default: 'NULL'
+        optional: true
+        type: string
+        help: Which dimensionality reduction to use. If not specified, first searches for
+          umap, then tsne, then pca
+      - long: split.by
+        default: 'NULL'
+        optional: true
+        type: string
+        help: A factor in object metadata to split the feature plot by, pass ident to
+          split by cell identity; similar to the old FeatureHeatmap.
+      - long: keep.scale
+        default: feature
+        type: string
+        options:
+          - feature: "By row/feature scaling: The plots
+              for each individual feature are scaled to the maximum
+              expression of the feature across the conditions provided
+              to 'split.by'."
+          - all: "Universal scaling: The plots for all features and
+              conditions are scaled to the maximum expression value for
+              the feature with the highest overall expression."
+          - NULL: "No scaling: Each individual plot is scaled to the
+              maximum expression value of the feature in the condition
+              provided to 'split.by'. Be aware setting NULL will result
+              in color scales that are not comparable between plots."
+        help: How to handle the color scale across multiple plots.
+      - long: shape.by
+        default: 'NULL'
+        optional: true
+        type: string
+        help: If NULL, all points are circles (default). You can specify any cell attribute
+          (that can be pulled with FetchData) allowing for both different colors and different
+          shapes on cells.  Only applicable if 'raster' is FALSE) .
+      - long: slot
+        default: data
+        optional: true
+        type: string
+        help: Which slot to pull expression data from?
+      - long: blend
+        default: no
+        type: boolean
+        optional: true
+        help: Scale and blend expression values to visualize coexpression of two features
+      - long: blend.threshold
+        default: 0
+        type: integer
+        optional: true
+        help: The color cutoff from weak signal to strong signal; ranges from 0 to 1.
+      - long: label
+        default: no
+        type: boolean
+        optional: true
+        help: Whether to label the clusters
+      - long: label.size
+        default: 4
+        type: integer
+        optional: true
+        help: Sets size of labels
+      - long: repel
+        default: no
+        type: boolean
+        optional: true
+        help: Repel labels
+      - long: ncol
+        default: 'NULL'
+        optional: true
+        type: integer
+        help: Number of columns to combine multiple feature plots to, ignored if split.by is
+          not NULL
+      - long: coord.fixed
+        default: no
+        optional: true
+        type: boolean
+        help: Plot cartesian coordinates with fixed aspect ratio
+      - long: by.col
+        default: yes
+        type: boolean
+        optional: true
+        help: If splitting by a factor, plot the splits per column with the features as
+          rows; ignored if blend = TRUE.
+      output:
+        - var_name: plot_object
+    - call: VlnPlot
+      dependencies:
+        - Seurat
+        - ggplot2
+        - patchwork
+      options:
+      - long: object
+        type: internal
+        var_name: seurat_object
+      - long: features
+        default: ''
+        type: list
+        help: Features to plot (gene expression, metrics, PC scores, anything that can be
+          retreived by FetchData)
+      - long: cols
+        default: 'NULL'
+        help: Colors to use for plotting, comma separated.
+        type: list
+        optional: true
+      - long: pt.size
+        default: 'NULL'
+        type: integer
+        optional: true
+        help: Point size for geom_violin
+      - long: idents
+        default: 'NULL'
+        type: string
+        optional: true
+        help: Which classes to include in the plot (default is all)
+      - long: sort
+        default: no
+        type: boolean
+        help: Sort identity classes (on the x-axis) by the average expression of the attribute
+          being potted, can also pass 'increasing' or 'decreasing' to change sort direction
+      - long: assay
+        default: 'NULL'
+        optional: true
+        type: string
+        help: Name of assay to use, defaults to the active assay
+      - long: group.by
+        default: 'NULL'
+        optional: true
+        type: list
+        help: Group (color) cells in different ways (for example, orig.ident)
+      - long: split.by
+        default: 'NULL'
+        optional: true
+        type: string
+        help: A variable to split the violin plots by,
+      - long: adjust
+        default: 1
+        type: integer
+        optional: true
+        help: Adjust parameter for geom_violin
+      - long: y.max
+        default: 'NULL'
+        optional: true
+        type: double
+        help: Maximum y axis value
+      - long: same.y.lims
+        default: no
+        type: boolean
+        help: Set all the y-axis limits to the same values
+      - long: log
+        default: no
+        type: boolean
+        help: plot the feature axis on log scale
+      - long: ncol
+        default: 'NULL'
+        optional: true
+        type: integer
+        help: Number of columns if multiple plots are displayed
+      - long: slot
+        default: data
+        type: string
+        optional: true
+        help: Use non-normalized counts data for plotting
+      - long: split.plot
+        default: no
+        type: boolean
+        help: plot each group of the split violin plots by multiple or single violin shapes.
+      - long: stack
+        default: no
+        type: boolean
+        help: Horizontally stack plots for each feature
+      - long: fill.by
+        default: feature
+        type: string
+        optional: true
+        help: Color violins/ridges based on either 'feature' or 'ident'
+      - long: flip
+        default: no
+        type: boolean
+        help: flip plot orientation (identities on x-axis)
+      output:
+        - var_name: plot_object
+    - call: DotPlot
+      dependencies:
+        - Seurat
+        - ggplot2
+        - patchwork
+      options:
+      - long: object
+        type: internal
+        var_name: seurat_object
+      - long: assay
+        default: 'NULL'
+        optional: true
+        type: string
+        help: Name of assay to use, defaults to the active assay
+      - long: features
+        default: ''
+        type: list
+        help: Input vector of features, or named list of feature vectors if feature-grouped
+          panels are desired (replicates the functionality of the old SplitDotPlotGG)
+      - long: cols-dot-plot
+        call_alias: cols
+        default: "yellow,lightgrey,blue"
+        type: list
+        optional: true
+        help: 'Colors to plot: the name of a palette from RColorBrewer::brewer.pal.info
+          , a pair of colors defining a gradient, or 3+ colors defining multiple gradients
+          (if split.by is set)'
+      - long: col.min
+        default: -2
+        type: integer
+        optional: true
+        help: Minimum scaled average expression threshold (everything smaller will be set
+          to this)
+      - long: col.max
+        default: 2
+        type: integer
+        optional: true
+        help: Maximum scaled average expression threshold (everything larger will be set
+          to this)
+      - long: dot.min
+        default: 0
+        type: integer
+        optional: true
+        help: The fraction of cells at which to draw the smallest dot (default is 0). All
+          cell groups with less than this expressing the given gene will have no dot drawn.
+      - long: dot.scale
+        default: 6
+        type: integer
+        optional: true
+        help: Scale the size of the points, similar to cex
+      - long: idents
+        default: 'NULL'
+        type: list
+        optional: true
+        help: Identity classes to include in plot (default is all)
+      - long: group.by
+        default: 'NULL'
+        optional: true
+        type: list
+        help: Factor to group the cells by
+      - long: split.by
+        default: 'NULL'
+        optional: true
+        type: string
+        help: Factor to split the groups by (replicates the functionality of the old SplitDotPlotGG);
+          see  'FetchData' for more details.
+      - long: cluster.idents
+        default: no
+        type: boolean
+        help: Whether to order identities by hierarchical clusters based on given features,
+          default is FALSE
+      - long: scale
+        default: yes
+        type: boolean
+        help: Determine whether the data is scaled, will be done by default
+      - long: scale.by
+        default: radius
+        optional: true
+        type: string
+        options:
+          - size: Size
+          - radius: Radius
+        help: Scale the size of the points by 'size' or by 'radius'
+      - long: scale.min
+        default: NA
+        optional: true
+        type: double
+        help: Set lower limit for scaling, use NA for default
+      - long: scale.max
+        default: NA
+        optional: true
+        type: double
+        help: Set upper limit for scaling, use NA for default
+      output:
+        - var_name: plot_object
+  - call: if_for_RDS
+    rcode: |
+
+      if (!is.null(opt$output_rds_file)) {
+  - call: saveRDS
+    options:
+      - long: output-rds-file
+        call_alias: file
+        type: file_out
+        help: Path to RDS to keep the plot object
+        optional: true
+        default: 'NULL'
+      - long: object
+        type: internal
+        var_name: plot_object
+  - call: close_if_for_RDS
+    rcode: |
+      }
+
+  - call: ggsave
+    dependencies:
+      - ggplot2
+    options:
+    - long: plot-out
+      call_alias: filename
+      type: file_out
+      help: File name to create on disk.
+    - long: plot
+      type: internal
+      var_name: plot_object
+    - long: plot-format
+      call_alias: device
+      default: png
+      type: string
+      options:
+        - png: PNG
+        - eps: EPS
+        - ps: PostScript
+        - tex: TeX (pictex)
+        - pdf: PDF
+        - jpg: JPG
+        - tiff: TIFF
+        - svg: SVG
+      help: Format to use, either PNG, EPS, PostScript, TeX, PDF, JPEG, TIFF or SVG
+    - long: scale-factor
+      call_alias: scale
+      default: 1
+      type: double
+      optional: true
+      help: Multiplicative scaling factor.
+    - long: width
+      type: double
+      default: 20
+      help: Width of the figure, in the selected units.
+    - long: height
+      type: double
+      default: 20
+      help: Height of the figure, in the selected units.
+    - long: units
+      default: cm
+      options:
+        - cm: Centimeters
+        - in: Inches
+        - mm: Milimeters
+        - px: Pixels
+      type: string
+      help: Units for the plot dimensions.
+    - long: dpi
+      default: 300
+      type: integer
+      options:
+        - 320: Retina
+        - 300: Print
+        - 72: screen
+      help: "Plot resolution. Also accepts a string input: retina (320), print (300),
+        or screen (72). Applies only to raster output types."
+    - long: limitsize
+      default: yes
+      type: boolean
+      help: When TRUE (the default) ggsave() will not save images
+        larger than 50x50 inches, to prevent the common error of specifying dimensions
+        in pixels.
+    - long: bg
+      default: 'NULL'
+      optional: true
+      type: string
+      help: Background colour. If NULL, uses the plot.background fill
+        value from the plot theme.

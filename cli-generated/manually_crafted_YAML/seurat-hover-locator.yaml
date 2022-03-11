@@ -1,0 +1,118 @@
+---
+cli_call: 'seurat-hover-locator.R'
+galaxy_tool:
+  id: seurat_hover_locator
+  name: Seurat Hover Locator
+  description: produces an interactive plot with data overlay
+  profile: 18.01
+  version: "@SEURAT_VERSION@"
+  macros:
+    - seurat_macros.xml
+  macro_expands_header:
+    - requirements
+    - version
+  macro_expands_footer:
+    - citations
+commands:
+    - call: 'readRDS'
+      dependencies:
+        - ggplot2
+        - optparse
+        - workflowscriptscommon
+      options:
+        - long: plot-rds
+          call_alias: file
+          type: file_in
+          human_readable: RDS with ggplot2 object from Seurat 4
+      output:
+        - var_name: ggplot2_object
+    - call: if_for_fread
+      rcode: |
+
+        if (!is.null(opt$information_table)) {
+    - call: fread
+      dependencies:
+        - data.table
+      options:
+      - long: information-table
+        call_alias: file
+        optional: true
+        default: 'NULL'
+        type: file_in
+        format: txt,tabular,csv
+        help: Table with information for overlaying on the plot. Usually the
+          result of calling FetchData on the original Seurat object.
+      - long: stringsAsFactors
+        type: boolean
+        default: true
+        help: Load strings as factors.
+      - long: key
+        default: 'NULL'
+        type: string
+        optional: true
+        help: Key (index) for the information table
+      - long: keepLeadingZeros
+        default: true
+        type: boolean
+        help: If TRUE a column containing numeric data with leading zeros will be read as
+          character, otherwise leading zeros will be removed and converted to numeric.
+      output:
+        - var_name: info_df
+    - call: close_if_for_RDS
+      rcode: |
+          } else {
+            info_df <- NULL
+          }
+    - call: 'HoverLocator'
+      dependencies:
+        - Seurat
+      options:
+        - long: plot
+          type: internal
+          var_name: ggplot2_object
+        - long: information
+          type: internal
+          var_name: info_df
+        - long: axes
+          type: boolean
+          default: true
+          help: Display x- and y-axes
+        - long: dark.theme
+          type: boolean
+          default: false
+          help: Plot using a dark theme?
+      output:
+        - var_name: plotly_obj
+    - call: 'as.widget'
+      dependencies:
+        - plotly
+      options:
+        - long: x
+          type: internal
+          var_name: plotly_obj
+      output:
+        - var_name: plotly_widget
+    - call: 'saveWidget'
+      dependencies:
+        - htmlwidgets
+      options:
+        - long: widget
+          type: internal
+          var_name: plotly_widget
+        - long: output-html
+          type: file_out
+          format: html
+          call_alias: file
+          help: HTML output file
+        - long: selfcontained
+          type: boolean
+          default: true
+          help: Whether to save the HTML as a single self-contained file
+            (with external resources base64 encoded) or a file with
+            external resources placed in an adjacent directory.
+        - long: libdir
+          type: string
+          optional: true
+          default: 'NULL'
+          help: Directory to copy HTML dependencies into (defaults to
+            filename_files).

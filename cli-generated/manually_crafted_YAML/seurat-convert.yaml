@@ -1,10 +1,10 @@
 commands:
-  - call: 'read_seurat3_object'
+  - call: 'read_seurat4_object'
     dependencies:
       - workflowscriptscommon
       - optparse
       - scater
-      - loomR
+      - SeuratDisk
       - Seurat
     options:
       - long: input-object-file
@@ -21,7 +21,7 @@ commands:
         help: 'Either loom, seurat, h5seurat, anndata or singlecellexperiment for the input format to read.'
     output:
       - var_name: seurat_object
-  - call: 'write_seurat3_object'
+  - call: 'write_seurat4_object'
     parsing_opts:
       - r_sep: "_"
     options_aliases:
