@@ -133,14 +133,14 @@ if (! is.null(opt$genes_use)){
 
 suppressPackageStartupMessages(require(Seurat))
 if(opt$input_format == "loom" | opt$output_format == "loom") {
-  suppressPackageStartupMessages(require(loomR))
+  suppressPackageStartupMessages(require(SeuratDisk))
 } else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
   suppressPackageStartupMessages(require(scater))
 }
 
 # Input from serialized R object
 
-seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
+seurat_object <- read_seurat4_object(input_path = opt$input_object_file, format = opt$input_format)
 # https://stackoverflow.com/questions/9129673/passing-list-of-named-parameters-to-function
 # might be useful
 scaled_seurat_object <- ScaleData(seurat_object, 
@@ -155,7 +155,8 @@ scaled_seurat_object <- ScaleData(seurat_object,
                                   min.cells.to.block = opt$min_cells_to_block, 
                                   verbose = FALSE)
 
+
 # Output to a serialized R object
-write_seurat3_object(seurat_object = scaled_seurat_object, 
+write_seurat4_object(seurat_object = scaled_seurat_object, 
                      output_path = opt$output_object_file,
                      format = opt$output_format)

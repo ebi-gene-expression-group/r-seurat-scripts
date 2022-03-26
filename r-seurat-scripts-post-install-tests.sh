@@ -79,6 +79,7 @@ export raw_seurat_object="$output_dir/raw_seurat.rds"
 export raw_seurat_object_from_tab="$output_dir/raw_seurat_from_tab.rds"
 export transfer_metadata_object="$data_dir/pancreas_metadata.rds"
 export transfer_expression_object="$data_dir/pancreas_expression_matrix.rds"
+export transfer_out_dir="$data_dir/transfer_out"
 export filtered_seurat_object="$output_dir/filtered_seurat.rds"
 export normalised_seurat_object="$output_dir/normalised_seurat.rds"
 export variable_genes_seurat_object="$output_dir/variable_genes_seurat.rds"
@@ -98,13 +99,34 @@ export tsne_embeddings_file="$output_dir/tsne_embeddings.csv"
 export html_output_dir="$output_dir/html_out"
 export marker_text_file="$output_dir/markers.csv"
 export anchor_object="$output_dir/anchor_object.rds"
+export integrated_obj="$output_dir/integrated_object.rds"
+export features_obj="$output_dir/features_object.rds"
+export classify_query="$transfer_out_dir/sep_by_tech_fluidigmc1.rds"
+export classify_result_object="$output_dir/classify_result.rds"
+export classify_result_anchors_object="$output_dir/classify_anchorset.rds"
+export pca_integrated_object="$output_dir/pca_integrated_object.rds"
+export umap_result_object="$output_dir/integrated_obj_umap.rds"
+export scaled_integrated_object="$output_dir/scaled_integrated_object.rds"
+export pca_integrated_embeddings="$output_dir/pca_integrated_embeddings.txt"
+export pca_integrated_loadings="$output_dir/pca_integrated_loadings.txt"
+export pca_integrated_stdev="$output_dir/pca_integrated_stdev.txt"
+export conserved_markers_result="$output_dir/conserved_markers_result.tsv"
+export tmp_conserved_markers_fn_object="$output_dir/tmp_conserved_markers_fn_object.rds"
+export tmp_conserved_markers_cl_object="$output_dir/tmp_conserved_markers_cl_object.rds"
+export umap_map_query_result_object="$output_dir/umap_map_query_result_object.rds"
 export singlecellexperiment_converted_cluster_object="$output_dir/singlecellexperiment_converted_cluster_object.rds"
-export loom_converted_cluster_object="$output_dir/loom_converted_cluster_object.loom"
+export loom_converted_cluster_object="$output_dir/loom_converted_cluster_object"
 export seurat_from_loom_cluster_object="$output_dir/seurat_from_loom_cluster_object.rds"
-export anndata_cluster_object=$test_anndata_file
-export seurat_from_anndata_cluster_object="${anndata_cluster_object}.rds"
-
-
+export h5seurat_cluster_object="$output_dir/h5seurat_cluster_object.h5seurat"
+export h5seurat_to_seurat_cluster_object="$output_dir/h5seurat_to_seurat_cluster_object.rds"
+export feature_plot_png_result="$output_dir/feature_plot_png_result.png"
+export vln_plot_pdf_result="$output_dir/vln_plot_pdf_result.png"
+export ridge_plot_eps_result="$output_dir/ridge_plot_eps_result.png"
+export dot_plot_jpg_result="$output_dir/dot_plot_jpg_result.png"
+export dim_plot_svg_result="$output_dir/dim_plot_svg_result.png"
+export do_heatmap_jpg_result="$output_dir/heatmap_plot_jpj_result.jpg"
+export feature_plot_rds_result="$output_dir/feature_plot_rds_result.rds"
+export HoverLocator_result="$output_dir/HoverLocator_result.html"
 ## Test parameters- would form config file in real workflow. DO NOT use these
 ## as default values without being sure what they mean.
 
@@ -161,7 +183,7 @@ export resolution=0.8
 export cluster_algorithm=1
 export cluster_tmp_file_location='/tmp'
 
-# Find neighbours 
+# Find neighbours
 export compute_snn=TRUE
 
 # t-SNE
@@ -175,6 +197,17 @@ export marker_test_use='wilcox'
 export marker_max_cells_per_ident='Inf'
 export marker_min_cells_gene=3
 export marker_min_cells_group=3
+
+# Integration
+inputs_integration=""
+for tech in celseq celseq2 smartseq2; do
+    inputs_integration=${inputs_integration},${transfer_out_dir}/sep_by_tech_${tech}_norm_fvg.rds
+done
+export inputs_integration=$(echo $inputs_integration | sed s/^,// )
+export integration_anchor_features=2000
+
+# Classify against reference
+
 
 ################################################################################
 # Test individual scripts

@@ -126,14 +126,14 @@ if (! is.null(opt$features) ) {
 
 suppressPackageStartupMessages(require(Seurat))
 if(opt$input_format == "loom" | opt$output_format == "loom") {
-  suppressPackageStartupMessages(require(loomR))
+  suppressPackageStartupMessages(require(SeuratDisk))
 } else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
   suppressPackageStartupMessages(require(scater))
 }
 
 # Input from serialized R object
 
-seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
+seurat_object <- read_seurat4_object(input_path = opt$input_object_file, format = opt$input_format)
 # Are the metadata variables valid for this object?
 wsc_check_metadata(seurat_object, subset_names)
 
@@ -181,6 +181,6 @@ cat(c(
 sep = '\n')
 
 # Output to a serialized R object
-write_seurat3_object(seurat_object = filtered_seurat_object, 
+write_seurat4_object(seurat_object = filtered_seurat_object, 
                      output_path = opt$output_object_file, 
                      format = opt$output_format)

@@ -161,14 +161,14 @@ if (! is.null(opt$pc_cells)){
 
 suppressPackageStartupMessages(require(Seurat))
 if(opt$input_format == "loom" | opt$output_format == "loom") {
-  suppressPackageStartupMessages(require(loomR))
+  suppressPackageStartupMessages(require(SeuratDisk))
 } else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
   suppressPackageStartupMessages(require(scater))
 }
 
 # Input from serialized R object
 
-seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
+seurat_object <- read_seurat4_object(input_path = opt$input_object_file, format = opt$input_format)
 
 features<-pc_genes
 if(opt$reverse_pca) {
@@ -191,7 +191,15 @@ write.csv(pca_seurat_object[['pca']]@cell.embeddings, file = opt$output_embeddin
 write.csv(pca_seurat_object[['pca']]@feature.loadings, file = opt$output_loadings_file)
 writeLines(con=opt$output_stdev_file, as.character(pca_seurat_object[['pca']]@stdev))
 
+cat(c(
+  '# Object summary',
+  capture.output(print(seurat_object)),
+  '\n# Metadata sample',
+  capture.output(head(seurat_object@meta.data))
+),
+sep = '\n')
+
 # Output to a serialized R object
-write_seurat3_object(seurat_object = pca_seurat_object,
+write_seurat4_object(seurat_object = pca_seurat_object,
                      output_path = opt$output_object_file,
                      format = opt$output_format)

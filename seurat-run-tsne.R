@@ -167,14 +167,14 @@ if ( ! is.null(dims_use)){
 
 suppressPackageStartupMessages(require(Seurat))
 if(opt$input_format == "loom" | opt$output_format == "loom") {
-  suppressPackageStartupMessages(require(loomR))
+  suppressPackageStartupMessages(require(SeuratDisk))
 } else if(opt$input_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
   suppressPackageStartupMessages(require(scater))
 }
 
 # Input from serialized R object
 
-seurat_object <- read_seurat3_object(input_path = opt$input_object_file, format = opt$input_format)
+seurat_object <- read_seurat4_object(input_path = opt$input_object_file, format = opt$input_format)
 
 tsne_seurat_object <- RunTSNE( seurat_object,
                                reduction = opt$reduction_use,
@@ -193,6 +193,14 @@ tsne_seurat_object <- RunTSNE( seurat_object,
 # Output to text-format components
 
 write.csv(tsne_seurat_object[['tsne']]@cell.embeddings, file = opt$output_embeddings_file)
+
+cat(c(
+  '# Object summary', 
+  capture.output(print(seurat_object)), 
+  '\n# Metadata sample', 
+  capture.output(head(seurat_object@meta.data))
+), 
+sep = '\n')
 
 # Output to a serialized R object
 

@@ -1,5 +1,8 @@
 #!/usr/bin/env Rscript
 
+# This deals with the functionality listed in https://satijalab.org/seurat/articles/integration_mapping.html
+# Cell type classification using an integrated reference.
+
 suppressPackageStartupMessages(require(optparse))
 suppressPackageStartupMessages(require(workflowscriptscommon))
 
@@ -35,16 +38,37 @@ option_list = list(
     help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
   ),
   make_option(
-    c("-o", "--output-file"),
+    c("-o", "--output-object-file"),
+    action = "store",
+    default = NA,
+    type = 'character',
+    help = "File name in which to store serialized R object of type 'Seurat'.'"
+  ),
+  make_option(
+    c("--output-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
+  ),
+  make_option(
+    c("--output-anchorset-file"),
     action = "store",
     default = NULL,
     type = 'character',
-    help = "File name in which to store serialized R matrix object."
+    help = "File name in which to store serialized R object for the anchorset."
+  ),
+  make_option(
+    c("--output-anchorset-format"),
+    action = "store",
+    default = "seurat",
+    type = 'character',
+    help = "Either loom, seurat, anndata or singlecellexperiment for the output format."
   ),
   make_option(
     c("-n", "--normalization-method"),
     action = "store",
-    default = 'SCT',
+    default = 'LogNormalize',
     type = 'character',
     help = "Name of normalization method used: LogNormalize or SCT."
   ),
@@ -96,9 +120,9 @@ option_list = list(
     help = "Number of PCs to compute on reference. If null, then use an existing PCA structure in the reference object."
   ),
   make_option(
-    c("-d","--dims"),
+    c("--dims"),
     action = "store",
-    default = "1:30", 
+    default = "1:30",
     type = 'character',
     help = "Which dimensions to use from the reduction to specify the neighbor search space."
   ),
@@ -110,7 +134,7 @@ option_list = list(
     help = "How many neighbors (k) to use when picking anchors."
   ),
   make_option(
-    c("--k-filter"),    
+    c("--k-filter"),
     action = "store",
     default = 200,
     type = 'integer',
@@ -153,13 +177,93 @@ option_list = list(
   make_option(
     c("--verbose"),
     action = "store_true",
-    default = TRUE,
+    default = FALSE,
     help ="Print progress bars and output."
+  ),
+  make_option(
+    c("--transfer-refdata"),
+    action = "store",
+    type = 'character',
+    help ="Data to transfer. The name of the metadata field or assay from the reference object provided. This requires the reference parameter to be specified. "
+  ),
+  make_option(
+    c("--transfer-weight-reduction"),
+    action = "store",
+    default = 'pcaproject',
+    type = 'character',
+    help ="Dimensional reduction to use for the weighting anchors. Options are: pcaproject - Use the projected PCA used for anchor building; pca - Use an internal PCA on the query only; cca - Use the CCA used for anchor building; custom DimReduc - User provided DimReduc paths as RDS, computed on the query cells"
+  ),
+  make_option(
+    c("--transfer-l2-norm"),
+    action = "store_true",
+    default = FALSE,
+    help ="Perform L2 normalization on the cell embeddings after dimensional reduction"
+  ),
+  make_option(
+    c("--transfer-dims"),
+    action = "store",
+    default = NULL,
+    type = 'character',
+    help = "Set of dimensions to use in the anchor weighting procedure."
+  ),
+  make_option(
+    c("--transfer-k-weight"),
+    action = "store",
+    default = 50,
+    type = 'integer',
+    help = "Number of neighbors to consider when weighting anchors"
+  ),
+  make_option(
+    c("--transfer-sd-weight"),
+    action = "store",
+    default = 1,
+    type = 'integer',
+    help = "Controls the bandwidth of the Gaussian kernel for weighting"
+  ),
+  make_option(
+    c("--transfer-eps"),
+    action = "store",
+    default = 0,
+    type = 'integer',
+    help ="Error bound on the neighbor finding algorithm (from RANN), for transfer"
+  ),
+  make_option(
+    c("--transfer-prediction-assay"),
+    action = "store_true",
+    default = FALSE,
+    help = "Return an Assay object with the prediction scores for each class stored in the data slot."
+  ),
+  make_option(
+    c("--transfer-n-trees"),
+    action = "store",
+    default = 50,
+    type = 'integer',
+    help = "More trees gives higher precision when using annoy approximate nearest neighbor search."
+  ),
+  make_option(
+    c("--transfer-slot"),
+    action = "store",
+    default = NULL,
+    type = 'character',
+    help = "Slot to store the imputed data. Must be either 'data' (default) or 'counts'"
+  ),
+  make_option(
+    c("--transfer-no-store-weights"),
+    action = "store_false",
+    default = TRUE,
+    help ="Don't store the weights matrix used for predictions in the returned query object."
+  ),
+  make_option(
+    c("--metadata-col"),
+    action = "store",
+    default = NULL,
+    type = 'character',
+    help = "Col name to store metadata in."
   )
 )
 
 #minimum arguments to work
-opt <- wsc_parse_args(option_list, mandatory = c('query_file', 'reference_file','output_file'))
+opt <- wsc_parse_args(option_list, mandatory = c('query_file', 'reference_file','output_object_file', 'transfer_refdata', 'transfer_weight_reduction'))
 
 # Check parameter values
 if ( ! file.exists(opt$reference_file)){
@@ -172,14 +276,15 @@ dims <- wsc_parse_numeric(opt, 'dims')
 suppressPackageStartupMessages(require(Seurat))
 
 #load loomR or scater if needed
-if(opt$query_format == "loom") {
-  suppressPackageStartupMessages(require(loomR))
-} else if(opt$query_format == "singlecellexperiment") {
+if (opt$query_format == "loom" | opt$reference_format == "loom" | opt$output_format == "loom") {
+  suppressPackageStartupMessages(require(SeuratDisk))
+}
+if (opt$query_format == "singlecellexperiment" | opt$reference_format == "singlecellexperiment" | opt$output_format == "singlecellexperiment") {
   suppressPackageStartupMessages(require(scater))
 }
 
-seurat_query <- read_seurat3_object(input_path = opt$reference_file, format = opt$reference_format)
-seurat_reference <- read_seurat3_object(input_path = opt$query_file, format = opt$query_format)
+seurat_query <- read_seurat4_object(input_path = opt$query_file, format = opt$query_format)
+seurat_reference <- read_seurat4_object(input_path = opt$reference_file, format = opt$reference_format)
 #make the function work
 anchor_object <- FindTransferAnchors(seurat_reference,
                                     seurat_query,
@@ -191,7 +296,7 @@ anchor_object <- FindTransferAnchors(seurat_reference,
                                     features = opt$features,
                                     npcs = opt$npcs,
                                     l2.norm = opt$l2_norm,
-                                    dims,
+                                    dims = dims,
                                     k.anchor = opt$k_anchor,
                                     k.filter = opt$k_filter,
                                     k.score = opt$k_score,
@@ -202,6 +307,36 @@ anchor_object <- FindTransferAnchors(seurat_reference,
                                     verbose = opt$verbose)
 
 #directly save the anchorset
-saveRDS(anchor_object, file = opt$output_file)
+if (!is.null(opt$output_anchorset_file)) {
+  print(paste0("Output anchorset: ", opt$output_anchorset_file))
+  write_seurat4_object(seurat_object = anchor_object,
+                       output_path = opt$output_anchorset_file,
+                       format = opt$output_anchorset_format
+                       )
+}
 
+predictions<-TransferData(
+  anchorset = anchor_object,
+  refdata = opt$transfer_refdata,
+  reference = seurat_reference,
+  query = seurat_query,
+  weight.reduction = opt$transfer_weight_reduction,
+  l2.norm = opt$transfer_l2_norm,
+  dims = opt$transfer_dims,
+  k.weight = opt$transfer_k_weight,
+  sd.weight = opt$transfer_sd_weight,
+  eps = opt$transfer_eps,
+  n.trees = opt$transfer_n_trees,
+  verbose = opt$verbose,
+  slot = opt$transfer_slot,
+  prediction.assay = opt$transfer_prediction_assay,
+  store.weights = opt$transfer_no_store_weights
+)
+
+seurat_query <- AddMetaData(seurat_query, metadata = predictions@meta.data, col.name = opt$metadata_col)
+
+# Output to a serialized R object
+write_seurat4_object(seurat_object = seurat_query,
+                     output_path = opt$output_object_file,
+                     format = opt$output_format)
 

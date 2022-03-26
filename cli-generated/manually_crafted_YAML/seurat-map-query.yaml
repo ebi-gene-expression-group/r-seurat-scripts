@@ -1,0 +1,154 @@
+cli_call: 'seurat-map-query.R'
+galaxy_tool:
+  id: seurat_map_query
+  name: Seurat map query
+  description: maps against a UMAP layout
+  profile: 18.01
+  version: "@SEURAT_VERSION@"
+  macros:
+    - seurat_macros.xml
+  macro_expands_header:
+    - requirements
+    - version
+  macro_expands_footer:
+    - citations
+commands:
+  - call: 'load_seurat4_packages_for_format'
+    dependencies:
+      - workflowscriptscommon
+      - optparse
+    options:
+      - long: formats
+        type: internal
+        # var_name: option_list
+        value: 'c(opt$query_format, opt$anchors_format, opt$reference_format)'
+  - call: 'read_seurat4_object'
+    dependencies:
+      - scater
+      - SeuratDisk
+    options:
+      - long: query-object-file
+        short: q
+        type: file_in
+        call_alias: input_path
+        human_readable: 'Input file'
+        help: "Query file with Seurat object in either RDS-Seurat, Loom or SCE"
+      - long: query-format
+        type: string
+        call_alias: format
+        human_readable: 'Input format'
+        default: 'seurat'
+        help: 'Either loom, seurat, anndata or singlecellexperiment for the input format to read.'
+    output:
+      - var_name: seurat_object
+  - call:  'read_seurat4_object'
+    options:
+      - long: anchors-object-file
+        short: a
+        type: file_in
+        human_readable: 'Seurat transfer anchors file'
+        call_alias: 'input_path'
+        help: "Input file with Seurat object with anchors in either RDS-Seurat, Loom or SCE"
+      - long: anchors-format
+        type: string
+        call_alias: format
+        human_readable: 'Anchors format'
+        default: 'seurat'
+        help: 'Either loom, seurat, anndata or singlecellexperiment for the anchors format to read.'
+    output:
+      - var_name: anchors_object
+  - call:  'read_seurat4_object'
+    options:
+      - long: reference-object-file
+        short: r
+        type: file_in
+        human_readable: 'Seurat reference object file'
+        call_alias: 'input_path'
+        default: 'NULL'
+        help: "Input file with Seurat object with reference (and UMAP) in either RDS-Seurat, Loom or SCE"
+      - long: reference-format
+        type: string
+        call_alias: format
+        human_readable: 'Anchors format'
+        default: 'seurat'
+        help: 'Either loom, seurat, anndata or singlecellexperiment for the reference format to read.'
+    output:
+      - var_name: reference_object
+  - call: MapQuery
+    dependencies:
+      - Seurat
+    options:
+      - long: query
+        type: internal
+        var_name: seurat_object
+      - long: anchorset
+        type: internal
+        var_name: anchors_object
+      - long: reference
+        type: internal
+        var_name: reference_object
+      - long: refdata-field-or-assay
+        type: string
+        evaluated: true
+        call_alias: refdata
+        optional: true
+        help: "The name of the metadata field or assay from the reference object provided. This requires the reference parameter to be specified."
+      - long: new-reduction-name
+        type: string
+        default: 'NULL'
+        optional: true
+        help: "Name for new integrated dimensional reduction."
+      - long: reference-reduction
+        type: string
+        default: 'NULL'
+        optional: true
+        help: "Name of reduction to use from the reference for neighbor finding"
+      - long: reduction-model
+        type: string
+        default: 'NULL'
+        optional: true
+        help: "DimReduc object name that contains the umap model"
+      - long: transferdata-args
+        type: string
+        evaluated: true
+        optional: true
+        call_alias: "transferdata.args"
+        default: 'NULL'
+        help: "A named list of additional arguments to TransferData, written in R syntax .ie list( argument = 'value' )"
+      - long: integrated-embedding-args
+        type: string
+        evaluated: true
+        optional: true
+        call_alias: "integrateembeddings.args"
+        default: 'NULL'
+        help: "A named list of additional arguments to IntegrateEmbeddings, written in R syntax .ie list( argument = 'value' )"
+      - long: project-umap-args
+        call_alias: projectumap.args
+        type: string
+        evaluated: true
+        optional: true
+        default: 'NULL'
+        help: "A named list of additional arguments to ProjectUMAP, written in R syntax .ie list( argument = 'value' )"
+    output:
+      - var_name: mapped_object
+  - call: 'write_seurat4_object'
+    dependencies:
+      - workflowscriptscommon
+    parsing_opts:
+      - r_sep: "_"
+    options_aliases:
+      - option: output-format
+        call: format
+    options:
+      - long: seurat_object
+        type: internal
+        var_name: mapped_object
+      - long: output-object-file
+        call_alias: output_path
+        short: o
+        type: file_out
+      - long: output-format
+        call_alias: format
+        type: string
+        default: seurat
+        help: Either loom, seurat, anndata or singlecellexperiment for the anchors format to read.'

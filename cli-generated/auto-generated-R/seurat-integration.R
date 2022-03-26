@@ -1,13 +1,13 @@
 #!/usr/bin/env Rscript
 # This script has been automatically generated through
 #
-# YAML2RScript.py -i ../r-seurat-scripts/cli-generated/manually_crafted_YAML/seurat-integration.yaml -o ../r-seurat-scripts/seurat-integration.R
+# YAML2RScript.py -i ../r-seurat-scripts/cli-generated/manually_crafted_YAML/seurat-integration.yaml -o ../r-seurat-scripts/cli-generated/auto-generated-R/seurat-integration.R
 #
 # to change this file edit the input YAML and re-run the above command
 
 suppressPackageStartupMessages(require(Seurat))
-suppressPackageStartupMessages(require(optparse))
 suppressPackageStartupMessages(require(workflowscriptscommon))
+suppressPackageStartupMessages(require(optparse))
 
 option_list <- list(
     make_option(
@@ -42,6 +42,30 @@ option_list <- list(
         help = "Either loom, seurat, anndata or singlecellexperiment for the input format to read."
     ),
     make_option(
+        c("--ident_for_adata"),
+        action = "store",
+        default = "louvain",
+        metavar = "Ident for AnnData object",
+        type = "character",
+        help = "If using an AnnData as input, which identity should be used."
+    ),
+    make_option(
+        c("--references-assay"),
+        action = "store",
+        default = "RNA",
+        metavar = "References assay",
+        type = "character",
+        help = "The Seurat assay used for references"
+    ),
+    make_option(
+        c("--update_seurat_object"),
+        action = "store_true",
+        default = FALSE,
+        metavar = "Update Seurat object",
+        type = "logical",
+        help = "Whether the Seurat objects given should be passed by the Seurat updater method."
+    ),
+    make_option(
         c("--assay-list"),
         action = "store",
         default = NULL,
@@ -52,8 +76,8 @@ option_list <- list(
         c("--anchor-features"),
         action = "store",
         default = 2000,
-        type = "character",
-        help = "A numeric value (this will call 'SelectIntegrationFeatures' to select the provided number of features to be used in anchor finding) or a file with a vector of features to be used as input to the anchor finding process (comma separated)"
+        type = "integer",
+        help = "A numeric value (this will call 'SelectIntegrationFeatures' to select the provided number of features to be used in anchor finding) or a vector of features to be used as input to the anchor finding process (comma separated)"
     ),
     make_option(
         c("-s", "--do-not-scale"),
@@ -238,21 +262,9 @@ option_list <- list(
     )
 )
 
-opt <- wsc_parse_args(option_list,
+opt <- wsc_parse_args(option_list, 
                       mandatory = c("input_object_files", "output_object_file"))
-
-
-if (!is.na(as.numeric(opt$anchor_features))) {
-    # this case also covers variables that can accept a numeric entry, but if the number is passed as a string
-    # the R method can often fail with unspecific errors.
-    opt$anchor_features <- as.numeric(opt$anchor_features)
-} else if (file.exists(opt$anchor_features)) {
-    # if the file exists, then we load it, otherwise the variable keeps its content.
-    tmp <- readRDS(opt$anchor_features)
-    opt$anchor_features <- tmp
-}
-
-# Check parameter values
+                # Check parameter values
 inputs<-strsplit(opt$input_object_files,split = ",")[[1]]
 if ( length(inputs) <= 1 ) {
   stop("At least 2 input objects need to be given for integration running.")
@@ -341,7 +353,7 @@ if (! is.null(opt$genes_use)){
   genes_use <- NULL
 }
 
-if ( !is.null(opt$anchor_features) && is.character(opt$anchor_features)) {
+if ( !is.null(opt$ancho_features) && is.character(opt$anchor_features)) {
   # this could be a number as well.
   opt$anchor_features <- strsplit(opt$anchor_features, split = ",")
 }
@@ -357,17 +369,20 @@ seurat_objects <- read_multiple_seurat4_objects(input_path_list = opt$input_obje
                     format = opt$input_format)
 
 reference_objects <- read_multiple_seurat4_objects(input_path_list = opt$reference_object_files,
-                    format = opt$reference_format)
+                    format = opt$reference_format,
+                    ident_for_adata = opt$ident_for_adata,
+                    assay = opt$references_assay,
+                    update_seurat_object = opt$update_seurat_object)
 
 anchors <- FindIntegrationAnchors(object.list = seurat_objects,
                     assay = opt$assay_list,
                     reference = reference_objects,
                     anchor.features = opt$anchor_features,
-                    scale = opt$do_not_scale,
+                    scale = !opt$do_not_scale,
                     normalization.method = opt$normalization_method,
                     sct.clip.range = opt$sct_clip_range,
                     reduction = opt$reduction,
-                    l2.norm = opt$do_not_l2_norm,
+                    l2.norm = !opt$do_not_l2_norm,
                     dims = opt$dims,
                     k.anchor = opt$k_anchor,
                     k.filter = opt$k_filter,
