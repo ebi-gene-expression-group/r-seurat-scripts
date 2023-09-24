@@ -10,7 +10,7 @@ dependencies:
   - r-loom
   - r-svglite
   - bioconductor-scater
-  # - r-seuratdisk
+  - r-seuratdisk
   - r-remotes
   - bioconductor-multtest
   - r-metap
