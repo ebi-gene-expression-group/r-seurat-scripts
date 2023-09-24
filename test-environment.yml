@@ -1,16 +1,16 @@
 name: test
 dependencies:
-  - bats
+  - bats-core
   - r-optparse
   - libpng
   - r-cairo
   - r-workflowscriptscommon >=0.0.8
-  - r-seurat=4.0.0
-  - r-uwot <0.1.11
+  - r-seurat<=4.3
+  # - r-uwot
   - r-loom
   - r-svglite
   - bioconductor-scater
-  - r-seuratdisk
+  # - r-seuratdisk
   - r-remotes
   - bioconductor-multtest
   - r-metap
