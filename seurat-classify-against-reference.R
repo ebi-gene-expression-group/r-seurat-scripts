@@ -94,6 +94,13 @@ option_list = list(
     help = "Dimensional reduction to perform when finding anchors."
   ),
   make_option(
+    c("--reference_reduction"),
+    action = "store",
+    default = "pca",
+    type = 'character',
+    help = "Name of dimensional reduction to use from the reference if running the pcaproject workflow. Optionally enables reuse of precomputed reference dimensional reduction. If NULL (default), use a PCA computed on the reference object."
+  ),
+  make_option(
     c("--project-query"),
     action = "store_false",
     default = FALSE,
@@ -285,6 +292,16 @@ if (opt$query_format == "singlecellexperiment" | opt$reference_format == "single
 
 seurat_query <- read_seurat4_object(input_path = opt$query_file, format = opt$query_format)
 seurat_reference <- read_seurat4_object(input_path = opt$reference_file, format = opt$reference_format)
+
+if(!(opt$reference_reduction %in% names(seurat_reference@reductions))) {
+  print(paste0("Calculating reduction ", opt$reference_reduction," as it is not present in the reference object."))
+  if(opt$reference_reduction == "pca") {
+    seurat_reference <- ScaleData(seurat_reference, verbose = FALSE)
+    seurat_reference <- RunPCA(seurat_reference, npcs=30, verbose = FALSE)
+  } else {
+    stop((paste('Reduction default calculation on reference not implemented for ', opt$reference_reduction, ', please compute previously on reference object.')))
+  }
+}
 #make the function work
 anchor_object <- FindTransferAnchors(seurat_reference,
                                     seurat_query,
@@ -292,6 +309,7 @@ anchor_object <- FindTransferAnchors(seurat_reference,
                                     reference.assay = opt$reference_assay,
                                     query.assay = opt$query_assay,
                                     reduction = opt$reduction,
+                                    reference.reduction = opt$reference_reduction,
                                     project.query = opt$project_query,
                                     features = opt$features,
                                     npcs = opt$npcs,

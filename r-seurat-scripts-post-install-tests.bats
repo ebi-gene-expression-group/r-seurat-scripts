@@ -515,7 +515,7 @@
     run rm -rf ${loom_converted_cluster_object}.loom && \
       seurat-convert.R -i $singlecellexperiment_converted_cluster_object \
         --input-format singlecellexperiment -o $loom_converted_cluster_object \
-        --output-format loom
+        --output-format loom --input-assay NULL
 
     echo "status = ${status}"
     echo "output = ${output}"
