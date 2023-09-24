@@ -1,4 +1,4 @@
-name: test
+name: seurat-scripts@4.3
 channels:
   - defaults
   - conda-forge
@@ -19,3 +19,4 @@ dependencies:
   - bioconductor-multtest
   - r-metap
   - pandoc
+  - bioconductor-limma
