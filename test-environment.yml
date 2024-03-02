@@ -1,4 +1,4 @@
-name: seurat-scripts@4.3
+name: seurat-scripts@4.4
 channels:
   - defaults
   - conda-forge
@@ -9,7 +9,7 @@ dependencies:
   - libpng
   - r-cairo
   - r-workflowscriptscommon >=0.0.8
-  - r-seurat<=4.3
+  - r-seurat<=4.4
   # - r-uwot
   - r-loom
   - r-svglite
