@@ -10,6 +10,7 @@ suppressPackageStartupMessages(require(optparse))
 suppressPackageStartupMessages(require(scater))
 suppressPackageStartupMessages(require(Seurat))
 suppressPackageStartupMessages(require(workflowscriptscommon))
+suppressPackageStartupMessages(require(metap))
 
 option_list <- list(
     make_option(
@@ -65,9 +66,9 @@ option_list <- list(
     make_option(
         c("--meta-method"),
         action = "store",
-        default = "metap::minimump",
+        default = "minimump",
         type = "character",
-        help = "method for combining p-values. Should be a function from the metap package (NOTE: pass the function, not a string)"
+        help = "method for combining p-values. Should be a function from the metap package: invchisq, invt, logitp, meanp, meanz, maximump, minimump, sumlog, sumz, truncated, votep, wilkinsonp"
     ),
     make_option(
         c("--reduction"),
@@ -204,13 +205,19 @@ if (!file.exists(opt$input_object_file)) {
     stop((paste("File", opt$input_object_file, "does not exist")))
 }
 
+list_of_meta_methods <- ls("package:metap")
+metap_method <- NULL
+if(!is.null(opt$meta_method) && !(opt$meta_method %in% list_of_meta_methods)) {
+    stop((paste("Metap method requested ", opt$meta_method, " doesn't exist, please choose from: ", list_of_meta_methods)))
+} else {
+    # safer way of running eval parse
+    opt$meta_method <- eval(parse(text=paste0("metap::", opt$meta_method)))
+}
 
 load_seurat4_packages_for_format(formats = c(opt$query_format, opt$anchors_format, opt$reference_format))
 
 seurat_object <- read_seurat4_object(input_path = opt$input_object_file,
                     format = opt$input_format)
-# transform method name into actual R function. This should probably be sanitised in Galaxy
-opt$meta_method <- eval(parse(text=opt$meta_method))
 
 conserved_markers <- FindConservedMarkers(object = seurat_object,
                     ident.1 = opt$ident_1,

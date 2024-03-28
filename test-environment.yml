@@ -1,12 +1,16 @@
-name: test
+name: seurat-scripts@4.4
+channels:
+  - defaults
+  - conda-forge
+  - bioconda
 dependencies:
-  - bats
+  - bats-core
   - r-optparse
   - libpng
   - r-cairo
   - r-workflowscriptscommon >=0.0.8
-  - r-seurat=4.0.0
-  - r-uwot <0.1.11
+  - r-seurat<=4.4
+  # - r-uwot
   - r-loom
   - r-svglite
   - bioconductor-scater
@@ -15,3 +19,4 @@ dependencies:
   - bioconductor-multtest
   - r-metap
   - pandoc
+  - bioconductor-limma

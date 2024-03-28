@@ -39,6 +39,13 @@ option_list <- list(
                     default = "seurat",
                     type = "character",
                     help = "Either seurat, h5seurat, loom, singlecellexperiment or h5seurat (partial support)")
+,
+    make_option(
+                    c("--input-assay"),
+                    action = "store",
+                    default = "RNA",
+                    type = "character",
+                    help = "The assay to be read from the input object, if it corresponds")
 )
 
 opt <- wsc_parse_args(option_list,
@@ -49,9 +56,12 @@ if (!file.exists(opt$input_object_file)) {
     stop((paste("File", opt$input_object_file, "does not exist")))
 }
 
+if(opt$input_assay == "NULL") {
+    opt$input_assay <- NULL
+}
 
 seurat_object <- read_seurat4_object(input_path = opt$input_object_file,
-                    format = opt$input_format)
+                    format = opt$input_format, assay = opt$input_assay)
 
 write_seurat4_object(seurat_object = seurat_object,
                     output_path = opt$output_object_file,
