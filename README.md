@@ -1,12 +1,14 @@
-# seurat-scripts 4.x.y for Seurat 4.0.0 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/seurat-scripts/README.html)
+# seurat-scripts 4.x.y for Seurat 4.4.0 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/seurat-scripts/README.html)
 
 In order to wrap Seurat's internal workflow in any given workflow language, it's important to have scripts to call each of those steps, which is what this package provides.
 
 This version of seurat-scripts uses native conversions to Loom, SCE, Seurat H5 and AnnData.
 
+Please note that given the little man power available to maintain this, we dropped MacOS support for Seurat version 4.4.0 onwards (not all tests were passing and there was no bandwidth to take care of the dependencies issues on both linux and macOS).
+
 ## Install
 
-The recommended method for script installation is via a Bioconda recipe called seurat-scripts.
+The recommended method for usage is through the [biocontainer](https://quay.io/repository/biocontainers/seurat-scripts?tab=tags&tag=latest) produced by Bioconda. If needed, scripts installation is via a Bioconda recipe called seurat-scripts.
 
 With the [Bioconda channels](https://bioconda.github.io/#set-up-channels) configured the latest release version of the package can be installed via the regular conda install command:
 
