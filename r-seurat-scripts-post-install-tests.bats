@@ -309,6 +309,7 @@
 }
 
 @test "Classify against reference" {
+     # maybe this should be moved after PCA and UMAP of integrated object
      if [ "$use_existing_outputs" = 'true' ] && [ -f "$classify_result_object" ]; then
          skip "$classify_result_object exists and use_existing_outputs is set to true"
      fi
@@ -466,7 +467,7 @@
       -o $tmp_conserved_markers_fn_object && \
     seurat-find-clusters.R -i $tmp_conserved_markers_fn_object --resolution 0.5 \
       -o $tmp_conserved_markers_cl_object -t $cluster_text_file".conserved_tmp.txt" && \
-    seurat-find-conserved-markers.R -i $tmp_conserved_markers_cl_object --ident-1 6 --ident-2 4 --grouping-var "tech" -o $conserved_markers_result
+    seurat-find-conserved-markers.R -i $tmp_conserved_markers_cl_object --ident-1 1 --ident-2 2 --grouping-var "tech" -o $conserved_markers_result
 
   [ "$status" -eq 0 ]
   [ -f "$conserved_markers_result" ]
@@ -515,7 +516,7 @@
     run rm -rf ${loom_converted_cluster_object}.loom && \
       seurat-convert.R -i $singlecellexperiment_converted_cluster_object \
         --input-format singlecellexperiment -o $loom_converted_cluster_object \
-        --output-format loom
+        --output-format loom --input-assay NULL
 
     echo "status = ${status}"
     echo "output = ${output}"
